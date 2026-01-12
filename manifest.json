@@ -1,21 +1,47 @@
 {
   "name": "Agenda Digital DRTE",
-  "short_name": "DRTE Agenda",
-  "description": "Sistema profesional de gestión diaria para Asesor Nacional DRTE",
+  "short_name": "AgendaDRTE", 
+  "description": "Sistema Profesional de Gestión para Asesor Nacional DRTE MEP",
+  "version": "4.0.0",
+  "author": "Kevin Sánchez Bogarín - DRTE MEP",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#667eea",
+  "orientation": "portrait",
+  "theme_color": "#1a1a2e",
+  "background_color": "#0f172a",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "sizes": "512x512", 
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "./",
+  "lang": "es-CR",
+  "dir": "ltr",
+  "categories": ["productivity", "business", "education"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Nueva Tarea",
+      "short_name": "Tarea",
+      "description": "Crear nueva tarea profesional",
+      "url": "./index.html#tareas?action=new",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Inicio", 
+      "description": "Ver resumen principal",
+      "url": "./index.html#dashboard",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
