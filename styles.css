@@ -1,4 +1,4 @@
-/* ===== SISTEMA DE DISEÑO MEJORADO ===== */
+/* ===== SISTEMA DE DISEÑO GLASSMORPHISM COMPLETO ===== */
 :root {
     --primary: #667eea;
     --secondary: #764ba2;
@@ -68,7 +68,7 @@ body::before {
     position: relative;
 }
 
-/* ===== HEADER ===== */
+/* ===== HEADER PRINCIPAL ===== */
 .main-header {
     display: flex;
     justify-content: space-between;
@@ -173,7 +173,7 @@ body::before {
     color: var(--text-secondary);
 }
 
-/* ===== BOTONES ===== */
+/* ===== BOTONES COMPLETOS ===== */
 .btn {
     padding: 14px 28px;
     border: none;
@@ -233,6 +233,11 @@ body::before {
     box-shadow: 0 8px 25px rgba(255, 165, 2, 0.3);
 }
 
+.btn-warning:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(255, 165, 2, 0.5);
+}
+
 .btn-secondary {
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
@@ -249,7 +254,7 @@ body::before {
     font-size: 14px;
 }
 
-/* ===== NAV PANEL ===== */
+/* ===== PANEL DE NAVEGACIÓN ===== */
 .nav-panel {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -471,7 +476,7 @@ body::before {
 .event-dot.training { background: var(--warning); }
 .event-dot.report { background: var(--danger); }
 
-/* ===== TAREAS ===== */
+/* ===== TAREAS DEL DÍA ===== */
 .tasks-section {
     background: var(--glass-light);
     backdrop-filter: blur(20px);
@@ -706,7 +711,7 @@ body::before {
     transform: translateY(-2px);
 }
 
-/* ===== SELECTOR DE CATEGORÍA MEJORADO ===== */
+/* ===== SELECTOR DE CATEGORÍA ===== */
 .category-selector {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -777,7 +782,7 @@ body::before {
     border-color: var(--primary);
 }
 
-/* ===== SUBIDA DE ARCHIVOS MEJORADA ===== */
+/* ===== SUBIDA DE ARCHIVOS COMPLETA ===== */
 .file-upload-section {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 15px;
@@ -876,7 +881,7 @@ body::before {
     gap: 5px;
 }
 
-/* ===== ESTADÍSTICAS ===== */
+/* ===== PANEL DE ESTADÍSTICAS ===== */
 .stats-section {
     background: var(--glass-light);
     backdrop-filter: blur(20px);
@@ -987,7 +992,7 @@ body::before {
     color: var(--text-secondary);
 }
 
-/* ===== MODALES ===== */
+/* ===== MODALES COMPLETOS ===== */
 .modal {
     display: none;
     position: fixed;
@@ -1169,6 +1174,28 @@ body::before {
     margin-bottom: 8px;
 }
 
+/* ===== GESTIÓN DE EVIDENCIAS ===== */
+.evidence-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* ===== PLANTILLAS ===== */
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
 /* ===== NOTIFICACIONES ===== */
 #notification-container {
     position: fixed;
@@ -1275,6 +1302,10 @@ textarea.form-control {
     gap: 10px;
     cursor: pointer;
     color: var(--text-secondary);
+}
+
+.reminder-options {
+    margin-top: 10px;
 }
 
 /* ===== RESPONSIVE ===== */
