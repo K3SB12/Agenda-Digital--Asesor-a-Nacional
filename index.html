@@ -6,821 +6,7 @@
     <title>Agenda Digital - Asesor Nacional DRTE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
-    <style>
-        /* ===== SISTEMA DE DISEÑO GLASSMORPHISM ===== */
-        :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --success: #2ed573;
-            --warning: #ffa502;
-            --danger: #ff4757;
-            --dark: #1a1a2e;
-            --light: #f8f9fa;
-            --glass-light: rgba(255, 255, 255, 0.15);
-            --glass-dark: rgba(0, 0, 0, 0.1);
-            --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            --border: rgba(255, 255, 255, 0.2);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.8);
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-success: linear-gradient(135deg, #2ed573 0%, #1dd1a1 100%);
-            --gradient-warning: linear-gradient(135deg, #ffa502 0%, #ff7f50 100%);
-            --gradient-danger: linear-gradient(135deg, #ff4757 0%, #ff3838 100%);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            color: var(--text-primary);
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
-            z-index: -1;
-        }
-
-        /* ===== CONTENEDOR PRINCIPAL ===== */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        /* ===== HEADER PRINCIPAL ===== */
-        .main-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 25px 30px;
-            background: var(--glass-light);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .main-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-primary);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .logo-text h1 {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 5px;
-        }
-
-        .logo-text p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            opacity: 0.9;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        /* ===== BOTONES SISTEMA ===== */
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.6s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
-        }
-
-        .btn-success {
-            background: var(--gradient-success);
-            color: white;
-            box-shadow: 0 8px 25px rgba(46, 213, 115, 0.3);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(46, 213, 115, 0.5);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-        }
-
-        .btn-sm {
-            padding: 10px 20px;
-            font-size: 14px;
-        }
-
-        /* ===== PANEL DE NAVEGACIÓN ===== */
-        .nav-panel {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .nav-item {
-            flex: 1;
-            min-width: 200px;
-            background: var(--glass-light);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 25px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .nav-item:hover::before {
-            transform: scaleX(1);
-        }
-
-        .nav-item:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .nav-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item h3 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .nav-item p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* ===== CALENDARIO ===== */
-        .calendar-section {
-            background: var(--glass-light);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .calendar-nav-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border);
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .calendar-nav-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .current-month {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .calendar-view-options {
-            display: flex;
-            gap: 10px;
-        }
-
-        .view-option {
-            padding: 8px 20px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .view-option.active {
-            background: var(--gradient-primary);
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-        }
-
-        .calendar-day-header {
-            text-align: center;
-            padding: 15px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            border: 1px solid transparent;
-        }
-
-        .calendar-day:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--border);
-        }
-
-        .calendar-day.active {
-            background: var(--gradient-primary);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .calendar-day.office-day {
-            border: 2px solid #667eea;
-        }
-
-        .calendar-day.remote-day {
-            border: 2px solid #2ed573;
-        }
-
-        .day-number {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .day-events {
-            font-size: 11px;
-            color: var(--text-secondary);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
-        }
-
-        .event-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .event-dot.task { background: var(--success); }
-        .event-dot.meeting { background: var(--primary); }
-        .event-dot.training { background: var(--warning); }
-        .event-dot.report { background: var(--danger); }
-
-        /* ===== FORMULARIO DE TAREAS ===== */
-        .task-form-section {
-            background: var(--glass-light);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-        }
-
-        .section-title {
-            font-size: 24px;
-            margin-bottom: 25px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-title i {
-            color: var(--primary);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .form-control {
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: white;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .select-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 16px;
-            padding-right: 40px;
-        }
-
-        /* ===== SUBIDA DE ARCHIVOS ===== */
-        .file-upload-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            border: 2px dashed var(--border);
-            margin-top: 20px;
-        }
-
-        .upload-area {
-            text-align: center;
-            padding: 40px 20px;
-            cursor: pointer;
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-        }
-
-        .upload-text {
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-
-        .upload-hint {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .file-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .file-item {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            min-width: 200px;
-        }
-
-        .file-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .file-info h5 {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .file-info span {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        /* ===== LISTA DE TAREAS ===== */
-        .tasks-section {
-            background: var(--glass-light);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-        }
-
-        .task-filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .filter-btn.active {
-            background: var(--gradient-primary);
-        }
-
-        .task-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .task-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            border-left: 4px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        .task-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
-        .task-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .task-category {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .task-description {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .task-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .task-date {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .task-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border);
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* ===== PANEL DE ENLACES RÁPIDOS ===== */
-        .quick-links-section {
-            background: var(--glass-light);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-        }
-
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .link-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: white;
-            border: 1px solid transparent;
-        }
-
-        .link-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--border);
-            transform: translateY(-3px);
-        }
-
-        .link-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .link-info h4 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .link-info span {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* ===== MODALES ===== */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--glass-light);
-            backdrop-filter: blur(30px);
-            border-radius: 24px;
-            padding: 40px;
-            border: 1px solid var(--border);
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border);
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .main-header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            
-            .header-actions {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .nav-panel {
-                flex-direction: column;
-            }
-            
-            .calendar-grid {
-                grid-template-columns: repeat(7, 1fr);
-                font-size: 14px;
-            }
-            
-            .day-number {
-                font-size: 16px;
-            }
-        }
-
-        /* ===== ESTADOS ===== */
-        .status-badge {
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-pending { background: rgba(255, 165, 2, 0.2); color: #ffa502; }
-        .status-completed { background: rgba(46, 213, 115, 0.2); color: #2ed573; }
-        .status-in-progress { background: rgba(102, 126, 234, 0.2); color: #667eea; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -839,18 +25,32 @@
                 <button class="btn btn-secondary" onclick="openModal('profile-modal')">
                     <i class="fas fa-user"></i> Perfil
                 </button>
-                <button class="btn btn-primary" onclick="exportData()">
-                    <i class="fas fa-file-export"></i> Exportar
+                <button class="btn btn-primary" onclick="exportToExcel()">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
                 </button>
                 <button class="btn btn-success" onclick="printReport()">
                     <i class="fas fa-print"></i> Imprimir
                 </button>
+                <button class="btn btn-secondary" id="theme-toggle">
+                    <i class="fas fa-moon"></i> Tema
+                </button>
             </div>
         </header>
 
+        <!-- BARRA DE BÚSQUEDA -->
+        <div class="search-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Buscar en tareas, descripciones, categorías...">
+                <button class="btn btn-sm" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
         <!-- PANEL DE NAVEGACIÓN -->
         <div class="nav-panel">
-            <div class="nav-item" onclick="openModal('task-modal')">
+            <div class="nav-item active" onclick="openTaskModal('task')">
                 <div class="nav-icon">
                     <i class="fas fa-tasks"></i>
                 </div>
@@ -858,28 +58,28 @@
                 <p>Registrar actividades diarias del PNFT</p>
             </div>
             
-            <div class="nav-item" onclick="openModal('meeting-modal')">
+            <div class="nav-item" onclick="openTaskModal('meeting')">
                 <div class="nav-icon">
                     <i class="fas fa-users"></i>
                 </div>
                 <h3>Reunión</h3>
-                <p>Agendar reuniones con el equipo de Gestión Curricular</p>
+                <p>Agendar reuniones con el equipo</p>
             </div>
             
-            <div class="nav-item" onclick="openModal('training-modal')">
+            <div class="nav-item" onclick="openTaskModal('training')">
                 <div class="nav-icon">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
                 <h3>Capacitación</h3>
-                <p>Registrar talleres y cursos realizados</p>
+                <p>Registrar talleres y cursos</p>
             </div>
             
             <div class="nav-item" onclick="openModal('evidence-modal')">
                 <div class="nav-icon">
                     <i class="fas fa-file-upload"></i>
                 </div>
-                <h3>Subir Evidencias</h3>
-                <p>Documentos, imágenes y archivos de soporte</p>
+                <h3>Evidencias</h3>
+                <p>Gestionar archivos de soporte</p>
             </div>
         </div>
 
@@ -887,42 +87,114 @@
         <section class="calendar-section">
             <div class="calendar-header">
                 <div class="calendar-nav">
-                    <button class="calendar-nav-btn" onclick="prevMonth()">
+                    <button class="calendar-nav-btn" onclick="changeMonth(-1)">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <h2 class="current-month" id="current-month">Marzo 2024</h2>
-                    <button class="calendar-nav-btn" onclick="nextMonth()">
+                    <h2 class="current-month" id="current-month"></h2>
+                    <button class="calendar-nav-btn" onclick="changeMonth(1)">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
                 <div class="calendar-view-options">
-                    <button class="view-option active">Día</button>
-                    <button class="view-option">Semana</button>
-                    <button class="view-option">Mes</button>
+                    <button class="view-option" onclick="changeView('day')">Día</button>
+                    <button class="view-option active" onclick="changeView('month')">Mes</button>
+                    <button class="view-option" onclick="changeView('week')">Semana</button>
                 </div>
+                <button class="btn btn-sm" onclick="goToToday()">
+                    <i class="fas fa-calendar-day"></i> Hoy
+                </button>
             </div>
             <div class="calendar-grid" id="calendar-grid">
-                <!-- Generado dinámicamente con JavaScript -->
+                <!-- Generado dinámicamente -->
             </div>
         </section>
 
         <!-- TAREAS DEL DÍA -->
         <section class="tasks-section">
-            <h2 class="section-title">
-                <i class="fas fa-clipboard-list"></i>
-                Tareas del Día
-            </h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span id="tasks-title">Tareas del Día</span>
+                </h2>
+                <div class="task-stats">
+                    <span class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="pending-count">0</span> Pendientes
+                    </span>
+                    <span class="stat-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="completed-count">0</span> Completadas
+                    </span>
+                    <span class="stat-item">
+                        <i class="fas fa-chart-bar"></i>
+                        <span id="total-count">0</span> Total
+                    </span>
+                </div>
+            </div>
             
             <div class="task-filters">
                 <button class="filter-btn active" onclick="filterTasks('all')">Todas</button>
                 <button class="filter-btn" onclick="filterTasks('pending')">Pendientes</button>
                 <button class="filter-btn" onclick="filterTasks('completed')">Completadas</button>
                 <button class="filter-btn" onclick="filterTasks('pntf')">PNFT</button>
-                <button class="filter-btn" onclick="filterTasks('meetings')">Reuniones</button>
+                <button class="filter-btn" onclick="filterTasks('meeting')">Reuniones</button>
+                <button class="filter-btn" onclick="filterTasks('training')">Capacitaciones</button>
+                <button class="filter-btn" onclick="filterTasks('office')">
+                    <i class="fas fa-building"></i> Oficina
+                </button>
+                <button class="filter-btn" onclick="filterTasks('remote')">
+                    <i class="fas fa-home"></i> Teletrabajo
+                </button>
             </div>
             
             <div class="task-list" id="task-list">
                 <!-- Tareas cargadas dinámicamente -->
+            </div>
+        </section>
+
+        <!-- PANEL DE ESTADÍSTICAS -->
+        <section class="stats-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-line"></i>
+                Estadísticas de Productividad
+            </h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(102, 126, 234, 0.2);">
+                        <i class="fas fa-tasks" style="color: #667eea;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="week-tasks">0</h3>
+                        <p>Tareas esta semana</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(46, 213, 115, 0.2);">
+                        <i class="fas fa-check-circle" style="color: #2ed573;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completion-rate">0%</h3>
+                        <p>Tasa de completado</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(255, 165, 2, 0.2);">
+                        <i class="fas fa-users" style="color: #ffa502;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="meetings-count">0</h3>
+                        <p>Reuniones este mes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(118, 75, 162, 0.2);">
+                        <i class="fas fa-file-upload" style="color: #764ba2;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="files-count">0</h3>
+                        <p>Archivos subidos</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -1005,10 +277,12 @@
             </button>
             <h2 class="section-title">
                 <i class="fas fa-plus-circle"></i>
-                Nueva Tarea / Actividad
+                <span id="modal-title">Nueva Tarea</span>
             </h2>
             
             <form id="task-form">
+                <input type="hidden" id="task-id">
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="task-title"><i class="fas fa-heading"></i> Título *</label>
@@ -1016,18 +290,34 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="task-category"><i class="fas fa-tag"></i> Categoría *</label>
-                        <select id="task-category" class="form-control select-control" required>
-                            <option value="">Seleccionar categoría</option>
-                            <option value="pntf">PNFT - Actividades principales</option>
-                            <option value="design">Diseño Instruccional</option>
-                            <option value="training">Capacitación</option>
-                            <option value="consultation">Consultas y seguimiento</option>
-                            <option value="system">Sistemas de Información</option>
-                            <option value="report">Elaboración de Informes</option>
-                            <option value="meeting">Reuniones</option>
-                            <option value="other">Otras tareas</option>
-                        </select>
+                        <label><i class="fas fa-tag"></i> Tipo de Tarea *</label>
+                        <div class="category-selector">
+                            <div class="category-option" data-value="pntf" onclick="selectCategory('pntf')">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>PNFT</span>
+                            </div>
+                            <div class="category-option" data-value="meeting" onclick="selectCategory('meeting')">
+                                <i class="fas fa-users"></i>
+                                <span>Reunión</span>
+                            </div>
+                            <div class="category-option" data-value="training" onclick="selectCategory('training')">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Capacitación</span>
+                            </div>
+                            <div class="category-option" data-value="design" onclick="selectCategory('design')">
+                                <i class="fas fa-pencil-ruler"></i>
+                                <span>Diseño</span>
+                            </div>
+                            <div class="category-option" data-value="report" onclick="selectCategory('report')">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Informe</span>
+                            </div>
+                            <div class="category-option" data-value="system" onclick="selectCategory('system')">
+                                <i class="fas fa-database"></i>
+                                <span>Sistemas</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="task-category" required>
                     </div>
                 </div>
                 
@@ -1035,6 +325,11 @@
                     <div class="form-group">
                         <label for="task-date"><i class="fas fa-calendar"></i> Fecha *</label>
                         <input type="date" id="task-date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-time"><i class="fas fa-clock"></i> Hora</label>
+                        <input type="time" id="task-time" class="form-control">
                     </div>
                     
                     <div class="form-group">
@@ -1050,40 +345,29 @@
                 
                 <div class="form-group">
                     <label for="task-description"><i class="fas fa-align-left"></i> Descripción Detallada *</label>
-                    <textarea id="task-description" class="form-control" 
+                    <textarea id="task-description" class="form-control" rows="4" 
                               placeholder="Describa la actividad, objetivos, acciones realizadas, resultados esperados..." 
                               required></textarea>
                 </div>
                 
-                <div class="form-group">
-                    <label><i class="fas fa-paperclip"></i> Adjuntar Evidencias</label>
-                    <div class="file-upload-section">
-                        <div class="upload-area" onclick="document.getElementById('file-input').click()">
-                            <div class="upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
-                            <div class="upload-text">
-                                Arrastra archivos aquí o haz clic para subir
-                            </div>
-                            <div class="upload-hint">
-                                Formatos permitidos: JPG, PNG, PDF, DOCX, PPT, CSV, HTML
-                            </div>
-                        </div>
-                        <input type="file" id="file-input" multiple style="display: none;" 
-                               accept=".jpg,.jpeg,.png,.pdf,.docx,.ppt,.pptx,.csv,.html,.txt">
-                        <div class="file-list" id="file-list"></div>
-                    </div>
-                </div>
-                
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="task-location"><i class="fas fa-map-marker-alt"></i> Ubicación de Trabajo</label>
-                        <select id="task-location" class="form-control select-control">
-                            <option value="office">Oficina DRTE</option>
-                            <option value="remote" selected>Teletrabajo (Remoto)</option>
-                            <option value="mixed">Mixto</option>
-                            <option value="other">Otra ubicación</option>
-                        </select>
+                        <label for="task-location"><i class="fas fa-map-marker-alt"></i> Ubicación</label>
+                        <div class="location-selector">
+                            <button type="button" class="location-option" data-value="office" onclick="selectLocation('office')">
+                                <i class="fas fa-building"></i>
+                                <span>Oficina</span>
+                            </button>
+                            <button type="button" class="location-option active" data-value="remote" onclick="selectLocation('remote')">
+                                <i class="fas fa-home"></i>
+                                <span>Teletrabajo</span>
+                            </button>
+                            <button type="button" class="location-option" data-value="mixed" onclick="selectLocation('mixed')">
+                                <i class="fas fa-random"></i>
+                                <span>Mixto</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="task-location" value="remote">
                     </div>
                     
                     <div class="form-group">
@@ -1096,14 +380,57 @@
                     </div>
                 </div>
                 
-                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <!-- SUBIDA DE ARCHIVOS MEJORADA -->
+                <div class="form-group">
+                    <label><i class="fas fa-paperclip"></i> Adjuntar Evidencias</label>
+                    <div class="file-upload-section">
+                        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">
+                                Arrastra archivos aquí o haz clic para subir
+                            </div>
+                            <div class="upload-hint">
+                                Formatos: JPG, PNG, PDF, DOCX, PPT, CSV, HTML (Máx. 10MB)
+                            </div>
+                        </div>
+                        <input type="file" id="file-input" multiple style="display: none;" 
+                               accept=".jpg,.jpeg,.png,.pdf,.docx,.ppt,.pptx,.csv,.html,.txt">
+                        <div class="file-list" id="file-list">
+                            <!-- Archivos subidos aparecen aquí -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-bell"></i> Recordatorio</label>
+                    <div class="reminder-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="task-reminder">
+                            <span>Activar recordatorio</span>
+                        </label>
+                        <select id="reminder-time" class="form-control select-control" style="margin-top: 10px;" disabled>
+                            <option value="5">5 minutos antes</option>
+                            <option value="15">15 minutos antes</option>
+                            <option value="30">30 minutos antes</option>
+                            <option value="60">1 hora antes</option>
+                            <option value="1440">1 día antes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('task-modal')">
                         <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="saveAsTemplate()" id="template-btn">
+                        <i class="fas fa-save"></i> Guardar Plantilla
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Guardar Tarea
                     </button>
-                    <button type="button" class="btn btn-success" onclick="saveAndEmail()">
+                    <button type="button" class="btn btn-success" onclick="saveAndEmail()" id="email-btn">
                         <i class="fas fa-paper-plane"></i> Guardar y Enviar
                     </button>
                 </div>
@@ -1111,690 +438,168 @@
         </div>
     </div>
 
-    <!-- MODAL PERFIL -->
-    <div id="profile-modal" class="modal">
+    <!-- MODAL PREVISUALIZACIÓN DE IMÁGENES -->
+    <div id="image-modal" class="modal">
+        <div class="modal-content" style="max-width: 90%; max-height: 90%;">
+            <button class="modal-close" onclick="closeModal('image-modal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="image-viewer">
+                <img id="modal-image" src="" alt="Previsualización">
+                <div class="image-info">
+                    <h4 id="image-name"></h4>
+                    <span id="image-size"></span>
+                </div>
+                <div class="image-nav">
+                    <button class="btn btn-secondary" onclick="prevImage()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <a id="download-image" class="btn btn-primary" download>
+                        <i class="fas fa-download"></i> Descargar
+                    </a>
+                    <button class="btn btn-secondary" onclick="nextImage()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GESTIÓN DE EVIDENCIAS -->
+    <div id="evidence-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('profile-modal')">
+            <button class="modal-close" onclick="closeModal('evidence-modal')">
                 <i class="fas fa-times"></i>
             </button>
             <h2 class="section-title">
-                <i class="fas fa-user-circle"></i>
-                Perfil Profesional
+                <i class="fas fa-archive"></i>
+                Gestión de Evidencias
             </h2>
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label><i class="fas fa-id-card"></i> Nombre Completo</label>
-                    <input type="text" class="form-control" value="Kevin Sánchez Bogarín" readonly>
+            <div class="evidence-controls">
+                <button class="btn btn-primary" onclick="backupToDrive()">
+                    <i class="fas fa-cloud-upload-alt"></i> Backup a Drive
+                </button>
+                <button class="btn btn-success" onclick="downloadAllFiles()">
+                    <i class="fas fa-download"></i> Descargar Todo
+                </button>
+                <button class="btn btn-secondary" onclick="clearOldFiles()">
+                    <i class="fas fa-trash"></i> Limpiar Antiguos
+                </button>
+            </div>
+            
+            <div class="evidence-grid" id="evidence-grid">
+                <!-- Evidencias cargadas dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HORARIO SEMANAL -->
+    <div id="schedule-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('schedule-modal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="section-title">
+                <i class="fas fa-calendar-alt"></i>
+                Horario Semanal - Asesor Nacional
+            </h2>
+            
+            <div class="schedule-grid">
+                <div class="schedule-day">
+                    <div class="day-header">Lunes</div>
+                    <div class="day-schedule office-day">
+                        <i class="fas fa-building"></i>
+                        <strong>Oficina DRTE</strong>
+                        <p>8:00 AM - 4:00 PM</p>
+                        <span class="badge">Presencial</span>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-briefcase"></i> Cargo</label>
-                    <input type="text" class="form-control" value="Asesor Nacional" readonly>
+                <div class="schedule-day">
+                    <div class="day-header">Martes</div>
+                    <div class="day-schedule remote-day">
+                        <i class="fas fa-home"></i>
+                        <strong>Teletrabajo</strong>
+                        <p>7:30 AM - 5:00 PM</p>
+                        <span class="badge">Remoto</span>
+                    </div>
+                </div>
+                <div class="schedule-day">
+                    <div class="day-header">Miércoles</div>
+                    <div class="day-schedule remote-day">
+                        <i class="fas fa-home"></i>
+                        <strong>Teletrabajo</strong>
+                        <p>7:30 AM - 5:00 PM</p>
+                        <span class="badge">Remoto</span>
+                    </div>
+                </div>
+                <div class="schedule-day">
+                    <div class="day-header">Jueves</div>
+                    <div class="day-schedule remote-day">
+                        <i class="fas fa-home"></i>
+                        <strong>Teletrabajo</strong>
+                        <p>7:30 AM - 5:00 PM</p>
+                        <span class="badge">Remoto</span>
+                    </div>
+                </div>
+                <div class="schedule-day">
+                    <div class="day-header">Viernes</div>
+                    <div class="day-schedule remote-day">
+                        <i class="fas fa-home"></i>
+                        <strong>Teletrabajo</strong>
+                        <p>7:30 AM - 4:00 PM</p>
+                        <span class="badge">Remoto</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label><i class="fas fa-building"></i> Departamento</label>
-                <input type="text" class="form-control" 
-                       value="Departamento de Investigación, Desarrollo e Implementación - DRTE" readonly>
-            </div>
-            
-            <div class="form-group">
-                <label><i class="fas fa-envelope"></i> Correo Institucional</label>
-                <input type="email" class="form-control" value="kevin.sanchez.bogarin@mep.go.cr" readonly>
-            </div>
-            
-            <h3 style="margin: 25px 0 15px 0; color: var(--text-primary);">
-                <i class="fas fa-tasks"></i> Funciones Específicas
-            </h3>
-            
-            <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px;">
-                <ul style="color: var(--text-secondary); line-height: 1.6; padding-left: 20px;">
-                    <li>Participar en el diseño instruccional de recursos para el equipo de Gestión Curricular</li>
-                    <li>Participar en proceso de capacitación a solicitud de la DRTE</li>
-                    <li>Dar seguimiento o redireccionar consultas relacionadas con el PNFT</li>
-                    <li>Mantener actualizados los sistemas de información del PNFT</li>
-                    <li>Elaboración de informes o planes de trabajo relacionados con el PNFT</li>
-                    <li>Ejecutar otras tareas asignadas por la jefatura o coordinación</li>
-                    <li>Reunión con el equipo de Gestión Curricular y otros departamentos</li>
+            <div class="schedule-notes">
+                <h4><i class="fas fa-info-circle"></i> Notas Importantes:</h4>
+                <ul>
+                    <li>Los lunes son días <strong>presenciales obligatorios</strong> en oficina</li>
+                    <li>Martes a viernes: modalidad de <strong>teletrabajo</strong></li>
+                    <li>Horario flexible con disponibilidad para reuniones virtuales</li>
+                    <li>Reportes semanales se envían los viernes antes de las 3:00 PM</li>
+                    <li>Reuniones de equipo: Miércoles 10:00 AM (virtual)</li>
                 </ul>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL PLANTILLAS -->
+    <div id="templates-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('templates-modal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="section-title">
+                <i class="fas fa-layer-group"></i>
+                Plantillas de Tareas Recurrentes
+            </h2>
             
-            <div style="margin-top: 30px; text-align: center;">
-                <button class="btn btn-primary" onclick="openModal('schedule-modal')">
-                    <i class="fas fa-calendar-alt"></i> Ver Horario Semanal
+            <div class="templates-grid" id="templates-grid">
+                <!-- Plantillas cargadas dinámicamente -->
+            </div>
+            
+            <div class="modal-actions" style="margin-top: 30px;">
+                <button class="btn btn-primary" onclick="createNewTemplate()">
+                    <i class="fas fa-plus"></i> Crear Nueva Plantilla
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CORREO -->
-    <div id="email-modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('email-modal')">
-                <i class="fas fa-times"></i>
-            </button>
-            <h2 class="section-title">
-                <i class="fas fa-envelope"></i>
-                Acceso al Correo Institucional
-            </h2>
-            
-            <div style="text-align: center; padding: 40px 20px;">
-                <div style="font-size: 72px; color: var(--primary); margin-bottom: 20px;">
-                    <i class="fas fa-mail-bulk"></i>
-                </div>
-                
-                <h3 style="margin-bottom: 20px;">Correo Institucional MEP</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 30px;">
-                    Para acceder a su correo institucional, haga clic en el botón inferior.
-                    Será redirigido al portal de Office 365 del MEP.
-                </p>
-                
-                <a href="https://outlook.office.com/mep.go.cr" target="_blank" class="btn btn-primary" style="font-size: 18px; padding: 15px 40px;">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión en Outlook
-                </a>
-                
-                <div style="margin-top: 40px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                    <h4 style="margin-bottom: 15px;"><i class="fas fa-info-circle"></i> Información de Acceso</h4>
-                    <p style="color: var(--text-secondary);">
-                        <strong>Usuario:</strong> kevin.sanchez.bogarin@mep.go.cr<br>
-                        <strong>Plataforma:</strong> Microsoft Office 365<br>
-                        <strong>Disponibilidad:</strong> 24/7 desde cualquier dispositivo
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- NOTIFICACIONES -->
+    <div id="notification-container"></div>
 
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
     <script>
-        // ===== SISTEMA DE ALMACENAMIENTO LOCAL =====
-        class TaskManager {
-            constructor() {
-                this.tasks = JSON.parse(localStorage.getItem('drte_tasks')) || [];
-                this.currentDate = new Date();
-                this.init();
-            }
-
-            init() {
-                this.renderCalendar();
-                this.renderTasks();
-                this.setupEventListeners();
-                this.setDefaultDate();
-            }
-
-            setDefaultDate() {
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('task-date').value = today;
-            }
-
-            saveTask(task) {
-                task.id = Date.now();
-                task.createdAt = new Date().toISOString();
-                this.tasks.push(task);
-                localStorage.setItem('drte_tasks', JSON.stringify(this.tasks));
-                this.renderTasks();
-                this.renderCalendar();
-                return task;
-            }
-
-            updateTask(id, updates) {
-                this.tasks = this.tasks.map(task => 
-                    task.id === id ? {...task, ...updates} : task
-                );
-                localStorage.setItem('drte_tasks', JSON.stringify(this.tasks));
-                this.renderTasks();
-                this.renderCalendar();
-            }
-
-            deleteTask(id) {
-                this.tasks = this.tasks.filter(task => task.id !== id);
-                localStorage.setItem('drte_tasks', JSON.stringify(this.tasks));
-                this.renderTasks();
-                this.renderCalendar();
-            }
-
-            filterTasks(filter) {
-                let filtered = this.tasks;
-                const today = new Date().toISOString().split('T')[0];
-                
-                switch(filter) {
-                    case 'pending':
-                        filtered = this.tasks.filter(t => t.status === 'pending');
-                        break;
-                    case 'completed':
-                        filtered = this.tasks.filter(t => t.status === 'completed');
-                        break;
-                    case 'pntf':
-                        filtered = this.tasks.filter(t => t.category === 'pntf');
-                        break;
-                    case 'meetings':
-                        filtered = this.tasks.filter(t => t.category === 'meeting');
-                        break;
-                    case 'today':
-                        filtered = this.tasks.filter(t => t.date === today);
-                        break;
-                }
-                
-                this.renderTasks(filtered);
-            }
-
-            renderTasks(tasksToRender = null) {
-                const tasks = tasksToRender || this.tasks;
-                const taskList = document.getElementById('task-list');
-                const today = new Date().toISOString().split('T')[0];
-                
-                if (tasks.length === 0) {
-                    taskList.innerHTML = `
-                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                            <i class="fas fa-clipboard-list" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
-                            <h3>No hay tareas registradas</h3>
-                            <p>Comience agregando una nueva tarea usando el botón "Nueva Tarea"</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                taskList.innerHTML = tasks.sort((a, b) => new Date(b.date) - new Date(a.date))
-                    .map(task => {
-                        const statusText = {
-                            'pending': 'Pendiente',
-                            'in-progress': 'En Progreso',
-                            'completed': 'Completado'
-                        }[task.status];
-                        
-                        const categoryText = {
-                            'pntf': 'PNFT',
-                            'design': 'Diseño',
-                            'training': 'Capacitación',
-                            'consultation': 'Consultas',
-                            'system': 'Sistemas',
-                            'report': 'Informes',
-                            'meeting': 'Reunión',
-                            'other': 'Otras'
-                        }[task.category];
-                        
-                        const priorityColor = {
-                            'low': '#2ed573',
-                            'medium': '#ffa502',
-                            'high': '#ff4757',
-                            'urgent': '#ff3838'
-                        }[task.priority];
-                        
-                        const locationIcon = task.location === 'office' ? '🏢' : 
-                                           task.location === 'remote' ? '🏠' : '🔀';
-                        
-                        const isToday = task.date === today;
-                        
-                        return `
-                            <div class="task-item" data-id="${task.id}">
-                                <div class="task-header">
-                                    <div>
-                                        <div class="task-title">${task.title}</div>
-                                        <span class="task-category">${categoryText}</span>
-                                        <span class="status-badge status-${task.status}">
-                                            <i class="fas fa-circle" style="font-size: 8px;"></i>
-                                            ${statusText}
-                                        </span>
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span style="font-size: 12px; color: ${priorityColor};">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            ${task.priority.toUpperCase()}
-                                        </span>
-                                        ${isToday ? '<span style="background: var(--gradient-primary); padding: 4px 10px; border-radius: 12px; font-size: 11px;">HOY</span>' : ''}
-                                    </div>
-                                </div>
-                                
-                                <div class="task-description">
-                                    ${task.description}
-                                </div>
-                                
-                                ${task.files && task.files.length > 0 ? `
-                                    <div style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px;">
-                                        ${task.files.map(file => `
-                                            <span style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 12px;">
-                                                <i class="fas fa-paperclip"></i> ${file.name}
-                                            </span>
-                                        `).join('')}
-                                    </div>
-                                ` : ''}
-                                
-                                <div class="task-footer">
-                                    <div class="task-date">
-                                        <i class="fas fa-calendar"></i>
-                                        ${new Date(task.date).toLocaleDateString('es-ES', { 
-                                            weekday: 'long', 
-                                            year: 'numeric', 
-                                            month: 'long', 
-                                            day: 'numeric' 
-                                        })}
-                                        <span style="margin-left: 10px;">${locationIcon}</span>
-                                    </div>
-                                    
-                                    <div class="task-actions">
-                                        <button class="action-btn" onclick="taskManager.toggleTaskStatus(${task.id})" title="Cambiar estado">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="action-btn" onclick="taskManager.editTask(${task.id})" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn" onclick="taskManager.deleteTask(${task.id})" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-            }
-
-            toggleTaskStatus(id) {
-                const task = this.tasks.find(t => t.id === id);
-                if (!task) return;
-                
-                const statusOrder = ['pending', 'in-progress', 'completed'];
-                const currentIndex = statusOrder.indexOf(task.status);
-                const nextIndex = (currentIndex + 1) % statusOrder.length;
-                
-                this.updateTask(id, { status: statusOrder[nextIndex] });
-            }
-
-            editTask(id) {
-                const task = this.tasks.find(t => t.id === id);
-                if (!task) return;
-                
-                // Llenar formulario con datos de la tarea
-                document.getElementById('task-title').value = task.title;
-                document.getElementById('task-category').value = task.category;
-                document.getElementById('task-date').value = task.date;
-                document.getElementById('task-priority').value = task.priority;
-                document.getElementById('task-description').value = task.description;
-                document.getElementById('task-location').value = task.location;
-                document.getElementById('task-status').value = task.status;
-                
-                // Guardar referencia a la tarea que se está editando
-                document.getElementById('task-form').dataset.editingId = id;
-                
-                openModal('task-modal');
-            }
-
-            renderCalendar() {
-                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                
-                const currentMonth = this.currentDate.getMonth();
-                const currentYear = this.currentDate.getFullYear();
-                
-                document.getElementById('current-month').textContent = 
-                    `${monthNames[currentMonth]} ${currentYear}`;
-                
-                const firstDay = new Date(currentYear, currentMonth, 1);
-                const lastDay = new Date(currentYear, currentMonth + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                
-                const calendarGrid = document.getElementById('calendar-grid');
-                
-                // Encabezados de días
-                const dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-                calendarGrid.innerHTML = dayHeaders.map(day => 
-                    `<div class="calendar-day-header">${day}</div>`
-                ).join('');
-                
-                // Espacios vacíos al inicio
-                const startingDay = firstDay.getDay();
-                for (let i = 0; i < startingDay; i++) {
-                    calendarGrid.innerHTML += '<div class="calendar-day"></div>';
-                }
-                
-                // Días del mes
-                const today = new Date().toISOString().split('T')[0];
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const dayTasks = this.tasks.filter(task => task.date === dateStr);
-                    
-                    // Determinar si es día de oficina o teletrabajo
-                    const dateObj = new Date(dateStr);
-                    const isMonday = dateObj.getDay() === 1; // Lunes = 1
-                    const dayClass = isMonday ? 'office-day' : 'remote-day';
-                    
-                    const isToday = dateStr === today;
-                    
-                    calendarGrid.innerHTML += `
-                        <div class="calendar-day ${dayClass} ${isToday ? 'active' : ''}" 
-                             onclick="taskManager.filterTasksByDate('${dateStr}')">
-                            <div class="day-number">${day}</div>
-                            <div class="day-events">
-                                ${dayTasks.slice(0, 3).map(task => {
-                                    const dotClass = {
-                                        'pntf': 'task',
-                                        'design': 'task',
-                                        'training': 'training',
-                                        'meeting': 'meeting',
-                                        'report': 'report'
-                                    }[task.category] || 'task';
-                                    return `<span class="event-dot ${dotClass}"></span>`;
-                                }).join('')}
-                                ${dayTasks.length > 3 ? `<span style="font-size: 10px;">+${dayTasks.length - 3}</span>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-
-            filterTasksByDate(date) {
-                const filtered = this.tasks.filter(task => task.date === date);
-                this.renderTasks(filtered);
-                
-                // Actualizar filtros activos
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            }
-
-            setupEventListeners() {
-                // Formulario de tarea
-                document.getElementById('task-form').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    
-                    const taskData = {
-                        title: document.getElementById('task-title').value,
-                        category: document.getElementById('task-category').value,
-                        date: document.getElementById('task-date').value,
-                        priority: document.getElementById('task-priority').value,
-                        description: document.getElementById('task-description').value,
-                        location: document.getElementById('task-location').value,
-                        status: document.getElementById('task-status').value,
-                        files: Array.from(document.getElementById('file-input').files).map(file => ({
-                            name: file.name,
-                            size: file.size,
-                            type: file.type
-                        }))
-                    };
-                    
-                    const editingId = document.getElementById('task-form').dataset.editingId;
-                    if (editingId) {
-                        this.updateTask(parseInt(editingId), taskData);
-                        delete document.getElementById('task-form').dataset.editingId;
-                    } else {
-                        this.saveTask(taskData);
-                    }
-                    
-                    this.resetForm();
-                    closeModal('task-modal');
-                    showNotification('Tarea guardada exitosamente', 'success');
-                });
-                
-                // Subida de archivos
-                document.getElementById('file-input').addEventListener('change', (e) => {
-                    const fileList = document.getElementById('file-list');
-                    fileList.innerHTML = '';
-                    
-                    Array.from(e.target.files).forEach(file => {
-                        const icon = getFileIcon(file.type);
-                        fileList.innerHTML += `
-                            <div class="file-item">
-                                <div class="file-icon">
-                                    <i class="fas fa-${icon}"></i>
-                                </div>
-                                <div class="file-info">
-                                    <h5>${file.name}</h5>
-                                    <span>${formatFileSize(file.size)}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-                });
-                
-                // Drag and drop para archivos
-                const uploadArea = document.querySelector('.upload-area');
-                uploadArea.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.background = 'rgba(255,255,255,0.1)';
-                });
-                
-                uploadArea.addEventListener('dragleave', () => {
-                    uploadArea.style.background = '';
-                });
-                
-                uploadArea.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.background = '';
-                    const files = e.dataTransfer.files;
-                    document.getElementById('file-input').files = files;
-                    document.getElementById('file-input').dispatchEvent(new Event('change'));
-                });
-            }
-
-            resetForm() {
-                document.getElementById('task-form').reset();
-                document.getElementById('file-list').innerHTML = '';
-                document.getElementById('file-input').value = '';
-                this.setDefaultDate();
-            }
-
-            prevMonth() {
-                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                this.renderCalendar();
-            }
-
-            nextMonth() {
-                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                this.renderCalendar();
-            }
-        }
-
-        // ===== FUNCIONES UTILITARIAS =====
-        function getFileIcon(fileType) {
-            if (fileType.includes('image')) return 'file-image';
-            if (fileType.includes('pdf')) return 'file-pdf';
-            if (fileType.includes('word') || fileType.includes('document')) return 'file-word';
-            if (fileType.includes('excel') || fileType.includes('spreadsheet')) return 'file-excel';
-            if (fileType.includes('powerpoint') || fileType.includes('presentation')) return 'file-powerpoint';
-            if (fileType.includes('text')) return 'file-alt';
-            if (fileType.includes('html')) return 'file-code';
-            return 'file';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            // Resetear formulario si es el modal de tareas
-            if (modalId === 'task-modal') {
-                taskManager.resetForm();
-                delete document.getElementById('task-form').dataset.editingId;
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                background: ${type === 'success' ? 'var(--gradient-success)' : 'var(--gradient-primary)'};
-                color: white;
-                border-radius: 12px;
-                box-shadow: var(--shadow);
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-            `;
-            
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        function exportData() {
-            const data = {
-                tasks: taskManager.tasks,
-                exportDate: new Date().toISOString(),
-                user: {
-                    name: "Kevin Sánchez Bogarín",
-                    position: "Asesor Nacional",
-                    department: "DRTE"
-                }
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `bitacora-drte-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            
-            showNotification('Datos exportados exitosamente', 'success');
-        }
-
-        function printReport() {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Informe DRTE - ${new Date().toLocaleDateString()}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        h1 { color: #333; }
-                        .task { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
-                        .header { background: #667eea; color: white; padding: 20px; border-radius: 10px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>Bitácora DRTE - Asesor Nacional</h1>
-                        <p>Fecha de impresión: ${new Date().toLocaleDateString()}</p>
-                    </div>
-                    <h2>Tareas Registradas (${taskManager.tasks.length})</h2>
-                    ${taskManager.tasks.map(task => `
-                        <div class="task">
-                            <h3>${task.title}</h3>
-                            <p><strong>Categoría:</strong> ${task.category}</p>
-                            <p><strong>Fecha:</strong> ${new Date(task.date).toLocaleDateString()}</p>
-                            <p><strong>Estado:</strong> ${task.status}</p>
-                            <p><strong>Descripción:</strong> ${task.description}</p>
-                        </div>
-                    `).join('')}
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
-        }
-
-        function saveAndEmail() {
-            // En un entorno real, esto enviaría los datos al servidor
-            // Por ahora, simulamos la funcionalidad
-            const form = document.getElementById('task-form');
-            if (form.checkValidity()) {
-                form.dispatchEvent(new Event('submit'));
-                showNotification('Tarea guardada y lista para enviar por correo', 'success');
-                setTimeout(() => {
-                    openModal('email-modal');
-                }, 1500);
-            } else {
-                form.reportValidity();
-            }
-        }
-
-        // ===== INICIALIZACIÓN =====
-        let taskManager;
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            taskManager = new TaskManager();
-            
-            // Cerrar modales con ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal.active').forEach(modal => {
-                        modal.classList.remove('active');
-                    });
-                }
-            });
-            
-            // Cerrar modal al hacer clic fuera
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('active');
-                    }
-                });
-            });
-            
-            // Agregar estilos de animación
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Cargar datos de ejemplo si no hay datos
-            if (taskManager.tasks.length === 0) {
-                loadSampleData();
-            }
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
         });
-
-        function loadSampleData() {
-            const sampleTasks = [
-                {
-                    title: "Revisión de diseño instruccional PNFT",
-                    category: "design",
-                    date: new Date().toISOString().split('T')[0],
-                    priority: "high",
-                    description: "Revisión y validación de recursos instruccionales para el equipo de Gestión Curricular",
-                    location: "remote",
-                    status: "in-progress"
-                },
-                {
-                    title: "Reunión con equipo de Gestión Curricular",
-                    category: "meeting",
-                    date: new Date().toISOString().split('T')[0],
-                    priority: "medium",
-                    description: "Coordinación de actividades trimestrales y seguimiento de proyectos",
-                    location: "office",
-                    status: "completed"
-                },
-                {
-                    title: "Actualización de sistemas de información",
-                    category: "system",
-                    date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-                    priority: "medium",
-                    description: "Mantenimiento y actualización de los sistemas del Programa Nacional de Formación Tecnológica",
-                    location: "remote",
-                    status: "completed"
-                }
-            ];
-            
-            sampleTasks.forEach(task => taskManager.saveTask(task));
-        }
     </script>
 </body>
 </html>
