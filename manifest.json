@@ -1,7 +1,7 @@
 {
   "name": "Agenda Digital DRTE",
   "short_name": "DRTE Agenda",
-  "description": "Sistema de gestión diaria para Asesor Nacional del Departamento de Investigación, Desarrollo e Implementación",
+  "description": "Sistema profesional de gestión diaria para Asesor Nacional DRTE",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a2e",
