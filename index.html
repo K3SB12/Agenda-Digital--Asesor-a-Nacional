@@ -1,445 +1,708 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Digital - Asesor Nacional DRTE</title>
+    <meta name="description" content="Agenda Digital Profesional - Asesor Nacional DRTE MEP">
+    <meta name="author" content="Kevin Sánchez Bogarín - DRTE MEP">
+    <title>Agenda Digital DRTE | Sistema Profesional de Gestión</title>
+    
+    <!-- ICONOS Y MANIFEST -->
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgSURBVHgB7c6hAQAgDMCw8+9oNDBUQZJz0W7AAwAAAAAAAAC/7AN2NwET9BzJOAAAAABJRU5ErkJggg==">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- FONTAWESOME -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css">
-    <!-- Librerías para exportación profesional -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.0/build/index.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
+    <!-- GOOGLE FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- ESTILOS -->
+    <link rel="stylesheet" href="./styles.css">
+    
+    <!-- OPEN GRAPH PARA COMPARTIR -->
+    <meta property="og:title" content="Agenda Digital DRTE | Sistema Profesional">
+    <meta property="og:description" content="Sistema integral de gestión para Asesor Nacional DRTE">
+    <meta property="og:image" content="https://k3sb12.github.io/Agenda-Digital--Asesor-a-Nacional/og-image.png">
+    <meta property="og:url" content="https://k3sb12.github.io/Agenda-Digital--Asesor-a-Nacional/">
 </head>
 <body>
-    <div class="container">
-        <!-- HEADER con Backup en Tiempo Real -->
-        <header class="main-header">
-            <div class="logo-section">
-                <div class="logo-icon">
-                    <i class="fas fa-chalkboard-teacher"></i>
+    <!-- SISTEMA DE CARGA -->
+    <div id="loading-system" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-circle"></div>
+            </div>
+            <h3>Iniciando Agenda DRTE</h3>
+            <p class="loading-status">Cargando sistema de persistencia...</p>
+            <div class="loading-progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="main-container" id="main-container" style="display: none;">
+        
+        <!-- HEADER PROFESIONAL -->
+        <header class="professional-header">
+            <div class="header-top-bar">
+                <div class="connection-status">
+                    <i class="fas fa-wifi"></i>
+                    <span id="connection-status">Conectado</span>
+                    <div class="sync-indicator" id="sync-indicator">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Sincronizado</span>
+                    </div>
                 </div>
-                <div class="logo-text">
-                    <h1>Agenda Digital DRTE</h1>
-                    <p>Asesor Nacional - Departamento de Investigación, Desarrollo e Implementación</p>
-                    <div class="backup-status">
-                        <i class="fas fa-cloud" id="backup-icon"></i>
-                        <span id="backup-status">Sincronizado</span>
-                        <span id="last-backup"></span>
+                <div class="datetime-display">
+                    <i class="fas fa-clock"></i>
+                    <span id="live-datetime"></span>
+                    <span class="timezone-badge">UTC-6 🇨🇷</span>
+                </div>
+            </div>
+            
+            <div class="header-main">
+                <div class="brand-section">
+                    <div class="brand-logo">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <div class="logo-glow"></div>
+                    </div>
+                    <div class="brand-info">
+                        <h1 class="brand-title">Agenda Digital <span class="highlight">DRTE</span></h1>
+                        <p class="brand-subtitle">Sistema Profesional de Gestión Integral</p>
+                        <div class="brand-meta">
+                            <span><i class="fas fa-user-tie"></i> Asesor Nacional</span>
+                            <span><i class="fas fa-building"></i> Departamento de Investigación, Desarrollo e Implementación</span>
+                            <span><i class="fas fa-id-card"></i> Kevin Sánchez Bogarín</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-controls">
+                    <div class="data-status-panel">
+                        <div class="status-item">
+                            <i class="fas fa-database"></i>
+                            <div class="status-info">
+                                <span class="status-label">Persistencia</span>
+                                <span class="status-value" id="data-persistence">100% Activa</span>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <div class="status-info">
+                                <span class="status-label">Backup</span>
+                                <span class="status-value" id="backup-status">Auto-activo</span>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-cloud"></i>
+                            <div class="status-info">
+                                <span class="status-label">Almacenamiento</span>
+                                <span class="status-value" id="storage-status">Disponible</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-export" id="export-btn" title="Exportar informes">
+                            <i class="fas fa-file-export"></i>
+                            <span>Exportar</span>
+                            <div class="export-dropdown">
+                                <a onclick="AgendaSystem.exportToPDF()"><i class="fas fa-file-pdf"></i> PDF Profesional</a>
+                                <a onclick="AgendaSystem.exportToExcel()"><i class="fas fa-file-excel"></i> Excel Avanzado</a>
+                                <a onclick="AgendaSystem.exportToDOCX()"><i class="fas fa-file-word"></i> DOCX Corporativo</a>
+                                <a onclick="AgendaSystem.exportToCSV()"><i class="fas fa-file-csv"></i> CSV Estructurado</a>
+                            </div>
+                        </button>
+                        
+                        <button class="btn btn-share" onclick="AgendaSystem.shareReport()" title="Compartir informe">
+                            <i class="fas fa-share-alt"></i>
+                            <span>Compartir</span>
+                        </button>
+                        
+                        <button class="btn btn-backup" onclick="AgendaSystem.openBackupManager()" title="Gestión de backups">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Backup</span>
+                        </button>
+                        
+                        <button class="btn btn-print" onclick="AgendaSystem.printProfessionalReport()" title="Imprimir informe profesional">
+                            <i class="fas fa-print"></i>
+                            <span>Imprimir</span>
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="header-actions">
-                <button class="btn btn-secondary" onclick="agenda.openModal('profile-modal')">
-                    <i class="fas fa-user"></i> Perfil
-                </button>
-                <button class="btn btn-primary" onclick="agenda.exportMenu()">
-                    <i class="fas fa-file-export"></i> Exportar
-                    <div class="export-menu" id="export-menu">
-                        <a onclick="agenda.exportToPDF()"><i class="fas fa-file-pdf"></i> PDF</a>
-                        <a onclick="agenda.exportToDOCX()"><i class="fas fa-file-word"></i> DOCX</a>
-                        <a onclick="agenda.exportToExcel()"><i class="fas fa-file-excel"></i> Excel</a>
-                        <a onclick="agenda.exportToCSV()"><i class="fas fa-file-csv"></i> CSV</a>
-                    </div>
-                </button>
-                <button class="btn btn-success" onclick="agenda.shareReport()">
-                    <i class="fas fa-share-alt"></i> Compartir
-                </button>
-                <button class="btn btn-warning" onclick="agenda.backupToDrive()">
-                    <i class="fas fa-cloud-upload-alt"></i> Backup
-                </button>
-            </div>
+            
+            <nav class="main-navigation">
+                <div class="nav-container">
+                    <a href="#dashboard" class="nav-item active" onclick="AgendaSystem.showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#tareas" class="nav-item" onclick="AgendaSystem.showSection('tareas')">
+                        <i class="fas fa-tasks"></i>
+                        <span>Gestión de Tareas</span>
+                    </a>
+                    <a href="#calendario" class="nav-item" onclick="AgendaSystem.showSection('calendario')">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Calendario Integral</span>
+                    </a>
+                    <a href="#archivos" class="nav-item" onclick="AgendaSystem.showSection('archivos')">
+                        <i class="fas fa-archive"></i>
+                        <span>Archivos & Evidencias</span>
+                    </a>
+                    <a href="#reportes" class="nav-item" onclick="AgendaSystem.showSection('reportes')">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reportes & Análisis</span>
+                    </a>
+                    <a href="#configuracion" class="nav-item" onclick="AgendaSystem.showSection('configuracion')">
+                        <i class="fas fa-cogs"></i>
+                        <span>Sistema</span>
+                    </a>
+                </div>
+            </nav>
         </header>
 
-        <!-- SISTEMA DE NOTIFICACIONES EN TIEMPO REAL -->
-        <div class="notification-center">
-            <div class="notification-header">
-                <i class="fas fa-bell"></i>
-                <h3>Recordatorios</h3>
-                <button class="btn btn-sm" onclick="agenda.enableNotifications()">
-                    <i class="fas fa-cog"></i> Configurar
-                </button>
-            </div>
-            <div class="notification-list" id="notification-list">
-                <!-- Recordatorios cargados dinámicamente -->
-            </div>
-        </div>
-
-        <!-- PANEL DE NAVEGACIÓN MEJORADO -->
-        <div class="nav-panel">
-            <div class="nav-item" onclick="agenda.openTaskModal('task')">
-                <div class="nav-icon">
-                    <i class="fas fa-tasks"></i>
-                </div>
-                <h3>Nueva Tarea</h3>
-                <p>Registrar actividades diarias del PNFT</p>
-                <div class="quick-templates">
-                    <span class="template-tag" onclick="agenda.loadTemplate(1)">Informe Semanal</span>
-                    <span class="template-tag" onclick="agenda.loadTemplate(2)">Reunión DRTE</span>
-                    <span class="template-tag" onclick="agenda.loadTemplate(3)">Capacitación</span>
-                </div>
-            </div>
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="content-wrapper">
             
-            <div class="nav-item" onclick="agenda.openTaskModal('meeting')">
-                <div class="nav-icon">
-                    <i class="fas fa-users"></i>
+            <!-- SECCIÓN DASHBOARD -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard Principal</h2>
+                    <p class="section-subtitle">Visión integral de tu productividad y gestión</p>
                 </div>
-                <h3>Reunión</h3>
-                <p>Agendar reuniones con el equipo</p>
-            </div>
-            
-            <div class="nav-item" onclick="agenda.openEvidenceManager()">
-                <div class="nav-icon">
-                    <i class="fas fa-file-upload"></i>
-                </div>
-                <h3>Evidencias</h3>
-                <p>Gestionar archivos de soporte</p>
-                <div class="file-counter" id="file-counter">0 archivos</div>
-            </div>
-            
-            <div class="nav-item" onclick="agenda.openModal('templates-modal')">
-                <div class="nav-icon">
-                    <i class="fas fa-layer-group"></i>
-                </div>
-                <h3>Plantillas</h3>
-                <p>Guardar formatos recurrentes</p>
-            </div>
-        </div>
-
-        <!-- CALENDARIO CON ZONA HORARIA CORREGIDA -->
-        <section class="calendar-section">
-            <div class="calendar-header">
-                <div class="calendar-nav">
-                    <button class="calendar-nav-btn" onclick="agenda.changeMonth(-1)">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <h2 class="current-month" id="current-month"></h2>
-                    <button class="calendar-nav-btn" onclick="agenda.changeMonth(1)">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-                <div class="timezone-info">
-                    <i class="fas fa-clock"></i>
-                    <span id="timezone-display">UTC-6 (Costa Rica)</span>
-                </div>
-                <button class="btn btn-primary" onclick="agenda.goToToday()">
-                    <i class="fas fa-calendar-day"></i> Hoy
-                </button>
-            </div>
-            <div class="calendar-grid" id="calendar-grid">
-                <!-- Generado dinámicamente con fechas CORRECTAS -->
-            </div>
-        </section>
-
-        <!-- GESTOR DE TAREAS CON PERSISTENCIA GARANTIZADA -->
-        <section class="tasks-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span id="tasks-title">Tareas del Día</span>
-                    <span class="data-status" id="data-status">
-                        <i class="fas fa-check-circle"></i> Datos guardados
-                    </span>
-                </h2>
-                <div class="task-stats">
-                    <span class="stat-item">
-                        <i class="fas fa-database"></i>
-                        <span id="storage-used">0%</span> Almacenamiento
-                    </span>
-                    <span class="stat-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <span id="backup-count">0</span> Backups
-                    </span>
-                    <span class="stat-item">
-                        <i class="fas fa-history"></i>
-                        <span id="auto-save">Auto-guardado: ON</span>
-                    </span>
-                </div>
-            </div>
-            
-            <!-- FILTROS FUNCIONALES -->
-            <div class="task-filters">
-                <button class="filter-btn active" onclick="agenda.filterTasks('all')">Todas</button>
-                <button class="filter-btn" onclick="agenda.filterTasks('today')">Hoy</button>
-                <button class="filter-btn" onclick="agenda.filterTasks('week')">Esta Semana</button>
-                <button class="filter-btn" onclick="agenda.filterTasks('pending')">Pendientes</button>
-                <button class="filter-btn" onclick="agenda.filterTasks('completed')">Completadas</button>
-                <button class="filter-btn" onclick="agenda.filterTasks('with-files')">
-                    <i class="fas fa-paperclip"></i> Con Archivos
-                </button>
-            </div>
-            
-            <!-- LISTA DE TAREAS CON ARCHIVOS PERSISTENTES -->
-            <div class="task-list" id="task-list">
-                <!-- Las tareas se cargan con sus archivos REALES -->
-            </div>
-            
-            <!-- SISTEMA DE AUTO-GUARDADO -->
-            <div class="autosave-indicator">
-                <i class="fas fa-sync-alt fa-spin" id="save-spinner"></i>
-                <span id="last-save">Último guardado: Justo ahora</span>
-            </div>
-        </section>
-
-        <!-- MODAL DE TAREAS CON PROTECCIÓN DE DATOS -->
-        <div id="task-modal" class="modal">
-            <div class="modal-content">
-                <button class="modal-close" onclick="agenda.closeTaskModal('cancel')">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h2 class="section-title">
-                    <i class="fas fa-plus-circle"></i>
-                    <span id="modal-title">Nueva Tarea</span>
-                    <span class="edit-warning" id="edit-warning">
-                        <i class="fas fa-exclamation-triangle"></i> Modo Edición
-                    </span>
-                </h2>
                 
-                <form id="task-form" onsubmit="return agenda.saveTaskWithProtection(event)">
-                    <input type="hidden" id="task-id">
-                    <input type="hidden" id="original-data">
-                    
-                    <!-- SELECTOR DE FECHA CON ZONA HORARIA -->
-                    <div class="form-group">
-                        <label for="task-date">
-                            <i class="fas fa-calendar"></i> Fecha *
-                            <span class="timezone-hint" id="date-timezone"></span>
-                        </label>
-                        <input type="date" id="task-date" class="form-control" required 
-                               onchange="agenda.updateDateDisplay(this.value)">
-                        <div class="date-preview" id="date-preview">
-                            <!-- Muestra la fecha en formato legible con zona horaria -->
+                <div class="dashboard-grid">
+                    <!-- RESUMEN RÁPIDO -->
+                    <div class="dashboard-card summary-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bolt"></i> Resumen del Día</h3>
+                            <span class="card-badge today-badge">HOY</span>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-item">
+                                <div class="summary-icon pending">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <span class="summary-label">Tareas Pendientes</span>
+                                    <span class="summary-value" id="today-pending">0</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-icon completed">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <span class="summary-label">Completadas Hoy</span>
+                                    <span class="summary-value" id="today-completed">0</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-icon meetings">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <span class="summary-label">Reuniones Programadas</span>
+                                    <span class="summary-value" id="today-meetings">0</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-icon files">
+                                    <i class="fas fa-paperclip"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <span class="summary-label">Archivos Subidos</span>
+                                    <span class="summary-value" id="today-files">0</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- GESTOR DE ARCHIVOS CON PREVISUALIZACIÓN REAL -->
-                    <div class="form-group">
-                        <label><i class="fas fa-paperclip"></i> Adjuntar Evidencias</label>
-                        <div class="file-manager">
-                            <div class="file-upload-area" id="file-upload-area">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p>Arrastra archivos aquí o haz clic para subir</p>
-                                <input type="file" id="file-input" multiple 
-                                       accept=".jpg,.jpeg,.png,.pdf,.docx,.doc,.ppt,.pptx,.csv,.xlsx,.txt">
-                            </div>
-                            <div class="file-preview-grid" id="file-preview-grid">
-                                <!-- Previsualizaciones en miniatura REALES -->
-                            </div>
+                    <!-- ACCIONES RÁPIDAS -->
+                    <div class="dashboard-card quick-actions-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-rocket"></i> Acciones Rápidas</h3>
+                        </div>
+                        <div class="quick-actions-grid">
+                            <button class="quick-action" onclick="AgendaSystem.quickAction('new-task')">
+                                <div class="action-icon primary">
+                                    <i class="fas fa-plus-circle"></i>
+                                </div>
+                                <span class="action-label">Nueva Tarea</span>
+                            </button>
+                            <button class="quick-action" onclick="AgendaSystem.quickAction('new-meeting')">
+                                <div class="action-icon meeting">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <span class="action-label">Agendar Reunión</span>
+                            </button>
+                            <button class="quick-action" onclick="AgendaSystem.quickAction('upload-file')">
+                                <div class="action-icon success">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <span class="action-label">Subir Evidencia</span>
+                            </button>
+                            <button class="quick-action" onclick="AgendaSystem.quickAction('generate-report')">
+                                <div class="action-icon warning">
+                                    <i class="fas fa-file-contract"></i>
+                                </div>
+                                <span class="action-label">Generar Reporte</span>
+                            </button>
+                            <button class="quick-action" onclick="AgendaSystem.quickAction('backup-now')">
+                                <div class="action-icon backup">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <span class="action-label">Backup Ahora</span>
+                            </button>
+                            <button class="quick-action" onclick="AgendaSystem.quickAction('email-summary')">
+                                <div class="action-icon email">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <span class="action-label">Enviar Resumen</span>
+                            </button>
                         </div>
                     </div>
                     
-                    <!-- SISTEMA DE RECORDATORIOS REAL -->
-                    <div class="form-group">
-                        <label><i class="fas fa-bell"></i> Recordatorio</label>
-                        <div class="reminder-system">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="task-reminder" 
-                                       onchange="agenda.toggleReminder(this.checked)">
-                                <span>Activar recordatorio</span>
-                            </label>
-                            <div class="reminder-options" id="reminder-options">
-                                <select id="reminder-time" class="form-control">
-                                    <option value="5">5 minutos antes</option>
-                                    <option value="15">15 minutos antes</option>
-                                    <option value="30">30 minutos antes</option>
-                                    <option value="60">1 hora antes</option>
-                                    <option value="1440">1 día antes</option>
-                                </select>
-                                <button type="button" class="btn btn-sm" 
-                                        onclick="agenda.testReminder()">
-                                    <i class="fas fa-play"></i> Probar
+                    <!-- CALENDARIO MINI -->
+                    <div class="dashboard-card calendar-mini-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar"></i> Calendario</h3>
+                            <div class="calendar-nav">
+                                <button class="calendar-nav-btn" onclick="AgendaSystem.calendarPrev()">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span id="mini-calendar-month" class="calendar-month">Enero 2024</span>
+                                <button class="calendar-nav-btn" onclick="AgendaSystem.calendarNext()">
+                                    <i class="fas fa-chevron-right"></i>
                                 </button>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- BOTONES CON PROTECCIÓN DE DATOS -->
-                    <div class="modal-actions protected">
-                        <button type="button" class="btn btn-secondary" 
-                                onclick="agenda.closeTaskModal('cancel')"
-                                id="cancel-btn">
-                            <i class="fas fa-times"></i> Cancelar
-                            <span class="tooltip">Restaura los datos originales</span>
-                        </button>
-                        
-                        <button type="button" class="btn btn-warning" 
-                                onclick="agenda.saveAsTemplate()"
-                                id="template-btn">
-                            <i class="fas fa-save"></i> Guardar Plantilla
-                            <span class="tooltip">Crea un formato reusable</span>
-                        </button>
-                        
-                        <button type="submit" class="btn btn-primary" id="save-btn">
-                            <i class="fas fa-save"></i> Guardar Tarea
-                            <span class="tooltip">Guarda con persistencia total</span>
-                        </button>
-                        
-                        <button type="button" class="btn btn-success" 
-                                onclick="agenda.saveAndShare()"
-                                id="share-btn">
-                            <i class="fas fa-paper-plane"></i> Guardar y Compartir
-                            <span class="tooltip">Guarda y genera enlace para correo</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- VISOR DE ARCHIVOS PROFESIONAL -->
-        <div id="file-viewer-modal" class="modal">
-            <div class="modal-content file-viewer">
-                <button class="modal-close" onclick="agenda.closeFileViewer()">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="file-viewer-header">
-                    <h3 id="viewer-filename"></h3>
-                    <div class="file-actions">
-                        <button class="btn btn-primary" onclick="agenda.downloadCurrentFile()">
-                            <i class="fas fa-download"></i> Descargar
-                        </button>
-                        <button class="btn btn-secondary" onclick="agenda.printFile()">
-                            <i class="fas fa-print"></i> Imprimir
-                        </button>
-                        <button class="btn btn-success" onclick="agenda.shareFile()">
-                            <i class="fas fa-share"></i> Compartir
-                        </button>
-                    </div>
-                </div>
-                <div class="file-viewer-content" id="file-viewer-content">
-                    <!-- Contenido del archivo según tipo -->
-                </div>
-            </div>
-        </div>
-
-        <!-- SISTEMA DE BACKUP REAL -->
-        <div id="backup-modal" class="modal">
-            <div class="modal-content">
-                <button class="modal-close" onclick="agenda.closeModal('backup-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h2 class="section-title">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    Sistema de Backup
-                </h2>
-                
-                <div class="backup-options">
-                    <div class="backup-option" onclick="agenda.backupToLocal()">
-                        <i class="fas fa-hdd"></i>
-                        <h4>Backup Local</h4>
-                        <p>Guarda en tu computadora</p>
-                    </div>
-                    
-                    <div class="backup-option" onclick="agenda.backupToGoogleDrive()">
-                        <i class="fab fa-google-drive"></i>
-                        <h4>Google Drive</h4>
-                        <p>Sincroniza con tu cuenta</p>
-                        <div class="drive-status" id="drive-status">
-                            No conectado
+                        <div class="mini-calendar" id="mini-calendar">
+                            <!-- Generado por JavaScript -->
                         </div>
                     </div>
                     
-                    <div class="backup-option" onclick="agenda.backupToEmail()">
-                        <i class="fas fa-envelope"></i>
-                        <h4>Enviar por Correo</h4>
-                        <p>Recibe backup en tu email</p>
+                    <!-- ESTADÍSTICAS -->
+                    <div class="dashboard-card stats-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+                            <select class="stats-period" id="stats-period" onchange="AgendaSystem.updateStatsPeriod(this.value)">
+                                <option value="week">Esta Semana</option>
+                                <option value="month">Este Mes</option>
+                                <option value="quarter">Este Trimestre</option>
+                                <option value="year">Este Año</option>
+                            </select>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stat-chart" id="productivity-chart">
+                                <!-- Gráfico de productividad -->
+                            </div>
+                            <div class="stat-details">
+                                <div class="stat-item">
+                                    <span class="stat-label">Tasa de Completado</span>
+                                    <div class="stat-progress">
+                                        <div class="progress-bar" style="width: 75%"></div>
+                                    </div>
+                                    <span class="stat-value" id="completion-rate">75%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Productividad Semanal</span>
+                                    <div class="stat-progress">
+                                        <div class="progress-bar" style="width: 82%"></div>
+                                    </div>
+                                    <span class="stat-value" id="weekly-productivity">82%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Tareas Activas</span>
+                                    <span class="stat-value" id="active-tasks">12</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="backup-history">
-                    <h4><i class="fas fa-history"></i> Historial de Backups</h4>
-                    <div class="backup-list" id="backup-list">
-                        <!-- Lista de backups realizados -->
+                <!-- ACTIVIDAD RECIENTE -->
+                <div class="recent-activity">
+                    <div class="section-header">
+                        <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+                        <button class="btn btn-sm" onclick="AgendaSystem.refreshActivity()">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
+                    <div class="activity-timeline" id="activity-timeline">
+                        <!-- Actividad cargada dinámicamente -->
                     </div>
                 </div>
+            </section>
+
+            <!-- SECCIÓN GESTIÓN DE TAREAS -->
+            <section id="tareas-section" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-tasks"></i> Gestión Profesional de Tareas</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="AgendaSystem.openTaskModal('new')">
+                            <i class="fas fa-plus-circle"></i> Nueva Tarea
+                        </button>
+                        <button class="btn btn-secondary" onclick="AgendaSystem.openTemplateManager()">
+                            <i class="fas fa-layer-group"></i> Plantillas
+                        </button>
+                        <button class="btn btn-success" onclick="AgendaSystem.bulkActions()">
+                            <i class="fas fa-cogs"></i> Acciones Masivas
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- FILTROS AVANZADOS -->
+                <div class="advanced-filters">
+                    <div class="filter-group">
+                        <input type="text" 
+                               class="filter-input" 
+                               id="task-search" 
+                               placeholder="🔍 Buscar en tareas, descripciones, categorías..."
+                               oninput="AgendaSystem.searchTasks(this.value)">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select class="filter-select" id="filter-category" onchange="AgendaSystem.filterByCategory(this.value)">
+                            <option value="">Todas las Categorías</option>
+                            <option value="pntf">PNFT - Actividades Principales</option>
+                            <option value="design">Diseño Instruccional</option>
+                            <option value="training">Capacitación & Talleres</option>
+                            <option value="meeting">Reuniones & Coordinaciones</option>
+                            <option value="system">Sistemas & Actualización</option>
+                            <option value="report">Informes & Documentación</option>
+                            <option value="other">Otras Tareas</option>
+                        </select>
+                        
+                        <select class="filter-select" id="filter-status" onchange="AgendaSystem.filterByStatus(this.value)">
+                            <option value="">Todos los Estados</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="in-progress">En Progreso</option>
+                            <option value="completed">Completado</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                        
+                        <select class="filter-select" id="filter-priority" onchange="AgendaSystem.filterByPriority(this.value)">
+                            <option value="">Todas las Prioridades</option>
+                            <option value="urgent">🔴 Urgente</option>
+                            <option value="high">🟠 Alta</option>
+                            <option value="medium">🟡 Media</option>
+                            <option value="low">🟢 Baja</option>
+                        </select>
+                        
+                        <input type="date" 
+                               class="filter-input" 
+                               id="filter-date"
+                               onchange="AgendaSystem.filterByDate(this.value)">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-tags" id="active-filters">
+                            <!-- Filtros activos aparecen aquí -->
+                        </div>
+                        <button class="btn btn-clear" onclick="AgendaSystem.clearFilters()">
+                            <i class="fas fa-times"></i> Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- LISTA DE TAREAS PROFESIONAL -->
+                <div class="tasks-container">
+                    <div class="tasks-header">
+                        <div class="tasks-summary">
+                            <span id="tasks-count">0 tareas</span>
+                            <span id="tasks-summary">Mostrando todas las tareas</span>
+                        </div>
+                        <div class="tasks-view-controls">
+                            <button class="view-toggle active" data-view="list" onclick="AgendaSystem.setViewMode('list')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button class="view-toggle" data-view="grid" onclick="AgendaSystem.setViewMode('grid')">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="view-toggle" data-view="timeline" onclick="AgendaSystem.setViewMode('timeline')">
+                                <i class="fas fa-stream"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="tasks-list" id="tasks-list">
+                        <!-- Tareas cargadas dinámicamente -->
+                    </div>
+                    
+                    <div class="empty-state" id="empty-tasks-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h3>No hay tareas registradas</h3>
+                        <p>Comienza agregando tu primera tarea profesional</p>
+                        <button class="btn btn-primary" onclick="AgendaSystem.openTaskModal('new')">
+                            <i class="fas fa-plus"></i> Crear Primera Tarea
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN CALENDARIO -->
+            <section id="calendario-section" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Calendario Integral</h2>
+                    <div class="calendar-controls">
+                        <div class="view-options">
+                            <button class="view-option active" onclick="AgendaSystem.setCalendarView('month')">
+                                <i class="fas fa-calendar"></i> Mes
+                            </button>
+                            <button class="view-option" onclick="AgendaSystem.setCalendarView('week')">
+                                <i class="fas fa-calendar-week"></i> Semana
+                            </button>
+                            <button class="view-option" onclick="AgendaSystem.setCalendarView('day')">
+                                <i class="fas fa-calendar-day"></i> Día
+                            </button>
+                            <button class="view-option" onclick="AgendaSystem.setCalendarView('agenda')">
+                                <i class="fas fa-list-alt"></i> Agenda
+                            </button>
+                        </div>
+                        
+                        <div class="calendar-nav">
+                            <button class="nav-btn" onclick="AgendaSystem.calendarPrev()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h3 id="calendar-title">Enero 2024</h3>
+                            <button class="nav-btn" onclick="AgendaSystem.calendarNext()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button class="btn btn-today" onclick="AgendaSystem.goToToday()">
+                                <i class="fas fa-calendar-day"></i> Hoy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CALENDARIO PRINCIPAL -->
+                <div class="calendar-main">
+                    <div class="calendar-view" id="calendar-view">
+                        <!-- Vista de calendario dinámica -->
+                    </div>
+                    
+                    <!-- SIDEBAR DE EVENTOS -->
+                    <div class="calendar-sidebar">
+                        <div class="sidebar-section">
+                            <h4><i class="fas fa-filter"></i> Filtros Rápidos</h4>
+                            <div class="calendar-filters">
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" checked onchange="AgendaSystem.toggleCalendarFilter('tasks', this.checked)">
+                                    <span class="filter-color task"></span>
+                                    <span>Tareas</span>
+                                </label>
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" checked onchange="AgendaSystem.toggleCalendarFilter('meetings', this.checked)">
+                                    <span class="filter-color meeting"></span>
+                                    <span>Reuniones</span>
+                                </label>
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" checked onchange="AgendaSystem.toggleCalendarFilter('trainings', this.checked)">
+                                    <span class="filter-color training"></span>
+                                    <span>Capacitaciones</span>
+                                </label>
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" checked onchange="AgendaSystem.toggleCalendarFilter('deadlines', this.checked)">
+                                    <span class="filter-color deadline"></span>
+                                    <span>Plazos</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="sidebar-section">
+                            <h4><i class="fas fa-calendar-day"></i> Hoy</h4>
+                            <div class="today-events" id="today-events">
+                                <!-- Eventos de hoy -->
+                            </div>
+                        </div>
+                        
+                        <div class="sidebar-section">
+                            <h4><i class="fas fa-clock"></i> Próximos Recordatorios</h4>
+                            <div class="upcoming-reminders" id="upcoming-reminders">
+                                <!-- Recordatorios próximos -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN ARCHIVOS Y EVIDENCIAS -->
+            <section id="archivos-section" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-archive"></i> Gestión Profesional de Archivos</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="AgendaSystem.openFileUpload()">
+                            <i class="fas fa-cloud-upload-alt"></i> Subir Archivos
+                        </button>
+                        <button class="btn btn-success" onclick="AgendaSystem.downloadAllFiles()">
+                            <i class="fas fa-download"></i> Descargar Todo
+                        </button>
+                        <button class="btn btn-backup" onclick="AgendaSystem.backupFiles()">
+                            <i class="fas fa-shield-alt"></i> Backup de Archivos
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- ESTADÍSTICAS DE ARCHIVOS -->
+                <div class="files-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total de Archivos</span>
+                            <span class="stat-value" id="total-files">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Espacio Usado</span>
+                            <span class="stat-value" id="storage-used">0 MB</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Documentos PDF</span>
+                            <span class="stat-value" id="pdf-count">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Imágenes</span>
+                            <span class="stat-value" id="image-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- GESTOR DE ARCHIVOS -->
+                <div class="file-manager">
+                    <div class="file-manager-toolbar">
+                        <div class="file-actions">
+                            <button class="file-action" onclick="AgendaSystem.selectAllFiles()" title="Seleccionar todo">
+                                <i class="fas fa-check-square"></i>
+                            </button>
+                            <button class="file-action" onclick="AgendaSystem.deleteSelectedFiles()" title="Eliminar seleccionados">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                            <button class="file-action" onclick="AgendaSystem.downloadSelectedFiles()" title="Descargar seleccionados">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="file-action" onclick="AgendaSystem.organizeFiles()" title="Organizar archivos">
+                                <i class="fas fa-folder"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="file-view-controls">
+                            <select class="view-select" onchange="AgendaSystem.setFileView(this.value)">
+                                <option value="grid">Vista de Cuadrícula</option>
+                                <option value="list">Vista de Lista</option>
+                                <option value="thumb">Vista de Miniaturas</option>
+                            </select>
+                            
+                            <input type="text" 
+                                   class="file-search" 
+                                   placeholder="Buscar archivos..."
+                                   oninput="AgendaSystem.searchFiles(this.value)">
+                        </div>
+                    </div>
+                    
+                    <div class="file-manager-content">
+                        <div class="file-grid" id="file-grid">
+                            <!-- Archivos cargados dinámicamente -->
+                        </div>
+                        
+                        <div class="empty-state" id="empty-files-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>No hay archivos subidos</h3>
+                            <p>Sube evidencias, documentos o imágenes relacionadas con tus tareas</p>
+                            <button class="btn btn-primary" onclick="AgendaSystem.openFileUpload()">
+                                <i class="fas fa-cloud-upload-alt"></i> Subir Primer Archivo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN REPORTES Y ANÁLISIS -->
+            <section id="reportes-section" class="content-section">
+                <!-- Contenido de reportes -->
+            </section>
+
+            <!-- SECCIÓN SISTEMA -->
+            <section id="configuracion-section" class="content-section">
+                <!-- Contenido de sistema -->
+            </section>
+        </main>
+
+        <!-- MODALES PROFESIONALES -->
+        
+        <!-- MODAL TAREAS -->
+        <div id="task-modal" class="modal-overlay">
+            <div class="modal-container">
+                <!-- Contenido modal tareas -->
             </div>
         </div>
 
-        <!-- SISTEMA DE PLANTILLAS FUNCIONAL -->
-        <div id="templates-modal" class="modal">
-            <div class="modal-content">
-                <button class="modal-close" onclick="agenda.closeModal('templates-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h2 class="section-title">
-                    <i class="fas fa-layer-group"></i>
-                    Plantillas Guardadas
-                </h2>
-                
-                <div class="templates-actions">
-                    <button class="btn btn-primary" onclick="agenda.createNewTemplate()">
-                        <i class="fas fa-plus"></i> Nueva Plantilla
-                    </button>
-                    <button class="btn btn-secondary" onclick="agenda.importTemplates()">
-                        <i class="fas fa-file-import"></i> Importar
-                    </button>
-                    <button class="btn btn-success" onclick="agenda.exportTemplates()">
-                        <i class="fas fa-file-export"></i> Exportar Todas
-                    </button>
-                </div>
-                
-                <div class="templates-grid" id="templates-grid">
-                    <!-- Plantillas cargadas dinámicamente -->
-                </div>
+        <!-- MODAL ARCHIVOS -->
+        <div id="file-modal" class="modal-overlay">
+            <div class="modal-container">
+                <!-- Contenido modal archivos -->
             </div>
         </div>
-    </div>
 
-    <!-- SISTEMA DE NOTIFICACIONES DEL NAVEGADOR -->
-    <div id="notification-permission" class="notification-permission">
-        <div class="permission-content">
-            <i class="fas fa-bell"></i>
-            <h3>Activar Recordatorios</h3>
-            <p>Permite notificaciones para recibir recordatorios de tus tareas</p>
-            <button class="btn btn-primary" onclick="agenda.requestNotificationPermission()">
-                Activar Notificaciones
-            </button>
-            <button class="btn btn-secondary" onclick="agenda.hidePermissionRequest()">
-                Ahora no
-            </button>
-        </div>
-    </div>
+        <!-- NOTIFICACIONES DEL SISTEMA -->
+        <div id="notification-center"></div>
 
-    <!-- SISTEMA DE SINCRONIZACIÓN EN SEGUNDO PLANO -->
-    <div id="sync-indicator">
-        <i class="fas fa-sync-alt fa-spin"></i>
-        <span>Sincronizando...</span>
-    </div>
+        <!-- SISTEMA DE SINCRONIZACIÓN -->
+        <div id="sync-system"></div>
 
-    <!-- SCRIPTS PRINCIPALES -->
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script src="app.js"></script>
-    <script src="fileManager.js"></script>
-    <script src="exportManager.js"></script>
-    <script src="backupManager.js"></script>
+    </div> <!-- Fin main-container -->
+
+    <!-- ===== SCRIPTS PROFESIONALES ===== -->
     
+    <!-- LIBRERÍAS ESENCIALES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.0/build/index.min.js"></script>
+    
+    <!-- SISTEMA PRINCIPAL -->
+    <script src="./app.js"></script>
+    
+    <!-- INICIALIZACIÓN -->
     <script>
-        // Inicializar aplicación con todas las funcionalidades
+        // Inicializar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar gestor principal
-            window.agenda = new AgendaDRTE();
+            // Crear instancia del sistema
+            window.AgendaSystem = new ProfessionalAgendaSystem();
             
-            // Configurar auto-guardado cada 30 segundos
-            setInterval(() => {
-                agenda.autoSave();
-            }, 30000);
-            
-            // Configurar verificación de backup cada hora
-            setInterval(() => {
-                agenda.checkBackupStatus();
-            }, 3600000);
-            
-            // Cargar datos existentes
-            agenda.loadAllData();
-            
-            // Configurar zona horaria de Costa Rica
-            agenda.setTimezone('America/Costa_Rica');
-            
-            // Solicitar permiso para notificaciones después de 5 segundos
-            setTimeout(() => {
-                agenda.checkNotificationPermission();
-            }, 5000);
+            // Inicializar con carga progresiva
+            AgendaSystem.initializeWithProgress();
+        });
+        
+        // Manejar errores globales
+        window.addEventListener('error', function(e) {
+            console.error('Error global capturado:', e);
+            if (window.AgendaSystem && AgendaSystem.showError) {
+                AgendaSystem.showError('Error del sistema: ' + e.message);
+            }
         });
     </script>
 </body>
