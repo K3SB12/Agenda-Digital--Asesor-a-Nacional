@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 IDOMEP v3.0 · Calidad Profesional</title>
+    <title>🎓 IDOMEP v4.0 · Sistema Adaptativo Profesional</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Mammoth.js para DOCX -->
+    <!-- Mammoth.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
     <style>
         body { background: #f0f9ff; font-family: system-ui, sans-serif; }
@@ -28,30 +28,54 @@
             font-size: 0.7rem;
             font-weight: bold;
         }
+        .dificultad-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .feedback-panel {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body class="min-h-screen p-4">
 
-    <!-- BARRA SUPERIOR con indicador de calidad -->
+    <!-- BARRA SUPERIOR -->
     <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b shadow-sm mb-4">
         <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
-            <span class="font-bold text-xl">🎓 IDOMEP <span class="text-blue-600">v3.0</span> <span class="calidad-badge">CALIDAD PROFESIONAL</span></span>
+            <span class="font-bold text-xl">🎓 IDOMEP <span class="text-blue-600">v4.0</span> 
+                <span class="calidad-badge">ADAPTATIVO</span>
+                <span class="calidad-badge" style="background: #059669">ANALYTICS</span>
+            </span>
             <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
                 <button data-tab="inicio" class="tab-button px-4 py-1.5 rounded-lg text-sm active">📚 Inicio</button>
                 <button data-tab="duolingo" class="tab-button px-4 py-1.5 rounded-lg text-sm">🎮 IdoMep</button>
                 <button data-tab="simulador" class="tab-button px-4 py-1.5 rounded-lg text-sm">📝 Simulacro</button>
                 <button data-tab="reporte" class="tab-button px-4 py-1.5 rounded-lg text-sm">📊 Progreso</button>
+                <button data-tab="analytics" class="tab-button px-4 py-1.5 rounded-lg text-sm">📈 Analytics</button>
             </div>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto">
-        <!-- ========== TAB INICIO (igual) ========== -->
+        <!-- ========== TAB INICIO ========== -->
         <div id="tab-inicio" class="tab-content block">
             <div class="card mb-6 border-l-8 border-blue-600">
-                <h2 class="text-2xl font-bold mb-2">📚 Sistema de Estudio MEP</h2>
-                <p class="text-gray-600">Cargue sus documentos. El sistema genera preguntas de calidad profesional.</p>
+                <h2 class="text-2xl font-bold mb-2">📚 Sistema Adaptativo MEP</h2>
+                <p class="text-gray-600">Cargue sus documentos. El sistema aprende de sus respuestas y se adapta.</p>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-sm">
+                    <div class="bg-blue-50 p-2 rounded"><span class="font-bold">FASE 4:</span> Analytics en tiempo real</div>
+                    <div class="bg-green-50 p-2 rounded"><span class="font-bold">FASE 5:</span> Banco expansivo</div>
+                    <div class="bg-purple-50 p-2 rounded"><span class="font-bold">FASE 6:</span> Personalización</div>
+                </div>
             </div>
+
             <div class="card mb-6">
                 <h3 class="font-bold text-lg mb-4">🎯 Seleccione su estrato</h3>
                 <div class="flex flex-wrap gap-3" id="selector-estrato">
@@ -60,29 +84,30 @@
                     <button data-estrato="administrativo" class="estrato-btn px-5 py-2 rounded-full bg-slate-100 hover:bg-blue-100">Administrativo Docente</button>
                 </div>
             </div>
+
             <div class="card mb-6">
                 <h3 class="font-bold text-lg mb-4">📁 Cargue sus documentos</h3>
-                <p class="text-sm text-amber-600 mb-3">📌 Formatos: PDF, DOCX, TXT (sin límite)</p>
                 <input type="file" id="carga-docs" multiple accept=".pdf,.txt,.docx,.doc" class="mb-4 w-full p-2 border rounded-lg">
                 <div id="lista-docs" class="text-sm max-h-40 overflow-y-auto bg-slate-50 p-3 rounded-lg hidden"></div>
                 <div id="progreso-carga" class="text-xs text-gray-500 mt-2"></div>
             </div>
+
             <div class="card">
                 <h3 class="font-bold text-lg mb-4">📋 Competencias a evaluar</h3>
                 <div id="competencias-container" class="space-y-3"></div>
             </div>
         </div>
 
-        <!-- ========== TAB IDOMEP con preguntas de calidad ========== -->
+        <!-- ========== TAB IDOMEP ========== -->
         <div id="tab-duolingo" class="tab-content hidden">
-            <!-- Panel XP (igual) -->
+            <!-- Panel XP -->
             <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl shadow-xl p-6 mb-6 text-white">
                 <div class="flex flex-wrap justify-between items-center gap-4">
                     <div class="flex items-center gap-4">
                         <span class="text-4xl">🎮</span>
                         <div>
-                            <h2 class="text-2xl font-black">Ruta de dominio</h2>
-                            <p class="text-blue-100">Preguntas de calidad profesional</p>
+                            <h2 class="text-2xl font-black">Ruta adaptativa</h2>
+                            <p class="text-blue-100">Preguntas que se ajustan a su nivel</p>
                         </div>
                     </div>
                     <div class="flex gap-6">
@@ -93,38 +118,53 @@
                     </div>
                 </div>
                 <div class="mt-4">
-                    <div class="flex justify-between text-sm mb-1"><span>XP: <span id="xp-duolingo">0</span></span><span>Siguiente nivel: <span id="xp-siguiente">200</span></span></div>
-                    <div class="w-full bg-white/30 h-3 rounded-full overflow-hidden"><div class="bg-yellow-400 h-3 rounded-full" id="barra-xp-duolingo" style="width:0%"></div></div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>XP: <span id="xp-duolingo">0</span></span>
+                        <span>Confianza: <span id="confianza-duolingo">0%</span></span>
+                    </div>
+                    <div class="w-full bg-white/30 h-3 rounded-full overflow-hidden">
+                        <div class="bg-yellow-400 h-3 rounded-full" id="barra-xp-duolingo" style="width:0%"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Ruta de competencias -->
+            <!-- Ruta -->
             <div class="card mb-6">
-                <h3 class="font-bold text-lg mb-4">🗺️ Ruta de aprendizaje</h3>
+                <h3 class="font-bold text-lg mb-4">🗺️ Ruta personalizada</h3>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="ruta-container"></div>
             </div>
 
-            <!-- Pregunta de ALTA CALIDAD -->
+            <!-- Pregunta adaptativa -->
             <div class="card">
                 <div id="pregunta-header" class="flex justify-between items-center mb-4">
                     <span class="bg-indigo-100 px-3 py-1 rounded-full text-sm" id="competencia-actual-tag">📘 1.1 Área disciplinar</span>
-                    <span class="text-xs text-gray-500" id="nivel-pregunta-tag">🟢 Conceptual</span>
+                    <div>
+                        <span class="text-xs text-gray-500" id="nivel-pregunta-tag">🟢 Conceptual</span>
+                        <span class="ml-2 dificultad-badge" id="dificultad-badge" style="background: #e5e7eb">Dificultad: media</span>
+                    </div>
                 </div>
                 <div id="pregunta-container" class="min-h-[300px]">
                     <div class="text-center text-gray-500 py-12">Cargue documentos y seleccione una competencia</div>
                 </div>
-                <!-- Indicador de calidad -->
-                <div id="calidad-indicador" class="mt-2 text-right text-xs text-purple-600 hidden">
-                    ✨ Pregunta diseñada con estándares profesionales
+                <div id="feedback-usuario" class="feedback-panel hidden">
+                    <p class="text-sm font-medium">📝 ¿Esta pregunta fue?</p>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="reportarCalidad('muy_facil')" class="text-xs bg-gray-200 px-3 py-1 rounded-full">😊 Muy fácil</button>
+                        <button onclick="reportarCalidad('adecuada')" class="text-xs bg-gray-200 px-3 py-1 rounded-full">👍 Adecuada</button>
+                        <button onclick="reportarCalidad('muy_dificil')" class="text-xs bg-gray-200 px-3 py-1 rounded-full">😓 Muy difícil</button>
+                        <button onclick="reportarCalidad('confusa')" class="text-xs bg-gray-200 px-3 py-1 rounded-full">🤔 Confusa</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ========== TAB SIMULADOR (igual) ========== -->
+        <!-- ========== TAB SIMULADOR ========== -->
         <div id="tab-simulador" class="tab-content hidden">
             <div class="card mb-6">
-                <h2 class="text-2xl font-bold mb-4">📝 Simulacro oficial (60 preguntas)</h2>
-                <button id="btn-iniciar-simulacro" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">Iniciar nuevo simulacro</button>
+                <h2 class="text-2xl font-bold mb-4">📝 Simulacro adaptativo</h2>
+                <button id="btn-iniciar-simulacro" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">
+                    Iniciar simulacro personalizado
+                </button>
                 <div id="estado-simulacro" class="hidden mb-4 p-4 bg-blue-50 rounded-lg mt-4">
                     <div class="flex justify-between"><span>Progreso: <span id="simulacro-progreso">0/60</span></span><span>Correctas: <span id="simulacro-correctas">0</span></span><span>Nota: <span id="simulacro-nota">0%</span></span></div>
                     <div class="w-full bg-gray-200 h-2 rounded-full mt-2"><div class="bg-blue-600 h-2 rounded-full" id="simulacro-barra" style="width:0%"></div></div>
@@ -137,7 +177,7 @@
         <!-- ========== TAB REPORTE ========== -->
         <div id="tab-reporte" class="tab-content hidden">
             <div class="card">
-                <h2 class="text-2xl font-bold mb-6">📊 Mi progreso</h2>
+                <h2 class="text-2xl font-bold mb-6">📊 Progreso personal</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div><h3 class="font-bold text-lg mb-4">Rendimiento por competencia</h3><div id="reporte-competencias" class="space-y-4"></div></div>
                     <div><h3 class="font-bold text-lg mb-4">Gráfico de dominio</h3><canvas id="radar-competencias" width="300" height="300"></canvas></div>
@@ -145,6 +185,57 @@
                 <div class="mt-8 p-4 bg-blue-50 rounded-lg">
                     <h3 class="font-bold text-lg mb-2">📈 Estadísticas globales</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="estadisticas-globales"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== NUEVO TAB: ANALYTICS ========== -->
+        <div id="tab-analytics" class="tab-content hidden">
+            <div class="card mb-6">
+                <h2 class="text-2xl font-bold mb-4">📈 Panel de Analytics</h2>
+                <p class="text-gray-600 mb-4">Análisis en tiempo real de su aprendizaje y calidad de preguntas</p>
+                
+                <!-- Métricas de calidad -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow border">
+                        <span class="text-sm text-gray-500">Precisión general</span>
+                        <p class="text-3xl font-bold" id="precision-general">0%</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow border">
+                        <span class="text-sm text-gray-500">Nivel de confianza</span>
+                        <p class="text-3xl font-bold" id="nivel-confianza">0%</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow border">
+                        <span class="text-sm text-gray-500">Preguntas reportadas</span>
+                        <p class="text-3xl font-bold" id="preguntas-reportadas">0</p>
+                    </div>
+                </div>
+
+                <!-- Gráficos de analytics -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold mb-2">Distribución de dificultad</h3>
+                        <canvas id="grafico-dificultad" width="300" height="200"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Rendimiento por nivel</h3>
+                        <canvas id="grafico-rendimiento" width="300" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recomendaciones personalizadas -->
+                <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+                    <h3 class="font-bold text-lg mb-2">🎯 Recomendaciones personalizadas</h3>
+                    <div id="recomendaciones-container" class="space-y-2"></div>
+                </div>
+
+                <!-- Banco de preguntas mejoradas -->
+                <div class="mt-6">
+                    <h3 class="font-bold text-lg mb-2">📚 Banco de preguntas mejoradas</h3>
+                    <p class="text-sm text-gray-600 mb-2">Basado en feedback de usuarios, estas preguntas han sido optimizadas:</p>
+                    <div id="banco-mejorado" class="max-h-60 overflow-y-auto bg-gray-50 p-3 rounded-lg">
+                        <p class="text-sm text-gray-500">Cargando estadísticas...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -156,8 +247,422 @@
         // ============================================
         // CONFIGURACIÓN
         // ============================================
-        const VERSION = '3.0';
+        const VERSION = '4.0';
         const XP_POR_NIVEL = 200;
+
+        // ============================================
+        // SISTEMA DE ANALYTICS (FASE 4)
+        // ============================================
+        class AnalyticsSystem {
+            constructor() {
+                this.metricas = this.cargarMetricas() || {
+                    preguntas: {}, // id -> { total: n, correctas: n, tiempos: [], feedback: [] }
+                    competencias: {
+                        '1.1': { total: 0, correctas: 0, dificultadMedia: 0 },
+                        '1.2': { total: 0, correctas: 0, dificultadMedia: 0 },
+                        '1.3': { total: 0, correctas: 0, dificultadMedia: 0 },
+                        '2.1': { total: 0, correctas: 0, dificultadMedia: 0 },
+                        '2.3': { total: 0, correctas: 0, dificultadMedia: 0 }
+                    },
+                    niveles: {
+                        conceptual: { total: 0, correctas: 0 },
+                        aplicado: { total: 0, correctas: 0 },
+                        normativo: { total: 0, correctas: 0 }
+                    },
+                    feedbackUsuarios: [], // registro de feedback
+                    preguntasMejoradas: {}, // preguntas que han recibido feedback positivo
+                    tendencias: {
+                        ultimaSemana: [],
+                        mejoraContinua: 0
+                    },
+                    calidadPromedio: 0.8 // métrica inicial
+                };
+            }
+
+            cargarMetricas() {
+                const data = localStorage.getItem('analyticsIDOMEP');
+                return data ? JSON.parse(data) : null;
+            }
+
+            guardarMetricas() {
+                localStorage.setItem('analyticsIDOMEP', JSON.stringify(this.metricas));
+            }
+
+            registrarRespuesta(preguntaId, competencia, nivel, correcta, tiempo) {
+                // Registrar en preguntas
+                if (!this.metricas.preguntas[preguntaId]) {
+                    this.metricas.preguntas[preguntaId] = { 
+                        total: 0, 
+                        correctas: 0, 
+                        tiempos: [],
+                        feedback: [],
+                        competencia,
+                        nivel
+                    };
+                }
+                
+                const p = this.metricas.preguntas[preguntaId];
+                p.total++;
+                if (correcta) p.correctas++;
+                p.tiempos.push(tiempo);
+                
+                // Registrar en competencias
+                const c = this.metricas.competencias[competencia];
+                if (c) {
+                    c.total++;
+                    if (correcta) c.correctas++;
+                    c.dificultadMedia = 1 - (c.correctas / c.total); // 0=fácil, 1=difícil
+                }
+                
+                // Registrar en niveles
+                const nl = this.metricas.niveles[nivel];
+                if (nl) {
+                    nl.total++;
+                    if (correcta) nl.correctas++;
+                }
+                
+                // Calcular calidad promedio
+                this.calcularCalidad();
+                this.guardarMetricas();
+            }
+
+            registrarFeedback(preguntaId, tipoFeedback) {
+                const p = this.metricas.preguntas[preguntaId];
+                if (p) {
+                    p.feedback.push(tipoFeedback);
+                    
+                    // Si es feedback positivo, marcar para mejora
+                    if (tipoFeedback === 'adecuada') {
+                        this.metricas.preguntasMejoradas[preguntaId] = {
+                            ...p,
+                            vecesMejorada: (this.metricas.preguntasMejoradas[preguntaId]?.vecesMejorada || 0) + 1
+                        };
+                    }
+                    
+                    // Si es feedback negativo, reducir calidad
+                    if (tipoFeedback === 'confusa' || tipoFeedback === 'muy_dificil') {
+                        this.metricas.calidadPromedio = Math.max(0.5, this.metricas.calidadPromedio - 0.05);
+                    }
+                }
+                
+                this.metricas.feedbackUsuarios.push({
+                    preguntaId,
+                    tipo: tipoFeedback,
+                    fecha: new Date().toISOString()
+                });
+                
+                this.guardarMetricas();
+            }
+
+            calcularCalidad() {
+                // Fórmula de calidad basada en múltiples factores
+                let totalPuntos = 0;
+                let totalMetricas = 0;
+                
+                // 1. Tasa de aciertos ideal (ni muy fácil ni muy difícil)
+                for (let p of Object.values(this.metricas.preguntas)) {
+                    if (p.total > 5) {
+                        const tasaAciertos = p.correctas / p.total;
+                        // Puntuación: 1 si tasa entre 0.6 y 0.8, disminuye si se aleja
+                        const puntuacion = tasaAciertos >= 0.6 && tasaAciertos <= 0.8 ? 1 :
+                                         1 - Math.min(1, Math.abs(tasaAciertos - 0.7) * 2);
+                        totalPuntos += puntuacion;
+                        totalMetricas++;
+                    }
+                }
+                
+                // 2. Feedback de usuarios
+                const feedbackPositivo = this.metricas.feedbackUsuarios.filter(f => f.tipo === 'adecuada').length;
+                const feedbackTotal = this.metricas.feedbackUsuarios.length;
+                if (feedbackTotal > 0) {
+                    totalPuntos += feedbackPositivo / feedbackTotal;
+                    totalMetricas++;
+                }
+                
+                this.metricas.calidadPromedio = totalMetricas > 0 ? totalPuntos / totalMetricas : 0.8;
+                return this.metricas.calidadPromedio;
+            }
+
+            obtenerRecomendaciones(usuario) {
+                const recoms = [];
+                
+                // 1. Competencias débiles
+                for (let [comp, data] of Object.entries(this.metricas.competencias)) {
+                    if (data.total > 5 && (data.correctas / data.total) < 0.6) {
+                        recoms.push(`🔴 Necesita reforzar competencia ${comp} (${Math.round(data.correctas/data.total*100)}% aciertos)`);
+                    }
+                }
+                
+                // 2. Niveles a mejorar
+                for (let [nivel, data] of Object.entries(this.metricas.niveles)) {
+                    if (data.total > 3 && (data.correctas / data.total) < 0.5) {
+                        recoms.push(`📚 Practique más preguntas de nivel ${nivel}`);
+                    }
+                }
+                
+                // 3. Sugerencias de estudio
+                if (usuario.nivel.xp < 500) {
+                    recoms.push("💡 Continúe con preguntas conceptuales para construir base");
+                } else if (usuario.nivel.xp < 1000) {
+                    recoms.push("🎯 Incorpore más preguntas aplicadas y casos prácticos");
+                } else {
+                    recoms.push("🏆 Desafíese con preguntas normativas complejas");
+                }
+                
+                return recoms;
+            }
+        }
+
+        // ============================================
+        // BANCO EXPANSIVO DE PREGUNTAS (FASE 5)
+        // ============================================
+        class BancoExpansivo {
+            constructor() {
+                this.bancoBase = {
+                    '1.1': {
+                        situaciones: [
+                            'Un docente le comenta: "Mis estudiantes aprueban los exámenes pero al mes ya no recuerdan nada".',
+                            'En una reunión de ciclo, varios docentes expresan que "los estudiantes no ven sentido a lo que aprenden".',
+                            'Un director le pide orientación para mejorar los resultados en comprensión lectora.',
+                            'Durante una asesoría, un docente dice: "Ya expliqué el tema tres veces y aún hay estudiantes que no entienden".',
+                            'Un equipo docente debate si priorizar la cobertura del programa o la profundidad de los aprendizajes.',
+                            // Nuevas situaciones (expansión)
+                            'Un docente novel solicita ayuda para planificar sus primeras lecciones.',
+                            'Se observa que los estudiantes tienen dificultades para transferir lo aprendido a nuevos contextos.',
+                            'Un grupo de docentes quiere implementar aprendizaje basado en proyectos pero no sabe cómo empezar.'
+                        ],
+                        distractores: [
+                            'Aplicar la misma estrategia pero con más ejercicios de repetición',
+                            'Reducir la complejidad de los contenidos para facilitar la aprobación',
+                            'Esperar que los estudiantes "maduren" y comprendan con el tiempo',
+                            'Atribuir las dificultades exclusivamente a la falta de interés de los estudiantes',
+                            'Utilizar únicamente la memorización como estrategia principal',
+                            'Evaluar solo al final del período sin retroalimentación intermedia',
+                            // Nuevos distractores
+                            'Sugerir cambiar de tema si los estudiantes no entienden',
+                            'Atribuir las dificultades a problemas de disciplina'
+                        ]
+                    },
+                    '1.2': {
+                        situaciones: [
+                            'Un director debe nombrar en propiedad a un docente interino que cumple 3 años. El docente alega que "la experiencia es suficiente".',
+                            'Durante un proceso de auditoría, encuentran que un centro educativo no tiene actualizado su reglamento interno.',
+                            'Una asociación de padres solicita revisar la aplicación del Código de la Niñez en el centro.',
+                            'Un asesor legal recibe consulta sobre si un docente puede ser sancionado por una falta cometida hace dos años.',
+                            'Un director regional debe interpretar una circular que parece contradecir el Estatuto de Servicio Civil.',
+                            // Nuevas
+                            'Un docente solicita licencia por maternidad y hay confusión sobre sus derechos.',
+                            'Se detecta que un centro educativo no está aplicando correctamente el protocolo de acoso escolar.'
+                        ],
+                        distractores: [
+                            'Aplicar el criterio de "siempre se ha hecho así" aunque no esté normado',
+                            'Resolver basándose en la opinión personal del director sin respaldo legal',
+                            'Confundir la normativa con prácticas administrativas informales',
+                            'Asumir que la experiencia laboral sustituye requisitos académicos',
+                            'Aplicar normas derogadas por desconocimiento de actualizaciones',
+                            'Interpretar la ley de manera literal sin considerar su espíritu',
+                            // Nuevos
+                            'Esperar a que el problema se resuelva en instancias superiores',
+                            'Aplicar el criterio más favorable al funcionario sin verificar normativa'
+                        ]
+                    },
+                    '1.3': {
+                        situaciones: [
+                            'Un asesor regional recibe consultas contradictorias de dos direcciones regionales sobre la misma circular.',
+                            'Se detecta que un centro educativo no está reportando información requerida por el nivel central.',
+                            'Un coordinador debe mediar entre las directrices del nivel central y las necesidades de su institución.',
+                            'Durante una reunión, no queda claro si una decisión corresponde al director, al asesor o al nivel regional.',
+                            'Un nuevo funcionario pregunta cuál es el canal adecuado para reportar una irregularidad.'
+                        ],
+                        distractores: [
+                            'Resolver según el criterio personal para agilizar el proceso',
+                            'Ignorar las directrices centrales si parecen poco prácticas',
+                            'Asumir que todos los niveles tienen las mismas competencias',
+                            'Comunicarse informalmente saltando canales establecidos',
+                            'Esperar a que el problema se resuelva solo',
+                            'Documentar pero no reportar formalmente'
+                        ]
+                    },
+                    '2.1': {
+                        situaciones: [
+                            'El equipo de planificación debe diseñar un proyecto para mejorar la convivencia escolar.',
+                            'Un comité técnico necesita alinear su plan anual con el PPPJ.',
+                            'Se requiere elaborar un proyecto para reducir la deserción estudiantil.',
+                            'Una dirección regional solicita proyectos innovadores para mejorar resultados en matemáticas.',
+                            'Un asesor debe validar si un proyecto institucional cumple con los lineamientos del MEP.'
+                        ],
+                        distractores: [
+                            'Copiar proyectos exitosos de otros centros sin adaptarlos',
+                            'Diseñar el proyecto basado únicamente en recursos disponibles',
+                            'Priorizar actividades vistosas sobre resultados medibles',
+                            'Omitir la evaluación del impacto del proyecto',
+                            'Involucrar solo al equipo directivo en el diseño',
+                            'Establecer metas sin indicadores verificables'
+                        ]
+                    },
+                    '2.3': {
+                        situaciones: [
+                            'Un coordinador TIC debe asesorar sobre la implementación de la transformación digital.',
+                            'Se requiere capacitar a docentes en el uso de plataformas educativas.',
+                            'Un director quiere integrar tecnología pero el personal se resiste.',
+                            'El centro educativo recibe tablets pero no hay plan pedagógico para usarlas.',
+                            'Un asesor debe recomendar herramientas digitales para evaluación formativa.'
+                        ],
+                        distractores: [
+                            'Imponer el uso de tecnología sin capacitación previa',
+                            'Utilizar la tecnología solo como sustituto del cuaderno',
+                            'Adquirir equipos sin plan pedagógico asociado',
+                            'Resistirse al cambio por temor a lo desconocido',
+                            'Usar tecnología solo para entretenimiento',
+                            'Delegar completamente en el especialista TIC sin involucrarse'
+                        ]
+                    }
+                };
+                
+                this.bancoExpandido = this.cargarBanco() || this.bancoBase;
+                this.preguntasGeneradas = new Set();
+            }
+
+            cargarBanco() {
+                const data = localStorage.getItem('bancoExpandidoIDOMEP');
+                return data ? JSON.parse(data) : null;
+            }
+
+            guardarBanco() {
+                localStorage.setItem('bancoExpandidoIDOMEP', JSON.stringify(this.bancoExpandido));
+            }
+
+            // Expande el banco con nuevas situaciones basadas en feedback
+            expandirConFeedback(feedback) {
+                const competencia = feedback.competencia;
+                if (!this.bancoExpandido[competencia]) return;
+                
+                // Si hay feedback positivo recurrente, crear variantes
+                if (feedback.tipo === 'adecuada' && feedback.veces > 3) {
+                    const situacionOriginal = feedback.situacion;
+                    const variante = situacionOriginal
+                        .replace('docente', 'profesor')
+                        .replace('director', 'asesor')
+                        .replace('estudiantes', 'alumnos');
+                    
+                    if (!this.bancoExpandido[competencia].situaciones.includes(variante)) {
+                        this.bancoExpandido[competencia].situaciones.push(variante);
+                    }
+                }
+                
+                this.guardarBanco();
+            }
+
+            obtenerSituacion(competencia) {
+                const lista = this.bancoExpandido[competencia]?.situaciones || this.bancoBase['1.1'].situaciones;
+                return lista[Math.floor(Math.random() * lista.length)];
+            }
+
+            obtenerDistractores(competencia, cantidad = 3) {
+                const lista = this.bancoExpandido[competencia]?.distractores || this.bancoBase['1.1'].distractores;
+                const seleccionados = [];
+                const copia = [...lista];
+                for (let i = 0; i < cantidad; i++) {
+                    if (copia.length === 0) break;
+                    const idx = Math.floor(Math.random() * copia.length);
+                    seleccionados.push(copia.splice(idx, 1)[0]);
+                }
+                return seleccionados;
+            }
+        }
+
+        // ============================================
+        // SISTEMA DE PERSONALIZACIÓN (FASE 6)
+        // ============================================
+        class Personalizador {
+            constructor(usuario, analytics) {
+                this.usuario = usuario;
+                this.analytics = analytics;
+                this.perfil = this.cargarPerfil() || {
+                    nivelConfianza: 0.5,
+                    estilos: [], // visual, práctico, teórico
+                    competenciasFuertes: [],
+                    competenciasDebiles: [],
+                    tiempoPromedioRespuesta: 0,
+                    dificultadPreferida: 0.5, // 0=fácil, 1=difícil
+                    ultimaAdaptacion: null
+                };
+            }
+
+            cargarPerfil() {
+                const data = localStorage.getItem('perfilPersonalIDOMEP');
+                return data ? JSON.parse(data) : null;
+            }
+
+            guardarPerfil() {
+                localStorage.setItem('perfilPersonalIDOMEP', JSON.stringify(this.perfil));
+            }
+
+            // Ajusta dificultad basada en rendimiento
+            calcularDificultadOptima(competencia) {
+                const dataComp = this.analytics.metricas.competencias[competencia];
+                if (!dataComp || dataComp.total < 5) return 0.5; // dificultad media por defecto
+                
+                const tasaAciertos = dataComp.correctas / dataComp.total;
+                
+                // Si acierta mucho (>80%), aumentar dificultad
+                if (tasaAciertos > 0.8) {
+                    return Math.min(1, this.perfil.dificultadPreferida + 0.1);
+                }
+                // Si acierta poco (<50%), reducir dificultad
+                if (tasaAciertos < 0.5) {
+                    return Math.max(0, this.perfil.dificultadPreferida - 0.1);
+                }
+                
+                return this.perfil.dificultadPreferida;
+            }
+
+            // Selecciona el nivel de pregunta adecuado
+            seleccionarNivel(competencia) {
+                const dificultad = this.calcularDificultadOptima(competencia);
+                
+                // Mapear dificultad a nivel
+                if (dificultad < 0.3) return 'conceptual';
+                if (dificultad < 0.6) return 'aplicado';
+                return 'normativo';
+            }
+
+            // Actualiza perfil con nueva respuesta
+            actualizarConRespuesta(pregunta, correcta, tiempo) {
+                // Actualizar tiempo promedio
+                if (!this.perfil.tiempoPromedioRespuesta) {
+                    this.perfil.tiempoPromedioRespuesta = tiempo;
+                } else {
+                    this.perfil.tiempoPromedioRespuesta = 
+                        (this.perfil.tiempoPromedioRespuesta * 0.7) + (tiempo * 0.3);
+                }
+                
+                // Actualizar confianza
+                const aciertos = this.usuario.estadisticas.totalCorrectas;
+                const total = this.usuario.estadisticas.totalPreguntas || 1;
+                this.perfil.nivelConfianza = aciertos / total;
+                
+                this.guardarPerfil();
+            }
+
+            obtenerRecomendacionPersonalizada() {
+                const recoms = [];
+                
+                // Basado en tiempo de respuesta
+                if (this.perfil.tiempoPromedioRespuesta > 30) {
+                    recoms.push("⏱️ Está tomando más tiempo del promedio. Practique con preguntas más cortas inicialmente.");
+                }
+                
+                // Basado en confianza
+                if (this.perfil.nivelConfianza < 0.5) {
+                    recoms.push("📘 Recomendamos repasar los fundamentos antes de continuar con casos complejos.");
+                } else if (this.perfil.nivelConfianza > 0.8) {
+                    recoms.push("🚀 Excelente rendimiento! Aumentando dificultad de preguntas.");
+                }
+                
+                return recoms;
+            }
+        }
 
         // ============================================
         // PERFILES MEP
@@ -197,186 +702,61 @@
         };
 
         // ============================================
-        // BANCO DE PROMPTS DE ALTA CALIDAD
+        // GENERADOR DE PREGUNTAS ADAPTATIVO
         // ============================================
-        const bancoPromptsCalidad = {
-            '1.1': { // Área disciplinar y pedagógica
-                situaciones: [
-                    'Un docente le comenta: "Mis estudiantes aprueban los exámenes pero al mes ya no recuerdan nada".',
-                    'En una reunión de ciclo, varios docentes expresan que "los estudiantes no ven sentido a lo que aprenden".',
-                    'Un director le pide orientación para mejorar los resultados en comprensión lectora.',
-                    'Durante una asesoría, un docente dice: "Ya expliqué el tema tres veces y aún hay estudiantes que no entienden".',
-                    'Un equipo docente debate si priorizar la cobertura del programa o la profundidad de los aprendizajes.'
-                ],
-                distractores: [
-                    'Aplicar la misma estrategia pero con más ejercicios de repetición',
-                    'Reducir la complejidad de los contenidos para facilitar la aprobación',
-                    'Esperar que los estudiantes "maduren" y comprendan con el tiempo',
-                    'Atribuir las dificultades exclusivamente a la falta de interés de los estudiantes',
-                    'Utilizar únicamente la memorización como estrategia principal',
-                    'Evaluar solo al final del período sin retroalimentación intermedia'
-                ]
-            },
-            '1.2': { // Marco jurídico
-                situaciones: [
-                    'Un director debe nombrar en propiedad a un docente interino que cumple 3 años. El docente alega que "la experiencia es suficiente".',
-                    'Durante un proceso de auditoría, encuentran que un centro educativo no tiene actualizado su reglamento interno.',
-                    'Una asociación de padres solicita revisar la aplicación del Código de la Niñez en el centro.',
-                    'Un asesor legal recibe consulta sobre si un docente puede ser sancionado por una falta cometida hace dos años.',
-                    'Un director regional debe interpretar una circular que parece contradecir el Estatuto de Servicio Civil.'
-                ],
-                distractores: [
-                    'Aplicar el criterio de "siempre se ha hecho así" aunque no esté normado',
-                    'Resolver basándose en la opinión personal del director sin respaldo legal',
-                    'Confundir la normativa con prácticas administrativas informales',
-                    'Asumir que la experiencia laboral sustituye requisitos académicos',
-                    'Aplicar normas derogadas por desconocimiento de actualizaciones',
-                    'Interpretar la ley de manera literal sin considerar su espíritu'
-                ]
-            },
-            '1.3': { // Estructura organizacional
-                situaciones: [
-                    'Un asesor regional recibe consultas contradictorias de dos direcciones regionales sobre la misma circular.',
-                    'Se detecta que un centro educativo no está reportando información requerida por el nivel central.',
-                    'Un coordinador debe mediar entre las directrices del nivel central y las necesidades de su institución.',
-                    'Durante una reunión, no queda claro si una decisión corresponde al director, al asesor o al nivel regional.',
-                    'Un nuevo funcionario pregunta cuál es el canal adecuado para reportar una irregularidad.'
-                ],
-                distractores: [
-                    'Resolver según el criterio personal para agilizar el proceso',
-                    'Ignorar las directrices centrales si parecen poco prácticas',
-                    'Asumir que todos los niveles tienen las mismas competencias',
-                    'Comunicarse informalmente saltando canales establecidos',
-                    'Esperar a que el problema se resuelva solo',
-                    'Documentar pero no reportar formalmente'
-                ]
-            },
-            '2.1': { // Diseño de proyectos
-                situaciones: [
-                    'El equipo de planificación debe diseñar un proyecto para mejorar la convivencia escolar.',
-                    'Un comité técnico necesita alinear su plan anual con el PPPJ.',
-                    'Se requiere elaborar un proyecto para reducir la deserción estudiantil.',
-                    'Una dirección regional solicita proyectos innovadores para mejorar resultados en matemáticas.',
-                    'Un asesor debe validar si un proyecto institucional cumple con los lineamientos del MEP.'
-                ],
-                distractores: [
-                    'Copiar proyectos exitosos de otros centros sin adaptarlos',
-                    'Diseñar el proyecto basado únicamente en recursos disponibles',
-                    'Priorizar actividades vistosas sobre resultados medibles',
-                    'Omitir la evaluación del impacto del proyecto',
-                    'Involucrar solo al equipo directivo en el diseño',
-                    'Establecer metas sin indicadores verificables'
-                ]
-            },
-            '2.3': { // Liderazgo y TIC
-                situaciones: [
-                    'Un coordinador TIC debe asesorar sobre la implementación de la transformación digital.',
-                    'Se requiere capacitar a docentes en el uso de plataformas educativas.',
-                    'Un director quiere integrar tecnología pero el personal se resiste.',
-                    'El centro educativo recibe tablets pero no hay plan pedagógico para usarlas.',
-                    'Un asesor debe recomendar herramientas digitales para evaluación formativa.'
-                ],
-                distractores: [
-                    'Imponer el uso de tecnología sin capacitación previa',
-                    'Utilizar la tecnología solo como sustituto del cuaderno',
-                    'Adquirir equipos sin plan pedagógico asociado',
-                    'Resistirse al cambio por temor a lo desconocido',
-                    'Usar tecnología solo para entretenimiento',
-                    'Delegar completamente en el especialista TIC sin involucrarse'
-                ]
-            }
-        };
-
-        // ============================================
-        // GENERADOR DE PREGUNTAS DE ALTA CALIDAD
-        // ============================================
-        class GeneradorPreguntasCalidad {
-            constructor(documentos) {
+        class GeneradorAdaptativo {
+            constructor(documentos, analytics, banco, personalizador) {
                 this.docs = documentos;
-                this.banco = bancoPromptsCalidad;
-                this.historial = JSON.parse(localStorage.getItem('historialCalidad')) || {};
+                this.analytics = analytics;
+                this.banco = banco;
+                this.personalizador = personalizador;
             }
 
-            generarPreguntaProfesional(competenciaCodigo) {
-                // 1. Seleccionar documento con contenido relevante
+            generarPreguntaPersonalizada(competenciaCodigo) {
+                // 1. Obtener nivel óptimo según perfil
+                const nivel = this.personalizador.seleccionarNivel(competenciaCodigo);
+                
+                // 2. Obtener situación del banco expansivo
+                const situacion = this.banco.obtenerSituacion(competenciaCodigo);
+                
+                // 3. Seleccionar documento
                 const doc = this.docs[Math.floor(Math.random() * this.docs.length)];
                 
-                // 2. Obtener banco de la competencia
-                const bancoComp = this.banco[competenciaCodigo] || this.banco['1.1'];
+                // 4. Generar opción correcta basada en documento
+                const fragmento = doc.contenido.substring(0, 200).split('.')[0];
+                const correcta = {
+                    texto: `Fundamentar según ${doc.nombre}: ${fragmento.substring(0, 100)}...`,
+                    correcta: true
+                };
                 
-                // 3. Seleccionar situación contextual
-                const situacion = bancoComp.situaciones[Math.floor(Math.random() * bancoComp.situaciones.length)];
+                // 5. Obtener distractores del banco
+                const distractores = this.banco.obtenerDistractores(competenciaCodigo, 3)
+                    .map(d => ({ texto: d, correcta: false }));
                 
-                // 4. Generar opciones (1 correcta + 3 distractores)
-                const correcta = this.generarOpcionCorrecta(doc, competenciaCodigo);
-                const distractores = this.seleccionarDistractores(bancoComp.distractores, 3);
-                
-                // 5. Construir pregunta completa
-                const opciones = [correcta, ...distractores.map(d => ({ texto: d, correcta: false }))];
-                
-                // 6. Mezclar opciones (posición aleatoria de la correcta)
+                // 6. Mezclar opciones
+                const opciones = [correcta, ...distractores];
                 const posCorrecta = Math.floor(Math.random() * 4);
                 const temp = opciones[0];
                 opciones[0] = opciones[posCorrecta];
                 opciones[posCorrecta] = temp;
                 
-                // 7. Determinar nivel y XP
-                const nivel = this.determinarNivel(competenciaCodigo);
-                const xp = nivel === 'normativo' ? 20 : (nivel === 'aplicado' ? 15 : 10);
+                // 7. Calcular XP según nivel y dificultad
+                const xpBase = nivel === 'normativo' ? 20 : (nivel === 'aplicado' ? 15 : 10);
+                const dificultad = this.personalizador.calcularDificultadOptima(competenciaCodigo);
+                const xp = Math.round(xpBase * (0.8 + dificultad * 0.4));
                 
                 return {
-                    id: `calidad_${Date.now()}_${Math.random()}`,
+                    id: `adapt_${Date.now()}_${Math.random()}`,
                     competencia: competenciaCodigo,
                     texto: `${situacion}\n\n¿Cuál es la actuación correcta según la normativa y buenas prácticas?`,
                     opciones: opciones,
                     correcta: posCorrecta,
-                    fundamento: this.generarFundamento(doc, competenciaCodigo),
+                    fundamento: `✅ Correcto. Esta actuación se alinea con ${doc.nombre}`,
                     documento: doc.nombre,
                     nivel: nivel,
                     xp: xp,
-                    calidad: 'profesional'
+                    dificultadCalculada: dificultad
                 };
-            }
-
-            generarOpcionCorrecta(doc, competencia) {
-                // Extraer concepto clave del documento
-                const fragmento = doc.contenido.substring(0, 200).split('.')[0];
-                
-                // Reformular para que no sea literal
-                const reformulaciones = [
-                    `Fundamentar la decisión en ${fragmento.substring(0, 50)}... considerando el contexto institucional`,
-                    `Aplicar el principio establecido en la normativa: ${fragmento.substring(0, 60)}...`,
-                    `Orientar la acción hacia el cumplimiento de ${fragmento.substring(0, 40)}... según lo establecido`,
-                    `Basar la respuesta en lo dispuesto en el documento "${doc.nombre}" respecto a este tema`
-                ];
-                
-                return {
-                    texto: reformulaciones[Math.floor(Math.random() * reformulaciones.length)],
-                    correcta: true
-                };
-            }
-
-            seleccionarDistractores(lista, cantidad) {
-                const seleccionados = [];
-                const copia = [...lista];
-                for (let i = 0; i < cantidad; i++) {
-                    if (copia.length === 0) break;
-                    const idx = Math.floor(Math.random() * copia.length);
-                    seleccionados.push(copia.splice(idx, 1)[0]);
-                }
-                return seleccionados;
-            }
-
-            determinarNivel(competencia) {
-                // Lógica simple: 40% conceptual, 40% aplicado, 20% normativo
-                const rand = Math.random();
-                if (rand < 0.4) return 'conceptual';
-                if (rand < 0.8) return 'aplicado';
-                return 'normativo';
-            }
-
-            generarFundamento(doc, competencia) {
-                return `✅ Correcto. Esta actuación se alinea con los principios establecidos en ${doc.nombre} y las buenas prácticas profesionales del MEP.`;
             }
         }
 
@@ -385,7 +765,11 @@
         // ============================================
         let estratoActual = 'tecnico';
         let documentos = [];
-        let generadorCalidad = null;
+        let analytics = new AnalyticsSystem();
+        let banco = new BancoExpansivo();
+        let personalizador = null;
+        let generadorAdaptativo = null;
+        
         let progresoUsuario = cargarProgreso() || {
             version: VERSION,
             nivel: { actual: 1, xp: 0, xpSiguiente: 200, rango: 'Bronce' },
@@ -489,10 +873,14 @@
             let html = '';
             perfil.competencias.forEach(comp => {
                 const nivel = progresoUsuario.competencias[comp.codigo]?.nivel || 0;
+                const dataComp = analytics.metricas.competencias[comp.codigo];
+                const aciertos = dataComp && dataComp.total > 0 ? 
+                    Math.round(dataComp.correctas / dataComp.total * 100) : 0;
+                
                 html += `<div class="p-3 bg-slate-50 rounded-lg border-l-4 border-blue-500">
                     <div class="flex justify-between">
                         <span class="text-xs font-mono ${comp.saber ? 'bg-blue-200' : 'bg-green-200'} px-2 py-1 rounded-full">${comp.saber ? 'SABER' : 'HACER'}</span>
-                        <span class="text-xs">Nivel ${nivel}</span>
+                        <span class="text-xs">Nivel ${nivel} | ${aciertos}%</span>
                     </div>
                     <span class="font-medium block mt-1">${comp.codigo} ${comp.nombre}</span>
                 </div>`;
@@ -505,6 +893,10 @@
             let html = '';
             rutaDuolingo.forEach(item => {
                 const estado = progresoUsuario.competencias[item.codigo];
+                const dataComp = analytics.metricas.competencias[item.codigo];
+                const dificultad = dataComp && dataComp.total > 0 ? 
+                    Math.round(dataComp.dificultadMedia * 100) : 50;
+                
                 html += `<div class="ruta-item ${item.estado} bg-slate-50 p-4 rounded-xl text-center" data-codigo="${item.codigo}">
                     <div class="text-3xl mb-2">${item.tipo}</div>
                     <div class="font-bold text-sm">${item.codigo}</div>
@@ -513,7 +905,7 @@
                         <div class="w-full bg-gray-200 h-1 rounded-full mt-2">
                             <div class="bg-blue-600 h-1 rounded-full" style="width: ${estado?.nivel * 20 || 0}%"></div>
                         </div>
-                        <div class="text-xs mt-1">Nivel ${estado?.nivel || 0}</div>
+                        <div class="text-xs mt-1">Nivel ${estado?.nivel || 0} | D:${dificultad}%</div>
                     ` : '<div class="text-xs text-gray-400 mt-2">🔒 Bloqueado</div>'}
                 </div>`;
             });
@@ -522,7 +914,7 @@
             document.querySelectorAll('.ruta-item.disponible').forEach(item => {
                 item.addEventListener('click', function() {
                     competenciaActual = this.dataset.codigo;
-                    cargarPreguntaCalidad();
+                    cargarPreguntaAdaptativa();
                 });
             });
         }
@@ -536,7 +928,6 @@
             
             document.getElementById('nivel-duolingo').textContent = nivel;
             document.getElementById('xp-duolingo').textContent = xp;
-            document.getElementById('xp-siguiente').textContent = nivel * XP_POR_NIVEL;
             document.getElementById('barra-xp-duolingo').style.width = Math.min(100, porcentaje) + '%';
             
             if (xp >= 2000) progresoUsuario.nivel.rango = 'Idóneo';
@@ -550,29 +941,30 @@
             let vidasHtml = '';
             for (let i = 0; i < 3; i++) vidasHtml += i < vidas ? '❤️' : '🤍';
             document.getElementById('vidas-duolingo').innerHTML = vidasHtml;
+            
+            // Confianza
+            const total = progresoUsuario.estadisticas.totalPreguntas || 1;
+            const confianza = Math.round(progresoUsuario.estadisticas.totalCorrectas / total * 100);
+            document.getElementById('confianza-duolingo').textContent = confianza + '%';
         }
 
         // ============================================
-        // NUEVA FUNCIÓN: Cargar pregunta de calidad
+        // PREGUNTA ADAPTATIVA
         // ============================================
-        function cargarPreguntaCalidad() {
-            if (!generadorCalidad || documentos.length === 0) {
+        function cargarPreguntaAdaptativa() {
+            if (!generadorAdaptativo || documentos.length === 0) {
                 document.getElementById('pregunta-container').innerHTML = `
                     <div class="text-center text-amber-600 py-12">
-                        <p class="font-medium">Primero cargue sus documentos en la pestaña INICIO</p>
+                        <p class="font-medium">Primero cargue sus documentos</p>
                     </div>
                 `;
-                document.getElementById('calidad-indicador').classList.add('hidden');
                 return;
             }
             
-            const pregunta = generadorCalidad.generarPreguntaProfesional(competenciaActual);
+            const pregunta = generadorAdaptativo.generarPreguntaPersonalizada(competenciaActual);
             if (!pregunta) return;
             
             preguntaActual = pregunta;
-            
-            // Mostrar indicador de calidad
-            document.getElementById('calidad-indicador').classList.remove('hidden');
             
             const compNombre = rutaDuolingo.find(r => r.codigo === competenciaActual).nombre;
             document.getElementById('competencia-actual-tag').innerHTML = 
@@ -580,6 +972,11 @@
             
             const niveles = { conceptual: '🟢 Conceptual', aplicado: '🟡 Aplicado', normativo: '🔴 Normativo' };
             document.getElementById('nivel-pregunta-tag').textContent = niveles[pregunta.nivel] || '🟢 Conceptual';
+            
+            // Badge de dificultad
+            const badge = document.getElementById('dificultad-badge');
+            badge.textContent = `Dificultad: ${pregunta.dificultadCalculada < 0.3 ? 'baja' : (pregunta.dificultadCalculada < 0.6 ? 'media' : 'alta')}`;
+            badge.style.background = pregunta.dificultadCalculada < 0.3 ? '#dcfce7' : (pregunta.dificultadCalculada < 0.6 ? '#fef9c3' : '#fee2e2');
             
             let html = `
                 <div>
@@ -589,32 +986,31 @@
             
             pregunta.opciones.forEach((op, idx) => {
                 html += `
-                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer relative group"
-                           onclick="seleccionarOpcionCalidad(this, ${idx})">
-                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
+                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer"
+                           onclick="seleccionarOpcionAdaptativa(this, ${idx})">
+                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-sm">
                             ${String.fromCharCode(65 + idx)}
                         </span>
-                        <div class="flex-1 min-w-0">
-                            <span class="text-sm block">${op.texto}</span>
-                        </div>
+                        <span class="text-sm">${op.texto}</span>
                     </label>
                 `;
             });
             
             html += `
                     </div>
-                    <button id="btn-responder" onclick="responderPreguntaCalidad()" 
+                    <button id="btn-responder" onclick="responderPreguntaAdaptativa()" 
                             class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold" disabled>
-                        Verificar respuesta
+                        Verificar
                     </button>
                 </div>
                 <div id="feedback-duolingo" class="hidden mt-4"></div>
             `;
             
             document.getElementById('pregunta-container').innerHTML = html;
+            document.getElementById('feedback-usuario').classList.add('hidden');
         }
 
-        function seleccionarOpcionCalidad(label, idx) {
+        function seleccionarOpcionAdaptativa(label, idx) {
             document.querySelectorAll('#pregunta-container label').forEach(l => {
                 l.classList.remove('bg-blue-100', 'border-blue-500');
                 l.querySelector('span:first-child').classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
@@ -625,12 +1021,14 @@
             opcionSeleccionada = idx;
         }
 
-        function responderPreguntaCalidad() {
+        function responderPreguntaAdaptativa() {
             if (opcionSeleccionada === undefined || !preguntaActual) return;
             
+            const inicio = Date.now();
             const esCorrecta = opcionSeleccionada === preguntaActual.correcta;
+            const tiempoRespuesta = (Date.now() - inicio) / 1000;
             
-            // Actualizar estadísticas
+            // Actualizar progreso
             progresoUsuario.estadisticas.totalPreguntas++;
             if (esCorrecta) {
                 progresoUsuario.estadisticas.totalCorrectas++;
@@ -645,9 +1043,22 @@
                 progresoUsuario.estadisticas.totalIncorrectas++;
             }
             
-            // Actualizar nivel
             progresoUsuario.nivel.actual = Math.floor(progresoUsuario.nivel.xp / XP_POR_NIVEL) + 1;
             guardarProgreso();
+            
+            // Registrar en analytics
+            analytics.registrarRespuesta(
+                preguntaActual.id,
+                preguntaActual.competencia,
+                preguntaActual.nivel,
+                esCorrecta,
+                tiempoRespuesta
+            );
+            
+            // Actualizar personalizador
+            if (personalizador) {
+                personalizador.actualizarConRespuesta(preguntaActual, esCorrecta, tiempoRespuesta);
+            }
             
             // Mostrar feedback
             const feedback = document.getElementById('feedback-duolingo');
@@ -657,34 +1068,58 @@
                 <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 ${esCorrecta ? 'border-green-500' : 'border-red-500'}">
                     <h4 class="font-bold text-lg mb-2">${esCorrecta ? '✅ Correcto' : '❌ Incorrecto'}</h4>
                     <div class="bg-${esCorrecta ? 'green' : 'red'}-50 p-4 rounded-lg">
-                        <p class="font-medium">${esCorrecta ? 'Fundamento profesional' : 'Error'}:</p>
-                        <p>${esCorrecta ? preguntaActual.fundamento : 'Esta opción no se ajusta a la normativa ni a las buenas prácticas.'}</p>
+                        <p>${esCorrecta ? preguntaActual.fundamento : 'Esta opción no es la correcta.'}</p>
                         ${!esCorrecta ? `
-                            <p class="mt-2 font-medium">✅ La respuesta correcta era:</p>
+                            <p class="mt-2 font-medium">✅ Respuesta correcta:</p>
                             <p>${preguntaActual.opciones[preguntaActual.correcta].texto}</p>
                         ` : ''}
                     </div>
-                    <button onclick="siguientePreguntaCalidad()" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg">Continuar</button>
+                    <button onclick="siguientePreguntaAdaptativa()" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg">Continuar</button>
                 </div>
             `;
             feedback.classList.remove('hidden');
             document.getElementById('btn-responder').disabled = true;
             
+            // Mostrar panel de feedback de calidad
+            document.getElementById('feedback-usuario').classList.remove('hidden');
+            
             actualizarUIDuolingo();
             renderizarRuta();
         }
 
-        function siguientePreguntaCalidad() {
+        function siguientePreguntaAdaptativa() {
             document.getElementById('feedback-duolingo').classList.add('hidden');
-            cargarPreguntaCalidad();
+            document.getElementById('feedback-usuario').classList.add('hidden');
+            cargarPreguntaAdaptativa();
         }
 
         // ============================================
-        // SIMULADOR (versión simplificada pero funcional)
+        // REPORTAR CALIDAD DE PREGUNTA
+        // ============================================
+        function reportarCalidad(tipo) {
+            if (!preguntaActual) return;
+            
+            analytics.registrarFeedback(preguntaActual.id, tipo);
+            
+            // Expandir banco si el feedback es positivo
+            if (tipo === 'adecuada') {
+                banco.expandirConFeedback({
+                    competencia: preguntaActual.competencia,
+                    tipo: tipo,
+                    veces: 1,
+                    situacion: preguntaActual.texto.split('\n')[0]
+                });
+            }
+            
+            alert('¡Gracias por su feedback! Mejoramos con su ayuda.');
+        }
+
+        // ============================================
+        // SIMULADOR ADAPTATIVO
         // ============================================
         function iniciarSimulador() {
-            if (!generadorCalidad || documentos.length === 0) {
-                alert('Debe cargar documentos primero');
+            if (!generadorAdaptativo || documentos.length === 0) {
+                alert('Cargue documentos primero');
                 return;
             }
             
@@ -693,7 +1128,7 @@
             
             for (let i = 0; i < 60; i++) {
                 const comp = competencias[Math.floor(Math.random() * competencias.length)];
-                const pregunta = generadorCalidad.generarPreguntaProfesional(comp);
+                const pregunta = generadorAdaptativo.generarPreguntaPersonalizada(comp);
                 if (pregunta) preguntas.push(pregunta);
             }
             
@@ -716,7 +1151,7 @@
             let html = `
                 <div class="pregunta-simulador">
                     <p class="text-sm text-gray-500 mb-2">Pregunta ${index+1} de 60</p>
-                    <p class="text-lg font-medium mb-4 whitespace-pre-line">${pregunta.texto}</p>
+                    <p class="text-lg font-medium mb-4">${pregunta.texto}</p>
                     <div class="space-y-3 mb-6">
             `;
             
@@ -740,7 +1175,6 @@
             `;
             
             document.getElementById('simulacro-container').innerHTML = html;
-            window.preguntaSimuladorActual = pregunta;
         }
 
         function seleccionarOpcionSimulador(label, idx, index) {
@@ -770,7 +1204,7 @@
             
             setTimeout(() => {
                 mostrarPreguntaSimulador(index + 1);
-            }, 500);
+            }, 400);
         }
 
         function finalizarSimulador() {
@@ -786,7 +1220,7 @@
                     <h3 class="text-2xl font-bold mb-4 ${aprobado ? 'text-green-600' : 'text-red-600'}">
                         ${aprobado ? '✅ APROBADO' : '❌ NO APROBADO'}
                     </h3>
-                    <p class="mb-2">Resultado: ${window.simuladorCorrectas}/60 (${porcentaje.toFixed(1)}%)</p>
+                    <p>Resultado: ${window.simuladorCorrectas}/60 (${porcentaje.toFixed(1)}%)</p>
                     <button onclick="iniciarSimulador()" class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg">
                         Nuevo simulacro
                     </button>
@@ -821,7 +1255,6 @@
                         <div class="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
                             <div class="${colorBarra} h-4 rounded-full" style="width: ${porcentaje}%"></div>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">XP: ${data.xp}</p>
                     </div>
                 `;
             }
@@ -850,23 +1283,82 @@
             });
             
             document.getElementById('estadisticas-globales').innerHTML = `
-                <div class="p-3 bg-white rounded-lg shadow">
-                    <span class="text-sm text-gray-500">Total preguntas</span>
-                    <p class="text-2xl font-bold">${progresoUsuario.estadisticas.totalPreguntas}</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg shadow">
-                    <span class="text-sm text-gray-500">Correctas</span>
-                    <p class="text-2xl font-bold text-green-600">${progresoUsuario.estadisticas.totalCorrectas}</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg shadow">
-                    <span class="text-sm text-gray-500">Simulacros</span>
-                    <p class="text-2xl font-bold">${progresoUsuario.estadisticas.simulacrosCompletados}</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg shadow">
-                    <span class="text-sm text-gray-500">Aprobados</span>
-                    <p class="text-2xl font-bold text-blue-600">${progresoUsuario.estadisticas.simulacrosAprobados}</p>
-                </div>
+                <div class="p-3 bg-white rounded-lg shadow"><span class="text-sm text-gray-500">Total</span><p class="text-2xl font-bold">${progresoUsuario.estadisticas.totalPreguntas}</p></div>
+                <div class="p-3 bg-white rounded-lg shadow"><span class="text-sm text-gray-500">Correctas</span><p class="text-2xl font-bold text-green-600">${progresoUsuario.estadisticas.totalCorrectas}</p></div>
+                <div class="p-3 bg-white rounded-lg shadow"><span class="text-sm text-gray-500">Simulacros</span><p class="text-2xl font-bold">${progresoUsuario.estadisticas.simulacrosCompletados}</p></div>
+                <div class="p-3 bg-white rounded-lg shadow"><span class="text-sm text-gray-500">Aprobados</span><p class="text-2xl font-bold text-blue-600">${progresoUsuario.estadisticas.simulacrosAprobados}</p></div>
             `;
+        }
+
+        // ============================================
+        // PANEL DE ANALYTICS
+        // ============================================
+        function actualizarPanelAnalytics() {
+            // Métricas generales
+            const total = progresoUsuario.estadisticas.totalPreguntas || 1;
+            const precision = Math.round(progresoUsuario.estadisticas.totalCorrectas / total * 100);
+            document.getElementById('precision-general').textContent = precision + '%';
+            
+            const confianza = personalizador ? Math.round(personalizador.perfil.nivelConfianza * 100) : 50;
+            document.getElementById('nivel-confianza').textContent = confianza + '%';
+            
+            document.getElementById('preguntas-reportadas').textContent = analytics.metricas.feedbackUsuarios.length;
+            
+            // Gráfico de dificultad
+            const ctxDificultad = document.getElementById('grafico-dificultad').getContext('2d');
+            new Chart(ctxDificultad, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fáciles', 'Medias', 'Difíciles'],
+                    datasets: [{
+                        data: [
+                            Object.values(analytics.metricas.preguntas).filter(p => (p.correctas/p.total) > 0.7).length,
+                            Object.values(analytics.metricas.preguntas).filter(p => (p.correctas/p.total) >= 0.4 && (p.correctas/p.total) <= 0.7).length,
+                            Object.values(analytics.metricas.preguntas).filter(p => (p.correctas/p.total) < 0.4).length
+                        ],
+                        backgroundColor: ['#4ade80', '#facc15', '#f87171']
+                    }]
+                }
+            });
+            
+            // Gráfico de rendimiento por nivel
+            const ctxRendimiento = document.getElementById('grafico-rendimiento').getContext('2d');
+            new Chart(ctxRendimiento, {
+                type: 'bar',
+                data: {
+                    labels: ['Conceptual', 'Aplicado', 'Normativo'],
+                    datasets: [{
+                        label: '% aciertos',
+                        data: [
+                            analytics.metricas.niveles.conceptual.total > 0 ? 
+                                (analytics.metricas.niveles.conceptual.correctas / analytics.metricas.niveles.conceptual.total * 100) : 0,
+                            analytics.metricas.niveles.aplicado.total > 0 ? 
+                                (analytics.metricas.niveles.aplicado.correctas / analytics.metricas.niveles.aplicado.total * 100) : 0,
+                            analytics.metricas.niveles.normativo.total > 0 ? 
+                                (analytics.metricas.niveles.normativo.correctas / analytics.metricas.niveles.normativo.total * 100) : 0
+                        ],
+                        backgroundColor: '#60a5fa'
+                    }]
+                }
+            });
+            
+            // Recomendaciones
+            const recoms = analytics.obtenerRecomendaciones(progresoUsuario);
+            if (personalizador) {
+                recoms.push(...personalizador.obtenerRecomendacionPersonalizada());
+            }
+            
+            document.getElementById('recomendaciones-container').innerHTML = recoms.map(r => 
+                `<div class="p-2 bg-white rounded shadow-sm">${r}</div>`
+            ).join('');
+            
+            // Banco mejorado
+            const mejoradas = Object.entries(analytics.metricas.preguntasMejoradas)
+                .slice(0, 5)
+                .map(([id, data]) => `<div class="text-xs p-2 bg-green-50 rounded">✅ Pregunta mejorada (${data.vecesMejorada} veces)</div>`)
+                .join('');
+            
+            document.getElementById('banco-mejorado').innerHTML = mejoradas || '<p class="text-sm text-gray-500">Aún no hay preguntas mejoradas</p>';
         }
 
         // ============================================
@@ -881,6 +1373,9 @@
                 
                 if (this.dataset.tab === 'reporte') {
                     generarReporteCompetencias();
+                }
+                if (this.dataset.tab === 'analytics') {
+                    actualizarPanelAnalytics();
                 }
             });
         });
@@ -918,9 +1413,12 @@
                 }
             }
             
-            generadorCalidad = new GeneradorPreguntasCalidad(documentos);
+            // Inicializar sistemas
+            personalizador = new Personalizador(progresoUsuario, analytics);
+            generadorAdaptativo = new GeneradorAdaptativo(documentos, analytics, banco, personalizador);
+            
             listaDiv.classList.remove('hidden');
-            progresoDiv.innerHTML = `✅ ${documentos.length} documentos listos. Modo: CALIDAD PROFESIONAL`;
+            progresoDiv.innerHTML = `✅ ${documentos.length} documentos listos. Sistema adaptativo activado.`;
         });
 
         document.getElementById('btn-iniciar-simulacro').addEventListener('click', iniciarSimulador);
