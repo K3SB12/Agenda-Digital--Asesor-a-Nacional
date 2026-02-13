@@ -281,47 +281,132 @@
             });
 
             // Generar pregunta
-            function generarPregunta(competenciaElegida = null) {
-                if (documentos.length === 0) { alert('Cargue documentos primero'); return; }
-
-                let competenciaObj = null;
+            function generarPreguntaProfesional(competenciaElegida = null) {
+                if (documentos.length === 0) {
+                    alert('Primero cargue sus documentos');
+                    return null;
+                }
+            
+                // 1. SELECCIONAR COMPETENCIA (con inteligencia)
+                let competenciaObj;
                 if (competenciaElegida) {
                     competenciaObj = perfilesMEP[estratoActual].competencias.find(c => c.codigo === competenciaElegida);
                 } else {
+                    // Priorizar competencias con menor nivel
                     const comps = perfilesMEP[estratoActual].competencias;
                     const niveles = comps.map(c => progreso.porCompetencia[c.codigo]?.nivel || 0);
                     const minNivel = Math.min(...niveles);
                     const candidatas = comps.filter((_, i) => niveles[i] === minNivel);
                     competenciaObj = candidatas[Math.floor(Math.random() * candidatas.length)];
                 }
-                if (!competenciaObj) return;
-
+            
+                // 2. SELECCIONAR DOCUMENTO RELEVANTE
                 let docsRel = documentos.filter(d => d.competencias.includes(competenciaObj.codigo));
                 if (docsRel.length === 0) docsRel = documentos;
                 const doc = docsRel[Math.floor(Math.random() * docsRel.length)];
-
-                const oraciones = doc.contenido.split('.').filter(o => o.trim().length > 40);
-                if (oraciones.length === 0) return generarPregunta(competenciaElegida);
-                const fragmento = oraciones[Math.floor(Math.random() * oraciones.length)].trim();
-
-                // Opciones base (se pueden personalizar más)
-                const opciones = [
-                    'A) Aplicar la normativa o procedimiento establecido',
-                    'B) Actuar según criterio personal',
-                    'C) Consultar con colegas sin fundamento legal',
-                    'D) Esperar directrices sin actuar'
-                ];
-
+            
+                // 3. EXTRAER FRAGMENTO DE CALIDAD (buscar párrafos completos)
+                const parrafos = doc.contenido.split('\n\n').filter(p => p.trim().length > 60);
+                let fragmento = '';
+                let contexto = '';
+                
+                if (parrafos.length > 0) {
+                    const parrafoElegido = parrafos[Math.floor(Math.random() * parrafos.length)];
+                    const oraciones = parrafoElegido.split('.').filter(o => o.trim().length > 30);
+                    if (oraciones.length >= 2) {
+                        // Tomar 2-3 oraciones para dar contexto
+                        const inicio = Math.floor(Math.random() * (oraciones.length - 1));
+                        fragmento = oraciones.slice(inicio, inicio + 2).join('. ').trim();
+                        contexto = oraciones.slice(0, inicio).join('. ') + '...';
+                    } else {
+                        fragmento = oraciones[0] || parrafoElegido.substring(0, 150);
+                    }
+                } else {
+                    const oraciones = doc.contenido.split('.').filter(o => o.trim().length > 30);
+                    fragmento = oraciones[Math.floor(Math.random() * oraciones.length)] || '';
+                }
+            
+                // 4. GENERAR OPCIONES SEGÚN LA COMPETENCIA (personalizadas)
+                let opciones = [];
+                let correcta = 0;
+                let explicacion = '';
+            
+                switch(competenciaObj.codigo) {
+                    case '1.1': // Área disciplinar y curricular
+                        opciones = [
+                            'A) Aplicar la metodología activa correspondiente al nivel y contexto (fundamentado en guías docentes y PNFT)',
+                            'B) Usar siempre la misma estrategia didáctica sin importar el contenido',
+                            'C) Enseñar exclusivamente con clase magistral, ignorando metodologías activas',
+                            'D) Seguir únicamente el libro de texto, sin adaptaciones curriculares'
+                        ];
+                        explicacion = 'Las guías docentes del MEP y los módulos PNFT establecen que la mediación pedagógica debe ser activa y contextualizada.';
+                        break;
+            
+                    case '1.2': // Marco jurídico
+                        opciones = [
+                            'A) Aplicar la Ley Marco de Empleo Público N°10159 y la Ley de Control Interno N°8292 según corresponda',
+                            'B) Actuar basándose únicamente en la costumbre institucional',
+                            'C) Resolver según el criterio personal del superior jerárquico',
+                            'D) Esperar a que el caso sea resuelto por instancias externas'
+                        ];
+                        explicacion = 'La Ley N°10159 (art.5) exige idoneidad y la Ley 8292 (art.8-16) establece responsabilidades del jerarca en control interno.';
+                        break;
+            
+                    case '1.3': // Estructura organizacional
+                        opciones = [
+                            'A) Remitir la consulta al nivel correspondiente según las competencias establecidas en la estructura del MEP',
+                            'B) Resolver sin consultar, asumiendo competencias que no le corresponden',
+                            'C) Enviar el caso a todos los niveles simultáneamente',
+                            'D) Archivar el caso hasta recibir instrucciones explícitas'
+                        ];
+                        explicacion = 'La estructura organizacional del MEP define claramente las competencias de cada nivel (central, regional, institucional).';
+                        break;
+            
+                    case '2.1': // Diseño de planes
+                        opciones = [
+                            'A) Diseñar el proyecto alineado al PPPJ 2026-2030 y al Plan Nacional de Desarrollo',
+                            'B) Crear un proyecto sin diagnóstico previo de necesidades',
+                            'C) Copiar un proyecto exitoso de otro país sin adaptarlo',
+                            'D) Planificar basándose únicamente en recursos disponibles, sin marco estratégico'
+                        ];
+                        explicacion = 'El PPPJ 2026-2030 y el Plan Nacional de Desarrollo son el marco obligatorio para todo proyecto institucional.';
+                        break;
+            
+                    case '2.3': // Liderazgo y TIC
+                        opciones = [
+                            'A) Implementar el Modelo de Gobernanza TIC y la Guía MITDE para la transformación digital',
+                            'B) Adquirir tecnología sin planificación ni diagnóstico',
+                            'C) Mantener los mismos procesos sin integrar tecnología',
+                            'D) Delegar completamente en personal técnico sin supervisión'
+                        ];
+                        explicacion = 'El Modelo de Gobernanza TIC y la Estrategia de Transformación Digital del MEP orientan la integración tecnológica.';
+                        break;
+            
+                    default:
+                        opciones = [
+                            'A) Aplicar el procedimiento establecido en la normativa vigente',
+                            'B) Actuar según el criterio personal del momento',
+                            'C) Consultar informalmente con compañeros y seguir su opinión',
+                            'D) Esperar a que el problema se resuelva solo'
+                        ];
+                        explicacion = 'La normativa del MEP establece procedimientos claros para cada situación.';
+                }
+            
+                // 5. CONSTRUIR PREGUNTA CONTEXTUALIZADA
                 return {
                     competencia: competenciaObj.codigo,
-                    pregunta: `[Competencia ${competenciaObj.codigo}] Según "${doc.nombre}":\n"${fragmento.substring(0,200)}..."\n¿Cuál es la actuación correcta?`,
+                    competenciaNombre: competenciaObj.nombre,
+                    pregunta: `**Competencia ${competenciaObj.codigo}: ${competenciaObj.nombre}**\n\n` +
+                             `Contexto extraído de: **${doc.nombre}**\n\n` +
+                             `"${fragmento.substring(0, 250)}..."\n\n` +
+                             `**Situación:** Basado en el texto anterior, ¿cuál sería la actuación correcta según la normativa y políticas del MEP?`,
                     opciones: opciones,
-                    correcta: 0,
-                    explicacion: `La respuesta correcta se fundamenta en el documento "${doc.nombre}". Revise el texto completo para más contexto.`,
-                    documento: doc.nombre
+                    correcta: correcta,
+                    explicacion: explicacion,
+                    documento: doc.nombre,
+                    contextoCompleto: fragmento
                 };
             }
-
             // Agregar pregunta al simulador
             function agregarPregunta(p) {
                 const id = Date.now();
@@ -374,7 +459,7 @@
 
             document.getElementById('btn-generar').addEventListener('click', () => {
                 const select = document.getElementById('selector-competencia');
-                const pregunta = generarPregunta(select.value || null);
+                const pregunta = generarPreguntaProfesional(select.value || null);
                 if (pregunta) agregarPregunta(pregunta);
             });
 
