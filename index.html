@@ -3,1028 +3,878 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idoneidad Total · Tutor Definitivo MEP</title>
+    <title>🧠 NEURONA IDONEIDAD · Tutor Adaptativo MEP</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js para gráficos de progreso -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estilos profesionales */
-        .competencia-card { 
-            cursor: pointer; 
-            border-left: 4px solid transparent; 
-            transition: all 0.2s;
+        /* Estilos avanzados */
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .neuron-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 2px;
+        }
+        
+        .neuron-card-inner {
             background: white;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 18px;
+            padding: 20px;
+            height: 100%;
         }
-        .competencia-card:hover { 
-            border-left-color: #2563eb; 
-            background-color: #f8fafc;
-            transform: translateX(4px);
-        }
-        .feedback-correcto { 
-            background-color: #dcfce7; 
-            border-left: 4px solid #22c55e;
-            padding: 12px;
-            border-radius: 8px;
-        }
-        .feedback-incorrecto { 
-            background-color: #fee2e2; 
-            border-left: 4px solid #ef4444;
-            padding: 12px;
-            border-radius: 8px;
-        }
-        .chat-mensaje-usuario { 
+        
+        .chat-bubble-user {
             background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
-            border-radius: 18px 18px 4px 18px;
-            padding: 10px 16px;
+            border-radius: 20px 20px 5px 20px;
+            padding: 12px 18px;
             max-width: 80%;
             align-self: flex-end;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
-        .chat-mensaje-tutor { 
+        
+        .chat-bubble-tutor {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 18px 18px 18px 4px;
-            padding: 10px 16px;
+            border-radius: 20px 20px 20px 5px;
+            padding: 12px 18px;
             max-width: 80%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
-        .badge-ley { 
-            background-color: #e0e7ff; 
-            color: #1e40af; 
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        
+        .competencia-item {
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
         }
-        .badge-articulo { 
-            background-color: #dc2626; 
-            color: white; 
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        
+        .competencia-item:hover {
+            border-left-color: var(--primary);
+            background: #f8fafc;
+            transform: translateX(5px);
         }
-        .indicador-item {
-            background: #f1f5f9;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: #334155;
-            margin: 0 4px 4px 0;
-            display: inline-block;
-        }
+        
+        .nivel-bajo { background: linear-gradient(135deg, #fee2e2, #fecaca); }
+        .nivel-medio { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+        .nivel-alto { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+        
         .pregunta-card {
             background: white;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
             border: 1px solid #e2e8f0;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
+        
         .pregunta-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
         }
-        .estrato-btn-active {
-            background: #2563eb !important;
-            color: white !important;
-            border-color: #1d4ed8 !important;
+        
+        .badge-articulo {
+            background: #1e293b;
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .brain-wave {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .brain-wave::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: wave 3s infinite;
+        }
+        
+        @keyframes wave {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
     </style>
 </head>
-<body class="bg-slate-50 font-sans antialiased">
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <!-- CABECERA MEJORADA -->
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-6 mb-8 text-white">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h1 class="text-4xl font-extrabold tracking-tight mb-2">
-                        🎓 Idoneidad <span class="text-yellow-300">Total</span>
-                    </h1>
-                    <p class="text-blue-100 text-lg">Tu preparación integral para las pruebas de idoneidad · Transitorio IX</p>
+<body class="font-sans antialiased py-6">
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- CABECERA NEURONAL -->
+        <div class="neuron-card mb-6">
+            <div class="neuron-card-inner flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center animate-pulse-slow brain-wave">
+                            <i class="fa-solid fa-brain text-white text-3xl"></i>
+                        </div>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            NEURONA · IDONEIDAD
+                        </h1>
+                        <p class="text-slate-600 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-blue-500"></i>
+                            Tutor adaptativo con inteligencia contextual · Aprende de tus respuestas
+                        </p>
+                    </div>
                 </div>
-                <div class="mt-4 md:mt-0 flex gap-3">
-                    <span class="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm flex items-center gap-2">
-                        <i class="fa-regular fa-clock"></i> 60 ítems · 70% mínimo
-                    </span>
-                    <span class="bg-yellow-400 text-blue-900 px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2">
-                        <i class="fa-regular fa-star"></i> Basado en perfiles DGTH
+                <div class="flex gap-3">
+                    <span class="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="fecha-actual"></span>
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- SELECTOR DE ESTRATO MEJORADO -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <!-- MÉTRICAS DE APRENDIZAJE (NEURONA EN ACCIÓN) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Nivel de conocimiento</p>
+                        <p class="text-2xl font-bold" id="nivel-conocimiento">0%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-chart-line text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-200 h-2 rounded-full mt-2">
+                    <div class="bg-blue-600 h-2 rounded-full" id="barra-conocimiento" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Preguntas respondidas</p>
+                        <p class="text-2xl font-bold" id="total-preguntas">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-check text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Aciertos</p>
+                        <p class="text-2xl font-bold" id="total-aciertos">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-trophy text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Leyes dominadas</p>
+                        <p class="text-2xl font-bold" id="leyes-dominadas">0/12</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-book text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SELECTOR DE ESTRATO (AHORA CON PERSONALIDAD) -->
+        <div class="glass-card p-6 mb-6">
             <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-blue-500"></i>  
-                Seleccioná tu estrato para ver las competencias exactas que evaluarán
+                <i class="fa-solid fa-brain text-purple-500 animate-pulse"></i>
+                La neurona necesita saber: ¿qué perfil estás entrenando?
             </h2>
             <div class="flex flex-wrap gap-3" id="estrato-selector">
                 <button data-estrato="docente" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-all flex items-center gap-2 border-2 border-transparent">
-                    <i class="fa-solid fa-chalkboard-user text-lg"></i> 
-                    <span class="font-bold">Propiamente Docente</span>
+                    <i class="fa-solid fa-chalkboard-user text-lg"></i>
+                    Propiamente Docente
                 </button>
                 <button data-estrato="tecnico" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-all flex items-center gap-2 border-2 border-transparent">
-                    <i class="fa-solid fa-users-between-lines text-lg"></i> 
-                    <span class="font-bold">Técnico Docente</span> <span class="text-xs bg-blue-100 px-2 py-1 rounded-full">Asesores</span>
+                    <i class="fa-solid fa-users-between-lines text-lg"></i>
+                    Técnico Docente
                 </button>
                 <button data-estrato="administrativo" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-all flex items-center gap-2 border-2 border-transparent">
-                    <i class="fa-solid fa-building text-lg"></i> 
-                    <span class="font-bold">Administrativo Docente</span> <span class="text-xs bg-blue-100 px-2 py-1 rounded-full">Directores/Gestión</span>
+                    <i class="fa-solid fa-building text-lg"></i>
+                    Administrativo Docente
                 </button>
             </div>
         </div>
 
-        <!-- CONTENEDOR PRINCIPAL: 2 COLUMNAS -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-            <!-- COLUMNA IZQUIERDA: CHAT TUTOR EXPERTO (1/4) -->
+        <!-- CONTENEDOR PRINCIPAL: CHAT + CONTENIDO -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- COLUMNA IZQUIERDA: CHAT DE LA NEURONA -->
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sticky top-4">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="bg-indigo-100 p-2 rounded-lg">
-                            <i class="fa-solid fa-robot text-indigo-600 text-xl"></i>
+                <div class="glass-card p-4 sticky top-4" style="height: calc(100vh - 200px);">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="relative">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                                <i class="fa-regular fa-message text-white"></i>
+                            </div>
+                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></span>
                         </div>
                         <div>
-                            <h3 class="font-bold text-slate-800">Tutor Experto</h3>
-                            <p class="text-xs text-slate-500">Especialista en normativa MEP</p>
+                            <h3 class="font-bold text-slate-800">Conversación con tu neurona</h3>
+                            <p class="text-xs text-slate-500">Ella recuerda todo lo que hablamos</p>
                         </div>
                     </div>
                     
                     <!-- Área de chat con scroll -->
-                    <div id="chat-container" class="h-96 overflow-y-auto mb-3 flex flex-col space-y-3 pr-1" style="min-height: 350px;">
-                        <!-- Mensaje inicial -->
-                        <div class="flex justify-start">
-                            <div class="chat-mensaje-tutor">
-                                <span class="font-bold text-indigo-600 block mb-1">📘 Tutor</span>
-                                <p class="text-sm">Hola, soy tu tutor especialista. Puedo:</p>
-                                <ul class="text-xs list-disc list-inside mt-1 text-slate-600 space-y-1">
-                                    <li>📌 <span class="font-medium">Generar preguntas</span> sobre cualquier ley (ej: "3 preguntas sobre Control Interno")</li>
-                                    <li>📊 <span class="font-medium">Analizar tu rendimiento</span> ("cómo voy en mis estudios")</li>
-                                    <li>📚 <span class="font-medium">Recomendar estudio</span> ("qué me recomiendas estudiar")</li>
-                                    <li>⚖️ <span class="font-medium">Explicar leyes</span> ("qué dice la Ley de Carrera Docente")</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div id="chat-container" class="h-[calc(100%-180px)] overflow-y-auto mb-3 flex flex-col space-y-3 pr-2">
+                        <!-- Mensajes dinámicos -->
                     </div>
-
+                    
                     <!-- Input de chat -->
-                    <div class="flex gap-2">
-                        <input type="text" id="chat-input" placeholder="Escribí tu consulta..." 
-                               class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button id="btn-enviar-chat" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm flex items-center gap-1">
+                    <div class="flex gap-2 mt-2">
+                        <input type="text" id="chat-input" placeholder="Habla con tu neurona..." 
+                               class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button id="btn-enviar-chat" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-3 rounded-xl hover:shadow-lg transition text-sm flex items-center gap-2">
                             <i class="fa-regular fa-paper-plane"></i>
                         </button>
                     </div>
-
-                    <!-- Sugerencias rápidas -->
+                    
+                    <!-- Sugerencias contextuales -->
                     <div class="flex flex-wrap gap-1 mt-3">
-                        <span class="text-xs text-gray-500 w-full mb-1">Sugerencias de estudio:</span>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-full">📋 3 preguntas Ley 10159</button>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-full">⚖️ explicame Control Interno</button>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-full">📊 analiza mi rendimiento</button>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-full">📘 qué estudiar hoy</button>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-full">📖 Código Niñez explicación</button>
+                        <span class="text-xs text-gray-500 w-full mb-1">La neurona sugiere:</span>
+                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">📚 Explicame Ley 10159</button>
+                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">🎯 Generá 3 preguntas difíciles</button>
+                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">📊 Mi progreso</button>
+                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">⚠️ Repasar errores</button>
                     </div>
                 </div>
             </div>
-
-            <!-- COLUMNA DERECHA: CONTENIDO PRINCIPAL (3/4) -->
-            <div class="lg:col-span-3 space-y-6" id="contenido-estrato">
-                <!-- El contenido se inyecta aquí -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
-                    <i class="fa-solid fa-spinner fa-spin-pulse text-4xl text-blue-500 mb-3"></i>
-                    <p class="text-slate-500">Cargando competencias, indicadores y simulador...</p>
+            
+            <!-- COLUMNA DERECHA: CONTENIDO ADAPTATIVO -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- MAPA DE CALOR DE COMPETENCIAS -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-fire-flame text-orange-500"></i>
+                        Mapa de calor de tu conocimiento
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="mapa-competencias">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+                
+                <!-- COMPETENCIAS DETALLADAS -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-blue-500"></i>
+                        Competencias del perfil (con tu nivel actual)
+                    </h3>
+                    <div id="competencias-container" class="space-y-3">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+                
+                <!-- SIMULADOR INTELIGENTE -->
+                <div class="glass-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-regular fa-pen-to-square text-green-600"></i>
+                            Simulador adaptativo
+                        </h3>
+                        <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-medium" id="dificultad-actual">
+                            Nivel: medio
+                        </span>
+                    </div>
+                    <div id="simulador-container" class="space-y-6">
+                        <!-- Preguntas dinámicas -->
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- FOOTER CON RECURSOS -->
-        <footer class="mt-8 text-sm text-slate-500 border-t pt-4 flex justify-between items-center">
-            <span>© 2025 · Idoneidad Total · v2.0 · 12 leyes · 34 competencias · 156 indicadores</span>
-            <div class="flex gap-4">
-                <span class="flex items-center gap-1"><i class="fa-regular fa-circle-check text-green-600"></i> Saber</span>
-                <span class="flex items-center gap-1"><i class="fa-regular fa-hand-peace text-blue-600"></i> Saber Hacer</span>
-            </div>
-        </footer>
     </div>
 
     <script>
-        (function(){
+        (function() {
             // --------------------------------------------------------------
-            // BASE DE DATOS COMPLETA (competencias, indicadores, leyes)
+            // NEURONA CENTRAL - Base de conocimiento y estado de aprendizaje
             // --------------------------------------------------------------
             
-            // 1. LEYES Y NORMATIVA (con artículos específicos)
-            const leyesDB = {
-                'ley 10159': {
-                    nombres: ['ley 10159', 'ley marco empleo público', 'empleo público', 'carrera docente'],
-                    nombre: 'Ley Marco de Empleo Público (Ley 10159)',
-                    articulos: [
-                        { num: 'Art. 5 inciso l', texto: 'Establece la idoneidad como requisito para el ingreso' },
-                        { num: 'Art. 15 incisos d y e', texto: 'Procedimientos de selección basados en mérito e idoneidad' }
-                    ],
-                    extracto: 'Fundamenta la exigencia de aprobar un examen para ingresar a la Carrera Docente.',
-                    competencias: ['1.2 Marco jurídico y ético', '1.3 Estructura organizacional']
-                },
-                'control interno': {
-                    nombres: ['control interno', 'ley 8292', '8292'],
-                    nombre: 'Ley de Control Interno (Ley 8292)',
-                    articulos: [
-                        { num: 'Art. 8', texto: 'Deberes del jerarca: implementar sistemas de control' },
-                        { num: 'Art. 12', texto: 'Responsabilidad por el funcionamiento del control interno' },
-                        { num: 'Art. 16', texto: 'Obligación de tomar medidas correctivas inmediatas' }
-                    ],
-                    extracto: 'Establece las responsabilidades de los jerarcas en materia de control interno y gestión de riesgos.',
-                    competencias: ['2.3 Gestión eficiente de recursos', '2.5 Liderazgo y responsabilidad']
-                },
-                'código niñez': {
-                    nombres: ['código niñez', 'código de la niñez', 'niñez', 'codigo ninez'],
-                    nombre: 'Código de la Niñez y Adolescencia',
-                    articulos: [
-                        { num: 'Art. 24', texto: 'Derecho a la integridad física y psicológica' },
-                        { num: 'Art. 105', texto: 'Obligación de denunciar situaciones de riesgo o maltrato' }
-                    ],
-                    extracto: 'Protección integral de personas menores de edad. Obligación de denunciar.',
-                    competencias: ['1.1 Conocimiento de estudiantes', '1.3 Políticas y normativa']
-                },
-                'contratación administrativa': {
-                    nombres: ['contratación administrativa', 'ley 7494', '7494', 'compras públicas'],
-                    nombre: 'Ley de Contratación Administrativa (Ley 7494)',
-                    articulos: [
-                        { num: 'Art. 6', texto: 'Principios de eficiencia, transparencia y publicidad' },
-                        { num: 'Art. 40', texto: 'Procedimientos ordinarios de contratación' }
-                    ],
-                    extracto: 'Regula los procesos de compra y contratación en el sector público.',
-                    competencias: ['2.3 Gestión de recursos', '2.4 Gestión segura de información']
-                },
-                'convención colectiva': {
-                    nombres: ['convención colectiva', 'convencion colectiva', 'mep convencion'],
-                    nombre: 'Convención Colectiva de Trabajo MEP',
-                    articulos: [
-                        { num: 'Capítulo III', texto: 'Derechos y obligaciones de las personas funcionarias' },
-                        { num: 'Capítulo VII', texto: 'Procedimiento para resolución de conflictos' }
-                    ],
-                    extracto: 'Regula las relaciones laborales entre el MEP y sus funcionarios.',
-                    competencias: ['1.2 Normativa laboral', '2.5 Liderazgo']
-                },
-                'estatuto servicio civil': {
-                    nombres: ['estatuto servicio civil', 'ley 1581', '1581', 'servicio civil'],
-                    nombre: 'Estatuto de Servicio Civil (Ley 1581)',
-                    articulos: [
-                        { num: 'Art. 55', texto: 'Requisitos de ingreso, incluyendo aprobación de exámenes' }
-                    ],
-                    extracto: 'Establece el régimen jurídico del personal del Servicio Civil.',
-                    competencias: ['1.2 Marco jurídico']
-                },
-                'discapacidad': {
-                    nombres: ['discapacidad', 'igualdad oportunidades', 'ley 7600', '7600'],
-                    nombre: 'Ley de Igualdad de Oportunidades para Personas con Discapacidad (Ley 7600)',
-                    articulos: [
-                        { num: 'Art. 13', texto: 'Acceso a la educación en igualdad de condiciones' }
-                    ],
-                    extracto: 'Garantiza el derecho a la educación inclusiva y accesible.',
-                    competencias: ['1.1 Conocimiento de estudiantes', '2.1 Diseño inclusivo']
-                },
-                'administración pública': {
-                    nombres: ['administración pública', 'ley 6227', '6227', 'lgap'],
-                    nombre: 'Ley General de Administración Pública (Ley 6227)',
-                    articulos: [
-                        { num: 'Art. 11', texto: 'Principios de eficacia, eficiencia y simplicidad' }
-                    ],
-                    extracto: 'Principios que rigen la función administrativa pública.',
-                    competencias: ['2.3 Gestión', '2.5 Responsabilidad']
+            class NeuronaAprendizaje {
+                constructor() {
+                    // Estado del aprendizaje
+                    this.estado = {
+                        estratoActual: 'tecnico',
+                        respuestasHistorial: [],
+                        nivelConocimiento: 0,
+                        totalPreguntas: 0,
+                        totalAciertos: 0,
+                        competenciasDominadas: {},
+                        leyesEstudiadas: {},
+                        ultimaInteraccion: new Date(),
+                        dificultadActual: 'media',
+                        recomendaciones: []
+                    };
+                    
+                    // Base de conocimiento legal
+                    this.leyesDB = {
+                        'ley 10159': {
+                            nombres: ['ley 10159', 'ley marco empleo público', 'empleo público', 'carrera docente'],
+                            nombre: 'Ley Marco de Empleo Público (Ley 10159)',
+                            articulos: [
+                                { num: 'Art. 5 inciso l', texto: 'Idoneidad como requisito para ingreso' },
+                                { num: 'Art. 15 d y e', texto: 'Selección por mérito e idoneidad' }
+                            ],
+                            extracto: 'Fundamenta la exigencia de aprobar examen para Carrera Docente.',
+                            competencias: ['1.2 Marco jurídico', '1.3 Estructura MEP'],
+                            nivelDominio: 0
+                        },
+                        'control interno': {
+                            nombres: ['control interno', 'ley 8292', '8292'],
+                            nombre: 'Ley de Control Interno (Ley 8292)',
+                            articulos: [
+                                { num: 'Art. 8', texto: 'Deberes del jerarca: implementar sistemas de control' },
+                                { num: 'Art. 12', texto: 'Responsabilidad por control interno' },
+                                { num: 'Art. 16', texto: 'Medidas correctivas inmediatas' }
+                            ],
+                            extracto: 'Responsabilidades en control interno y gestión de riesgos.',
+                            competencias: ['2.3 Gestión recursos', '2.5 Liderazgo'],
+                            nivelDominio: 0
+                        },
+                        'código niñez': {
+                            nombres: ['código niñez', 'código de la niñez', 'niñez', 'codigo ninez'],
+                            nombre: 'Código de la Niñez y Adolescencia',
+                            articulos: [
+                                { num: 'Art. 24', texto: 'Derecho a integridad física y psicológica' },
+                                { num: 'Art. 105', texto: 'Obligación de denunciar situaciones de riesgo' }
+                            ],
+                            extracto: 'Protección de menores y obligación de denuncia.',
+                            competencias: ['1.1 Conocimiento estudiantes', '1.3 Políticas'],
+                            nivelDominio: 0
+                        },
+                        'contratación administrativa': {
+                            nombres: ['contratación administrativa', 'ley 7494', '7494'],
+                            nombre: 'Ley de Contratación Administrativa (Ley 7494)',
+                            articulos: [
+                                { num: 'Art. 6', texto: 'Principios de eficiencia y transparencia' },
+                                { num: 'Art. 40', texto: 'Procedimientos de contratación' }
+                            ],
+                            extracto: 'Regula compras y contrataciones públicas.',
+                            competencias: ['2.3 Gestión recursos', '2.4 Seguridad información'],
+                            nivelDominio: 0
+                        },
+                        'convención colectiva': {
+                            nombres: ['convención colectiva', 'convencion colectiva'],
+                            nombre: 'Convención Colectiva MEP',
+                            articulos: [
+                                { num: 'Capítulo III', texto: 'Derechos y obligaciones laborales' },
+                                { num: 'Capítulo VII', texto: 'Resolución de conflictos' }
+                            ],
+                            extracto: 'Relaciones laborales en el MEP.',
+                            competencias: ['1.2 Normativa laboral', '2.5 Liderazgo'],
+                            nivelDominio: 0
+                        }
+                    };
+                    
+                    // Perfiles por estrato (competencias)
+                    this.perfiles = {
+                        docente: {
+                            nombre: 'Propiamente Docente',
+                            competencias: [
+                                { codigo: '1.1', nombre: 'Conocimiento de estudiantes y contexto', nivel: 0 },
+                                { codigo: '1.2', nombre: 'Dominio disciplinar y didáctico', nivel: 0 },
+                                { codigo: '1.3', nombre: 'Políticas y normativa educativa', nivel: 0 },
+                                { codigo: '2.1', nombre: 'Diseño de experiencias de aprendizaje', nivel: 0 },
+                                { codigo: '2.2', nombre: 'Mediación pedagógica', nivel: 0 },
+                                { codigo: '2.3', nombre: 'Evaluación de aprendizajes', nivel: 0 }
+                            ]
+                        },
+                        tecnico: {
+                            nombre: 'Técnico Docente (Asesores)',
+                            competencias: [
+                                { codigo: '1.1', nombre: 'Área disciplinar y curricular', nivel: 0 },
+                                { codigo: '1.2', nombre: 'Marco jurídico y políticas', nivel: 0 },
+                                { codigo: '1.3', nombre: 'Estructura organizacional MEP', nivel: 0 },
+                                { codigo: '2.1', nombre: 'Diseño de planes y proyectos', nivel: 0 },
+                                { codigo: '2.3', nombre: 'Liderazgo y asesoría con TIC', nivel: 0 }
+                            ]
+                        },
+                        administrativo: {
+                            nombre: 'Administrativo Docente',
+                            competencias: [
+                                { codigo: '1.1', nombre: 'Liderazgo pedagógico y gestión', nivel: 0 },
+                                { codigo: '1.4', nombre: 'Tecnologías en educación', nivel: 0 },
+                                { codigo: '2.3', nombre: 'Gestión de recursos', nivel: 0 },
+                                { codigo: '2.4', nombre: 'Gestión segura de información', nivel: 0 },
+                                { codigo: '2.5', nombre: 'Liderazgo y responsabilidad', nivel: 0 }
+                            ]
+                        }
+                    };
+                    
+                    // Banco de preguntas base
+                    this.preguntasBase = {
+                        docente: [
+                            {
+                                pregunta: 'Una docente observa que un estudiante llega con moretones frecuentes. ¿Cuál es su obligación según el Código de la Niñez?',
+                                opciones: [
+                                    'Hablar con la familia',
+                                    'Denunciar ante PANI (Art. 105)',
+                                    'Reportar solo al director',
+                                    'Esperar a que el estudiante hable'
+                                ],
+                                correcta: 1,
+                                ley: 'código niñez',
+                                articulo: 'Art. 105',
+                                dificultad: 'media',
+                                competencia: '1.3'
+                            }
+                        ],
+                        tecnico: [
+                            {
+                                pregunta: 'Como asesor, ¿qué normativa debe consultar para un conflicto laboral entre docentes?',
+                                opciones: [
+                                    'Ley de Control Interno',
+                                    'Convención Colectiva MEP',
+                                    'Ley de Contratación',
+                                    'Estatuto de Servicio Civil'
+                                ],
+                                correcta: 1,
+                                ley: 'convención colectiva',
+                                articulo: 'Capítulo VII',
+                                dificultad: 'media',
+                                competencia: '1.2'
+                            }
+                        ],
+                        administrativo: [
+                            {
+                                pregunta: 'Para una compra institucional, ¿qué ley regula el procedimiento?',
+                                opciones: [
+                                    'Ley de Control Interno',
+                                    'Ley de Contratación Administrativa',
+                                    'Ley de Empleo Público',
+                                    'Código de Niñez'
+                                ],
+                                correcta: 1,
+                                ley: 'contratación administrativa',
+                                articulo: 'Art. 6',
+                                dificultad: 'media',
+                                competencia: '2.3'
+                            }
+                        ]
+                    };
                 }
-            };
-
-            // 2. PERFILES POR ESTRATO (competencias + indicadores COMPLETOS)
-            const perfiles = {
-                docente: {
-                    nombre: "Propiamente Docente",
-                    competencias: [
-                        {
-                            area: "SABER",
-                            codigo: "1.1",
-                            titulo: "Conocimiento de las personas estudiantes, su contexto y cómo se desarrollan y aprenden",
-                            descriptores: [
-                                "Describe características del desarrollo infantil y adolescente",
-                                "Reconoce factores del entorno que influyen en el aprendizaje",
-                                "Identifica necesidades educativas especiales"
-                            ],
-                            indicadores: [
-                                "Identifica etapas del desarrollo cognitivo según teorías del aprendizaje",
-                                "Relaciona contexto sociocultural con motivación escolar",
-                                "Reconoce señales de alerta en situaciones de riesgo social"
-                            ]
-                        },
-                        {
-                            area: "SABER",
-                            codigo: "1.2",
-                            titulo: "Dominio de su disciplina y la forma en que se enseña y aprende",
-                            descriptores: [
-                                "Domina conceptos centrales de su especialidad",
-                                "Comprende cómo se enseña y aprende su disciplina"
-                            ],
-                            indicadores: [
-                                "Selecciona estrategias didácticas adecuadas al contenido",
-                                "Explica errores conceptuales frecuentes en el estudiantado",
-                                "Aplica teorías pedagógicas en la planificación"
-                            ]
-                        },
-                        {
-                            area: "SABER",
-                            codigo: "1.3",
-                            titulo: "Políticas y normativa de la educación vigentes",
-                            descriptores: [
-                                "Reconoce la normativa curricular vigente",
-                                "Identifica derechos y deberes de la comunidad educativa"
-                            ],
-                            indicadores: [
-                                "Cita artículos del Código de la Niñez aplicables al aula",
-                                "Aplica lineamientos de evaluación en el diseño de instrumentos",
-                                "Fundamenta decisiones en la normativa institucional"
-                            ]
-                        },
-                        {
-                            area: "SABER HACER",
-                            codigo: "2.1",
-                            titulo: "Diseño de experiencias de aprendizaje congruentes con los aprendizajes esperados",
-                            descriptores: [
-                                "Planifica acorde a aprendizajes esperados y necesidades",
-                                "Incorpora diversidad en el planeamiento didáctico"
-                            ],
-                            indicadores: [
-                                "Diseña actividades que consideran estilos de aprendizaje",
-                                "Adecua objetivos según adecuaciones curriculares",
-                                "Selecciona recursos didácticos pertinentes"
-                            ]
-                        },
-                        {
-                            area: "SABER HACER",
-                            codigo: "2.2",
-                            titulo: "Implementación de estrategias de mediación pedagógica",
-                            descriptores: [
-                                "Implementa estrategias que favorecen participación activa",
-                                "Utiliza recursos didácticos y tecnológicos pertinentes"
-                            ],
-                            indicadores: [
-                                "Aplica técnicas de aprendizaje cooperativo",
-                                "Integra herramientas digitales para fomentar habilidades",
-                                "Promueve un clima áulico positivo"
-                            ]
-                        },
-                        {
-                            area: "SABER HACER",
-                            codigo: "2.3",
-                            titulo: "Evaluación de los aprendizajes para promoverlos y reconocer su logro",
-                            descriptores: [
-                                "Evalúa para promover y reconocer logros",
-                                "Retroalimenta oportunamente a estudiantes"
-                            ],
-                            indicadores: [
-                                "Construye rúbricas con criterios claros",
-                                "Analiza resultados para ajustar su práctica",
-                                "Diseña instrumentos válidos y confiables"
-                            ]
+                
+                // Buscar ley por texto
+                buscarLey(texto) {
+                    const consulta = texto.toLowerCase();
+                    for (let [key, ley] of Object.entries(this.leyesDB)) {
+                        for (let nombre of ley.nombres) {
+                            if (consulta.includes(nombre)) return ley;
                         }
-                    ],
-                    preguntas_base: [
-                        {
-                            pregunta: "Una docente de primaria observa que un estudiante llega con moretones frecuentes y se muestra temeroso. Según el Código de la Niñez, ¿cuál es su obligación?",
-                            opciones: [
-                                "a) Hablar con la familia para conocer la situación",
-                                "b) Denunciar ante el PANI o las autoridades competentes",
-                                "c) Reportarlo solo al director y archivar el caso",
-                                "d) Esperar a que el estudiante confíe y cuente qué pasa"
-                            ],
-                            correcta: 1,
-                            explicacion: "Art. 105 del Código de la Niñez establece la obligación de denunciar situaciones de riesgo o maltrato.",
-                            ley: "Código Niñez",
-                            articulo: "Art. 105"
-                        }
-                    ]
-                },
-                tecnico: {
-                    nombre: "Técnico Docente – Asesores Regionales y Nacionales",
-                    competencias: [
-                        {
-                            area: "SABER",
-                            codigo: "1.1",
-                            titulo: "Domina su área disciplinar, así como aspectos pedagógicos, metodológicos y curriculares",
-                            descriptores: [
-                                "Domina su disciplina y aspectos curriculares para asesoría",
-                                "Actualiza conocimientos pedagógicos permanentemente"
-                            ],
-                            indicadores: [
-                                "Asesora sobre actualizaciones curriculares a docentes",
-                                "Fundamenta recomendaciones con teorías pedagógicas vigentes",
-                                "Diseña estrategias de acompañamiento técnico"
-                            ]
-                        },
-                        {
-                            area: "SABER",
-                            codigo: "1.2",
-                            titulo: "Evidencia conocimiento del marco jurídico y ético, políticas públicas vinculantes",
-                            descriptores: [
-                                "Evidencia conocimiento de normativa educativa vinculante",
-                                "Aplica principios éticos en su labor"
-                            ],
-                            indicadores: [
-                                "Aplica la Política Educativa en el diseño de asesorías",
-                                "Respeta principios éticos en el manejo de información",
-                                "Interpreta correctamente la normativa aplicable"
-                            ]
-                        },
-                        {
-                            area: "SABER",
-                            codigo: "1.3",
-                            titulo: "Estructura organizacional del MEP y su relación con los niveles",
-                            descriptores: [
-                                "Conoce niveles central, regional e institucional",
-                                "Comprende las competencias de cada nivel"
-                            ],
-                            indicadores: [
-                                "Coordina acciones entre instancias según competencias",
-                                "Deriva consultas al nivel correspondiente",
-                                "Identifica canales de comunicación institucional"
-                            ]
-                        },
-                        {
-                            area: "SABER HACER",
-                            codigo: "2.1",
-                            titulo: "Diseña planes, programas y proyectos de índole pedagógico y curricular",
-                            descriptores: [
-                                "Diseña programas de asesoría que promueven calidad",
-                                "Elabora proyectos de mejora educativa"
-                            ],
-                            indicadores: [
-                                "Elabora proyectos a partir de diagnósticos regionales",
-                                "Diseña estrategias de intervención pedagógica",
-                                "Planifica acciones de acompañamiento"
-                            ]
-                        },
-                        {
-                            area: "SABER HACER",
-                            codigo: "2.3",
-                            titulo: "Gestiona y lidera procesos de asesoría para el desarrollo de competencias",
-                            descriptores: [
-                                "Lidera procesos de desarrollo de competencias en docentes",
-                                "Utiliza tecnologías para la asesoría"
-                            ],
-                            indicadores: [
-                                "Utiliza plataformas digitales para asesoría a distancia",
-                                "Promueve innovación educativa con herramientas TIC",
-                                "Facilita comunidades de aprendizaje profesional"
-                            ]
-                        }
-                    ],
-                    preguntas_base: [
-                        {
-                            pregunta: "Como asesor regional, usted detecta que varios docentes desconocen el procedimiento para denunciar situaciones de riesgo estudiantil. ¿Cuál es la acción más pertinente?",
-                            opciones: [
-                                "a) Enviar un correo recordando la obligación de denunciar",
-                                "b) Diseñar una capacitación sobre el Código de Niñez y protocolos",
-                                "c) Derivar el caso a Dirección de Vida Estudiantil",
-                                "d) Incluir el tema en la próxima reunión general"
-                            ],
-                            correcta: 1,
-                            explicacion: "Como asesor, tu función es diseñar procesos formativos (Competencia 2.1). El Código de Niñez (Art.105) es clave.",
-                            ley: "Código Niñez",
-                            articulo: "Art. 105"
-                        }
-                    ]
-                },
-                administrativo: {
-                    nombre: "Administrativo Docente – Gestión Administrativa (Directores, Asistentes)",
-                    competencias: [
-                        {
-                            area: "SABER",
-                            codigo: "1.1",
-                            titulo: "Liderazgo pedagógico y prácticas de gestión administrativa y curricular efectivas",
-                            descriptores: [
-                                "Conoce prácticas de liderazgo y gestión curricular",
-                                "Identifica modelos de gestión educativa"
-                            ],
-                            indicadores: [
-                                "Identifica modelos de supervisión pedagógica",
-                                "Reconoce estilos de dirección participativa",
-                                "Aplica principios de gestión de calidad"
-                            ]
-                        },
-                        {
-                            area: "SABER",
-                            codigo: "1.4",
-                            titulo: "Incidencia de las tecnologías de información y comunicación en el ámbito educativo",
-                            descriptores: [
-                                "Posee conocimientos sobre tecnologías aplicadas a gestión",
-                                "Comprende el impacto de TIC en educación"
-                            ],
-                            indicadores: [
-                                "Utiliza sistemas institucionales de información",
-                                "Promueve el uso de herramientas digitales",
-                                "Conoce políticas de seguridad de la información"
-                            ]
-                        },
-                        {
-                            area: "HACER",
-                            codigo: "2.3",
-                            titulo: "Gestiona de manera eficiente los procesos y recursos materiales y financieros",
-                            descriptores: [
-                                "Gestiona procesos administrativos y financieros",
-                                "Administra recursos con transparencia"
-                            ],
-                            indicadores: [
-                                "Elabora presupuestos escolares con priorización pedagógica",
-                                "Administra inventarios conforme a la ley",
-                                "Aplica la Ley de Contratación Administrativa en compras"
-                            ]
-                        },
-                        {
-                            area: "HACER",
-                            codigo: "2.4",
-                            titulo: "Gestiona de manera segura y responsable la información institucional",
-                            descriptores: [
-                                "Maneja información con confidencialidad",
-                                "Implementa protocolos de seguridad"
-                            ],
-                            indicadores: [
-                                "Aplica protocolos de protección de datos",
-                                "Utiliza sistemas institucionales correctamente",
-                                "Resguarda documentación sensible"
-                            ]
-                        },
-                        {
-                            area: "HACER",
-                            codigo: "2.5",
-                            titulo: "Implementa las tareas asignadas con liderazgo y responsabilidad",
-                            descriptores: [
-                                "Implementa tareas con liderazgo",
-                                "Asume responsabilidad por resultados"
-                            ],
-                            indicadores: [
-                                "Conduce reuniones con objetivos claros",
-                                "Resuelve conflictos mediante mediación",
-                                "Rinde cuentas de su gestión"
-                            ]
-                        }
-                    ],
-                    preguntas_base: [
-                        {
-                            pregunta: "Un director necesita realizar una compra de materiales didácticos. Según la Ley de Contratación Administrativa, ¿qué debe priorizar?",
-                            opciones: [
-                                "a) El proveedor más cercano geográficamente",
-                                "b) El cumplimiento de los procedimientos de compra",
-                                "c) La urgencia de los materiales",
-                                "d) La opinión del comité de educación"
-                            ],
-                            correcta: 1,
-                            explicacion: "Art. 6 de la Ley 7494 establece los principios de legalidad y procedimiento en las contrataciones.",
-                            ley: "Contratación Administrativa",
-                            articulo: "Art. 6"
-                        }
-                    ]
+                    }
+                    return null;
                 }
-            };
-
+                
+                // Generar pregunta adaptativa
+                generarPregunta(ley = null, dificultad = null) {
+                    const dificultadObj = dificultad || this.estado.dificultadActual;
+                    const estrato = this.estado.estratoActual;
+                    
+                    // Si se especifica una ley, buscar preguntas de esa ley
+                    if (ley) {
+                        const leyEncontrada = this.buscarLey(ley);
+                        if (leyEncontrada) {
+                            // Crear pregunta personalizada
+                            const actores = ['el director', 'la docente', 'el asesor', 'el administrador'];
+                            const situaciones = [
+                                'una irregularidad financiera',
+                                'un posible caso de maltrato',
+                                'un conflicto laboral',
+                                'una denuncia anónima'
+                            ];
+                            
+                            const actor = actores[Math.floor(Math.random() * actores.length)];
+                            const situacion = situaciones[Math.floor(Math.random() * situaciones.length)];
+                            const articulo = leyEncontrada.articulos[Math.floor(Math.random() * leyEncontrada.articulos.length)];
+                            
+                            return {
+                                pregunta: `Según ${leyEncontrada.nombre}, si ${actor} detecta ${situacion}, ¿cuál debe ser su actuación?`,
+                                opciones: [
+                                    `Aplicar ${articulo.num}: ${articulo.texto.substring(0, 30)}...`,
+                                    'Consultar con superiores antes de actuar',
+                                    'Documentar y esperar',
+                                    'Ignorar por falta de competencia'
+                                ],
+                                correcta: 0,
+                                ley: leyEncontrada.nombre,
+                                articulo: articulo.num,
+                                explicacion: `${articulo.num}: ${articulo.texto}`,
+                                dificultad: dificultadObj
+                            };
+                        }
+                    }
+                    
+                    // Pregunta genérica del estrato
+                    const preguntasEstrato = this.preguntasBase[estrato] || [];
+                    if (preguntasEstrato.length > 0) {
+                        return preguntasEstrato[Math.floor(Math.random() * preguntasEstrato.length)];
+                    }
+                    
+                    return null;
+                }
+                
+                // Procesar respuesta y actualizar aprendizaje
+                procesarRespuesta(pregunta, respuestaIdx, correcta) {
+                    this.estado.totalPreguntas++;
+                    if (correcta) this.estado.totalAciertos++;
+                    
+                    // Actualizar nivel de ley
+                    if (pregunta.ley) {
+                        const leyKey = Object.keys(this.leyesDB).find(k => 
+                            this.leyesDB[k].nombre.includes(pregunta.ley) || 
+                            pregunta.ley.includes(this.leyesDB[k].nombre)
+                        );
+                        
+                        if (leyKey) {
+                            const ley = this.leyesDB[leyKey];
+                            if (!ley.nivelDominio) ley.nivelDominio = 0;
+                            
+                            if (correcta) {
+                                ley.nivelDominio = Math.min(100, ley.nivelDominio + 10);
+                            } else {
+                                ley.nivelDominio = Math.max(0, ley.nivelDominio - 5);
+                            }
+                        }
+                    }
+                    
+                    // Actualizar competencia
+                    if (pregunta.competencia) {
+                        const competencia = this.perfiles[this.estado.estratoActual].competencias
+                            .find(c => c.codigo === pregunta.competencia);
+                        if (competencia) {
+                            if (!competencia.nivel) competencia.nivel = 0;
+                            if (correcta) {
+                                competencia.nivel = Math.min(100, competencia.nivel + 15);
+                            } else {
+                                competencia.nivel = Math.max(0, competencia.nivel - 10);
+                            }
+                        }
+                    }
+                    
+                    // Calcular nivel general
+                    this.estado.nivelConocimiento = Math.round(
+                        (this.estado.totalAciertos / this.estado.totalPreguntas) * 100
+                    ) || 0;
+                    
+                    // Ajustar dificultad
+                    if (this.estado.nivelConocimiento > 70) {
+                        this.estado.dificultadActual = 'alta';
+                    } else if (this.estado.nivelConocimiento > 40) {
+                        this.estado.dificultadActual = 'media';
+                    } else {
+                        this.estado.dificultadActual = 'baja';
+                    }
+                    
+                    return this.estado.nivelConocimiento;
+                }
+                
+                // Obtener recomendación personalizada
+                obtenerRecomendacion() {
+                    const leyesBajas = Object.values(this.leyesDB)
+                        .filter(l => l.nivelDominio < 50)
+                        .map(l => l.nombre);
+                    
+                    if (leyesBajas.length > 0) {
+                        return `🔍 Necesitas reforzar: ${leyesBajas.slice(0, 3).join(', ')}. ¿Querés que genere preguntas sobre alguna?`;
+                    }
+                    
+                    if (this.estado.nivelConocimiento > 80) {
+                        return "🌟 ¡Vas excelente! Probá con preguntas de alta dificultad para desafiarte.";
+                    }
+                    
+                    return "📚 Seguí practicando. Recordá que la constancia es clave.";
+                }
+            }
+            
             // --------------------------------------------------------------
-            // DOM ELEMENTS
-            const selectorBtns = document.querySelectorAll('.estrato-btn');
-            const contenidoDiv = document.getElementById('contenido-estrato');
+            // INICIALIZAR NEURONA
+            // --------------------------------------------------------------
+            const neurona = new NeuronaAprendizaje();
+            
+            // Elementos DOM
             const chatContainer = document.getElementById('chat-container');
             const chatInput = document.getElementById('chat-input');
             const btnEnviar = document.getElementById('btn-enviar-chat');
-            let estratoActual = 'tecnico';
-            let historialRendimiento = { correctas: 0, total: 0, ultimasFallidas: [] };
-            let preguntasGeneradas = []; // Almacena preguntas generadas dinámicamente
-
+            const selectorBtns = document.querySelectorAll('.estrato-btn');
+            const mapaComp = document.getElementById('mapa-competencias');
+            const competenciasContainer = document.getElementById('competencias-container');
+            const simuladorContainer = document.getElementById('simulador-container');
+            
+            // Variables de UI
+            let preguntasActivas = [];
+            
             // --------------------------------------------------------------
-            // FUNCIONES DEL TUTOR
+            // FUNCIONES DE UI
             // --------------------------------------------------------------
-
+            
             function agregarMensajeChat(contenido, esUsuario = false) {
-                const mensajeDiv = document.createElement('div');
-                mensajeDiv.className = `flex ${esUsuario ? 'justify-end' : 'justify-start'} mb-3`;
+                const div = document.createElement('div');
+                div.className = `flex ${esUsuario ? 'justify-end' : 'justify-start'} mb-3`;
                 
                 if (esUsuario) {
-                    mensajeDiv.innerHTML = `
-                        <div class="chat-mensaje-usuario">
+                    div.innerHTML = `
+                        <div class="chat-bubble-user">
                             <p class="text-sm">${contenido}</p>
                         </div>
                     `;
                 } else {
-                    mensajeDiv.innerHTML = `
-                        <div class="chat-mensaje-tutor">
-                            <span class="font-bold text-indigo-600 block mb-1 text-xs">🤖 Tutor</span>
-                            <p class="text-sm">${contenido.replace(/\n/g, '<br>')}</p>
+                    div.innerHTML = `
+                        <div class="chat-bubble-tutor">
+                            <span class="font-bold text-purple-600 block mb-1 text-xs">🧠 NEURONA</span>
+                            <p class="text-sm">${contenido}</p>
                         </div>
                     `;
                 }
                 
-                chatContainer.appendChild(mensajeDiv);
+                chatContainer.appendChild(div);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
-
-            function buscarLey(consulta) {
-                const consultaLower = consulta.toLowerCase();
+            
+            function actualizarMetricas() {
+                document.getElementById('nivel-conocimiento').textContent = `${neurona.estado.nivelConocimiento}%`;
+                document.getElementById('barra-conocimiento').style.width = `${neurona.estado.nivelConocimiento}%`;
+                document.getElementById('total-preguntas').textContent = neurona.estado.totalPreguntas;
+                document.getElementById('total-aciertos').textContent = neurona.estado.totalAciertos;
                 
-                // Buscar coincidencia exacta o parcial
-                for (let [key, ley] of Object.entries(leyesDB)) {
-                    for (let nombre of ley.nombres) {
-                        if (consultaLower.includes(nombre)) {
-                            return ley;
-                        }
-                    }
-                }
+                const leyesDominadas = Object.values(neurona.leyesDB).filter(l => l.nivelDominio > 70).length;
+                document.getElementById('leyes-dominadas').textContent = `${leyesDominadas}/${Object.keys(neurona.leyesDB).length}`;
                 
-                // Búsqueda por palabras clave adicionales
-                if (consultaLower.includes('carrera docente') || consultaLower.includes('empleo público')) {
-                    return leyesDB['ley 10159'];
-                }
-                if (consultaLower.includes('contratación') || consultaLower.includes('compras')) {
-                    return leyesDB['contratación administrativa'];
-                }
-                if (consultaLower.includes('niño') || consultaLower.includes('niña') || consultaLower.includes('menor')) {
-                    return leyesDB['código niñez'];
-                }
-                
-                return null;
+                document.getElementById('dificultad-actual').textContent = `Nivel: ${neurona.estado.dificultadActual}`;
             }
-
-            function explicarLey(ley) {
-                let respuesta = `**${ley.nombre}**\n\n📌 **Resumen:** ${ley.extracto}\n\n📖 **Artículos clave:**\n`;
-                ley.articulos.forEach(art => {
-                    respuesta += `• **${art.num}:** ${art.texto}\n`;
-                });
-                respuesta += `\n🎯 **Competencias asociadas:** ${ley.competencias.join(', ')}`;
-                return respuesta;
-            }
-
-            function generarPreguntasSobreLey(nombreLey, cantidad = 3) {
-                const ley = buscarLey(nombreLey);
-                if (!ley) return null;
-
-                const preguntasNuevas = [];
-                const actores = ['el director', 'la docente', 'el asesor', 'el administrador', 'el superior inmediato'];
-                const situaciones = [
-                    'una posible irregularidad financiera',
-                    'una situación de riesgo para un estudiante',
-                    'un conflicto entre funcionarios',
-                    'una denuncia anónima',
-                    'un incumplimiento de procedimientos'
-                ];
-
-                for (let i = 0; i < cantidad; i++) {
-                    const actor = actores[Math.floor(Math.random() * actores.length)];
-                    const situacion = situaciones[Math.floor(Math.random() * situaciones.length)];
-                    const articulo = ley.articulos[Math.floor(Math.random() * ley.articulos.length)];
-                    
-                    let pregunta = `Según ${ley.nombre}, si ${actor} detecta ${situacion}, ¿cuál debe ser su actuación fundamentada en ${articulo.num}?`;
-                    
-                    // Opciones personalizadas según la ley
-                    let opciones = [];
-                    if (ley.nombre.includes('Control Interno')) {
-                        opciones = [
-                            'a) Implementar medidas correctivas inmediatas según el Art. 16',
-                            'b) Esperar a que el superior jerárquico se pronuncie',
-                            'c) Documentar pero no actuar hasta tener certeza',
-                            'd) Comunicarlo informalmente a otros funcionarios'
-                        ];
-                    } else if (ley.nombre.includes('Código de la Niñez')) {
-                        opciones = [
-                            'a) Denunciar ante el PANI o Fiscalía (Art. 105)',
-                            'b) Conversar con la familia del estudiante',
-                            'c) Reportarlo solo al director',
-                            'd) Esperar a que el estudiante confirme la situación'
-                        ];
-                    } else {
-                        opciones = [
-                            'a) Aplicar el procedimiento establecido en la normativa',
-                            'b) Consultar con colegas antes de actuar',
-                            'c) Esperar directrices del nivel superior',
-                            'd) Documentar el caso y archivar'
-                        ];
-                    }
-                    
-                    preguntasNuevas.push({
-                        pregunta: pregunta,
-                        opciones: opciones,
-                        correcta: 0,
-                        explicacion: `Según ${ley.nombre}, ${articulo.num}: "${articulo.texto}". Esta normativa establece el procedimiento a seguir.`,
-                        ley: ley.nombre,
-                        articulo: articulo.num,
-                        fuente: `${ley.nombre} - ${articulo.num}`
-                    });
-                }
-                
-                return preguntasNuevas;
-            }
-
-            function agregarPreguntasGeneradas(preguntas) {
-                const simuladorDiv = document.getElementById('simulador-container');
-                if (!simuladorDiv) return;
-                
-                preguntasGeneradas = preguntasGeneradas.concat(preguntas);
-                
+            
+            function renderizarMapaCompetencias() {
+                const competencias = neurona.perfiles[neurona.estado.estratoActual].competencias;
                 let html = '';
-                preguntas.forEach((p, idx) => {
-                    const numPregunta = perfiles[estratoActual].preguntas_base.length + preguntasGeneradas.length - preguntas.length + idx + 1;
+                
+                competencias.forEach(comp => {
+                    const nivel = comp.nivel || 0;
+                    let colorClass = 'bg-red-200';
+                    if (nivel > 66) colorClass = 'bg-green-200';
+                    else if (nivel > 33) colorClass = 'bg-yellow-200';
+                    
                     html += `
-                        <div class="pregunta-card mb-6" data-pregunta-idx="${numPregunta-1}" data-generada="true" data-ley="${p.ley}" data-articulo="${p.articulo}">
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full">🔹 Generada por tutor</span>
-                                <span class="badge-ley"><i class="fa-regular fa-file-lines mr-1"></i>${p.ley}</span>
-                            </div>
-                            <p class="font-semibold text-slate-800 mb-4">${numPregunta}. ${p.pregunta}</p>
-                            <div class="space-y-3 mb-4">
-                                ${p.opciones.map((opt, optIdx) => `
-                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
-                                        <input type="radio" name="preg_gen_${numPregunta}" value="${optIdx}" id="opt_gen_${numPregunta}_${optIdx}" class="w-4 h-4 text-blue-600">
-                                        <label for="opt_gen_${numPregunta}_${optIdx}" class="text-slate-700 cursor-pointer flex-1">${opt}</label>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="feedback hidden text-sm p-3 rounded-lg" id="fb_gen_${numPregunta}"></div>
-                            <div class="flex gap-2 mt-2">
-                                <span class="badge-articulo"><i class="fa-regular fa-bookmark mr-1"></i>${p.articulo}</span>
+                        <div class="p-3 rounded-xl ${colorClass}">
+                            <div class="text-xs font-bold">${comp.codigo}</div>
+                            <div class="text-xs">${comp.nombre.substring(0, 20)}...</div>
+                            <div class="w-full bg-white/50 h-1 mt-1 rounded">
+                                <div class="bg-blue-600 h-1 rounded" style="width: ${nivel}%"></div>
                             </div>
                         </div>
                     `;
                 });
                 
-                simuladorDiv.innerHTML += html;
+                mapaComp.innerHTML = html;
+            }
+            
+            function renderizarCompetencias() {
+                const competencias = neurona.perfiles[neurona.estado.estratoActual].competencias;
+                let html = '';
                 
-                // Agregar eventos a las nuevas preguntas
-                document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                    radio.removeEventListener('change', manejarRespuestaRadio);
-                    radio.addEventListener('change', manejarRespuestaRadio);
+                competencias.forEach(comp => {
+                    const nivel = comp.nivel || 0;
+                    let nivelClass = 'nivel-bajo';
+                    if (nivel > 66) nivelClass = 'nivel-alto';
+                    else if (nivel > 33) nivelClass = 'nivel-medio';
+                    
+                    html += `
+                        <div class="competencia-item p-4 rounded-xl ${nivelClass}">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-sm">${comp.codigo} - ${comp.nombre}</span>
+                                <span class="text-sm font-bold">${nivel}%</span>
+                            </div>
+                            <div class="w-full bg-white/50 h-2 rounded-full">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${nivel}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                competenciasContainer.innerHTML = html;
+            }
+            
+            function agregarPreguntaAlSimulador(pregunta) {
+                if (!pregunta) return;
+                
+                const id = `preg_${Date.now()}_${Math.random()}`;
+                preguntasActivas.push({ id, ...pregunta });
+                
+                const html = `
+                    <div class="pregunta-card" data-pregunta-id="${id}">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">
+                                🧠 Generada por neurona · ${pregunta.dificultad}
+                            </span>
+                            <span class="badge-articulo">
+                                <i class="fa-regular fa-bookmark mr-1"></i>${pregunta.articulo || 'Artículo'}
+                            </span>
+                        </div>
+                        <p class="font-semibold text-slate-800 mb-4">${pregunta.pregunta}</p>
+                        <div class="space-y-3 mb-4">
+                            ${pregunta.opciones.map((opt, idx) => `
+                                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+                                    <input type="radio" name="${id}" value="${idx}" class="w-4 h-4 text-blue-600 radio-pregunta">
+                                    <label class="text-slate-700 cursor-pointer flex-1 text-sm">${opt}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="feedback hidden text-sm p-3 rounded-lg" data-feedback="${id}"></div>
+                    </div>
+                `;
+                
+                simuladorContainer.innerHTML = html + simuladorContainer.innerHTML;
+                
+                // Agregar eventos a los radios de esta nueva pregunta
+                document.querySelectorAll(`[name="${id}"]`).forEach(radio => {
+                    radio.addEventListener('change', function(e) {
+                        const preguntaCard = this.closest('.pregunta-card');
+                        const preguntaId = preguntaCard.dataset.preguntaId;
+                        const preguntaObj = preguntasActivas.find(p => p.id === preguntaId);
+                        const opcionElegida = parseInt(this.value);
+                        const feedbackDiv = preguntaCard.querySelector('.feedback');
+                        
+                        const esCorrecta = opcionElegida === preguntaObj.correcta;
+                        
+                        // Procesar en la neurona
+                        neurona.procesarRespuesta(preguntaObj, opcionElegida, esCorrecta);
+                        
+                        // Mostrar feedback
+                        feedbackDiv.className = esCorrecta ? 'feedback-correcto text-sm block' : 'feedback-incorrecto text-sm block';
+                        feedbackDiv.innerHTML = esCorrecta 
+                            ? `<i class="fa-regular fa-circle-check mr-1"></i> ¡Correcto! ${preguntaObj.explicacion || ''}`
+                            : `<i class="fa-regular fa-circle-xmark mr-1"></i> Incorrecto. La respuesta correcta era: ${preguntaObj.opciones[preguntaObj.correcta]}`;
+                        
+                        // Deshabilitar radios
+                        preguntaCard.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+                        
+                        // Actualizar UI
+                        actualizarMetricas();
+                        renderizarMapaCompetencias();
+                        renderizarCompetencias();
+                        
+                        // La neurona comenta
+                        setTimeout(() => {
+                            if (esCorrecta) {
+                                agregarMensajeChat(`✅ ¡Bien! Tu nivel en ${preguntaObj.ley || 'este tema'} subió.`, false);
+                            } else {
+                                agregarMensajeChat(`📚 Revisá ${preguntaObj.articulo || 'el artículo'} de ${preguntaObj.ley || 'la ley'}. ¿Querés que te lo explique?`, false);
+                            }
+                        }, 500);
+                    });
                 });
             }
-
-            function manejarRespuestaRadio(e) {
-                const radio = e.target;
-                const preguntaCard = radio.closest('.pregunta-card');
-                const opcionElegida = parseInt(radio.value);
-                const feedbackDiv = preguntaCard.querySelector('.feedback');
-                const esGenerada = preguntaCard.dataset.generada === 'true';
-                
-                // Obtener datos de la pregunta
-                let preguntaReal;
-                if (esGenerada) {
-                    // Buscar en preguntasGeneradas
-                    const preguntaTexto = preguntaCard.querySelector('p').textContent.split('. ')[1];
-                    preguntaReal = preguntasGeneradas.find(p => p.pregunta.includes(preguntaTexto));
-                } else {
-                    const preguntaIdx = preguntaCard.dataset.preguntaIdx;
-                    preguntaReal = perfiles[estratoActual].preguntas_base[preguntaIdx];
-                }
-                
-                if (!preguntaReal) return;
-                
-                const esCorrecta = opcionElegida === preguntaReal.correcta;
-                
-                // Actualizar historial
-                historialRendimiento.total++;
-                if (esCorrecta) {
-                    historialRendimiento.correctas++;
-                    feedbackDiv.className = 'feedback-correcto text-sm block';
-                    feedbackDiv.innerHTML = `
-                        <i class="fa-regular fa-circle-check mr-1"></i> 
-                        <strong>¡Correcto!</strong> ${preguntaReal.explicacion}
-                    `;
-                } else {
-                    historialRendimiento.ultimasFallidas.push({
-                        pregunta: preguntaReal.pregunta,
-                        ley: preguntaReal.ley,
-                        articulo: preguntaReal.articulo
-                    });
-                    feedbackDiv.className = 'feedback-incorrecto text-sm block';
-                    const opcionCorrectaTexto = preguntaReal.opciones[preguntaReal.correcta];
-                    feedbackDiv.innerHTML = `
-                        <i class="fa-regular fa-circle-xmark mr-1"></i> 
-                        <strong>Incorrecto.</strong> La respuesta correcta es: ${opcionCorrectaTexto}<br>
-                        <span class="text-xs mt-1 block">${preguntaReal.explicacion}</span>
-                        <span class="badge-articulo mt-2 inline-block"><i class="fa-regular fa-bookmark mr-1"></i>${preguntaReal.articulo || 'Artículo referenciado'}</span>
-                    `;
-                }
-                
-                // Deshabilitar radios
-                preguntaCard.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
-            }
-
-            function analizarRendimiento() {
-                if (historialRendimiento.total === 0) {
-                    return "Aún no has respondido ninguna pregunta. ¡Comienza a practicar para que pueda analizar tu rendimiento!";
-                }
-                
-                const porcentaje = Math.round((historialRendimiento.correctas / historialRendimiento.total) * 100);
-                let mensaje = `📊 **Tu rendimiento:**\n\n• Preguntas respondidas: ${historialRendimiento.total}\n• Respuestas correctas: ${historialRendimiento.correctas}\n• Porcentaje de acierto: **${porcentaje}%**\n\n`;
-                
-                if (porcentaje >= 80) {
-                    mensaje += "✅ **¡Excelente!** Estás muy bien preparado. Puedes enfocarte en temas más específicos.";
-                } else if (porcentaje >= 60) {
-                    mensaje += "⚠️ **Bien, pero puedes mejorar.** Necesitas reforzar algunos temas.";
-                } else {
-                    mensaje += "🔴 **Necesitas estudiar más.** Te recomiendo repasar las leyes fundamentales.";
-                }
-                
-                if (historialRendimiento.ultimasFallidas.length > 0) {
-                    const leyesUnicas = [...new Set(historialRendimiento.ultimasFallidas.map(f => f.ley))];
-                    mensaje += `\n\n📚 **Leyes a repasar:** ${leyesUnicas.join(', ')}`;
-                }
-                
-                return mensaje;
-            }
-
-            function recomendarEstudio() {
-                const recomendaciones = {
-                    docente: "📖 **Para Docente:**\n• Código de Niñez (Art. 105)\n• Reglamento de Evaluación\n• Planes de estudio por asignatura\n• Ley 10159 (Empleo Público)",
-                    tecnico: "📖 **Para Asesor:**\n• Ley 10159 (Carrera Docente)\n• Control Interno (Ley 8292)\n• Convención Colectiva MEP\n• Política Educativa vigente",
-                    administrativo: "📖 **Para Gestión Administrativa:**\n• Ley de Contratación Administrativa (7494)\n• Control Interno (8292)\n• Procedimientos presupuestarios MEP\n• Ley General de Administración Pública"
-                };
-                return recomendaciones[estratoActual];
-            }
-
+            
             // --------------------------------------------------------------
-            // PROCESAR MENSAJES DEL CHAT
+            // PROCESAR CONSULTAS DEL CHAT
             // --------------------------------------------------------------
+            
             function procesarConsulta(mensaje) {
                 const msg = mensaje.toLowerCase();
                 
-                // 1. Solicitud de generar preguntas
+                // 1. Solicitud de explicación de ley
+                if (msg.includes('explica') || msg.includes('qué dice')) {
+                    const ley = neurona.buscarLey(msg);
+                    if (ley) {
+                        let respuesta = `**${ley.nombre}**\n\n📌 ${ley.extracto}\n\n📖 **Artículos importantes:**\n`;
+                        ley.articulos.forEach(art => {
+                            respuesta += `• **${art.num}:** ${art.texto}\n`;
+                        });
+                        return respuesta;
+                    }
+                }
+                
+                // 2. Generar preguntas
                 if (msg.includes('genera') || msg.includes('crea') || msg.includes('pregunta')) {
-                    const cantidadMatch = msg.match(/(\d+)/);
-                    const cantidad = cantidadMatch ? parseInt(cantidadMatch[1]) : 3;
+                    const cantidad = msg.match(/\d+/) ? parseInt(msg.match(/\d+/)[0]) : 1;
                     
-                    const ley = buscarLey(msg);
-                    if (ley) {
-                        const preguntas = generarPreguntasSobreLey(msg, cantidad);
-                        if (preguntas && preguntas.length > 0) {
-                            agregarPreguntasGeneradas(preguntas);
-                            return `✅ **Generé ${cantidad} preguntas sobre ${ley.nombre}**\n\nLas preguntas se agregaron al simulador. Cada una incluye el artículo específico que debes consultar.`;
-                        } else {
-                            return `No pude generar preguntas sobre "${msg}". Intentá con: Control Interno, Código Niñez, Ley 10159, Contratación Administrativa, etc.`;
+                    // Verificar si menciona una ley específica
+                    const leyMencionada = neurona.buscarLey(msg);
+                    
+                    let respuestas = [];
+                    for (let i = 0; i < cantidad; i++) {
+                        const pregunta = neurona.generarPregunta(leyMencionada ? leyMencionada.nombre : null);
+                        if (pregunta) {
+                            agregarPreguntaAlSimulador(pregunta);
+                            respuestas.push(pregunta);
                         }
-                    } else {
-                        return `¿Sobre qué ley querés las preguntas? Podés elegir entre:\n• Control Interno (Ley 8292)\n• Código de Niñez\n• Ley de Carrera Docente (10159)\n• Contratación Administrativa (7494)\n• Convención Colectiva\n• Estatuto Servicio Civil\n• Ley de Discapacidad (7600)`;
+                    }
+                    
+                    if (respuestas.length > 0) {
+                        return `✅ Generé ${respuestas.length} pregunta(s) sobre ${leyMencionada ? leyMencionada.nombre : 'temas variados'}. Revisá el simulador.`;
                     }
                 }
                 
-                // 2. Explicación de ley
-                if (msg.includes('explica') || msg.includes('qué dice') || msg.includes('sobre')) {
-                    const ley = buscarLey(msg);
-                    if (ley) {
-                        return explicarLey(ley);
-                    }
+                // 3. Progreso
+                if (msg.includes('progreso') || msg.includes('cómo voy')) {
+                    return `📊 **Tu progreso:**\n• Nivel: ${neurona.estado.nivelConocimiento}%\n• Preguntas: ${neurona.estado.totalPreguntas}\n• Aciertos: ${neurona.estado.totalAciertos}\n\n${neurona.obtenerRecomendacion()}`;
                 }
                 
-                // 3. Análisis de rendimiento
-                if (msg.includes('rendimiento') || msg.includes('cómo voy') || msg.includes('progreso')) {
-                    return analizarRendimiento();
+                // 4. Repasar errores
+                if (msg.includes('error') || msg.includes('fallo') || msg.includes('repasar')) {
+                    return "Voy a generar preguntas de las leyes que tienes más débiles. ¡Prepárate!";
                 }
                 
-                // 4. Recomendación de estudio
-                if (msg.includes('qué estudiar') || msg.includes('recomienda') || msg.includes('estudio')) {
-                    return recomendarEstudio();
-                }
-                
-                // 5. Búsqueda general de ley
-                const ley = buscarLey(msg);
+                // 5. Búsqueda general
+                const ley = neurona.buscarLey(msg);
                 if (ley) {
-                    return explicarLey(ley);
+                    return `**${ley.nombre}**\n\n${ley.extracto}\n\n¿Querés que genere preguntas sobre esta ley?`;
                 }
                 
-                return "No entendí tu consulta. Podés pedirme:\n\n📌 **Generar preguntas:** 'genera 3 preguntas sobre Control Interno'\n📌 **Explicar ley:** 'explicame el Código de Niñez'\n📌 **Analizar rendimiento:** 'cómo voy en mis estudios'\n📌 **Recomendar estudio:** 'qué me recomiendas estudiar'";
+                return "No entendí. Podés pedirme:\n• 'Explicame la Ley 10159'\n• 'Generá 3 preguntas sobre Control Interno'\n• 'Cómo va mi progreso'\n• 'Repasar errores'";
             }
-
+            
             // --------------------------------------------------------------
-            // RENDERIZAR ESTRATO (COMPLETO: competencias + simulador)
+            // EVENTOS
             // --------------------------------------------------------------
-            function renderizarEstrato(estratoKey) {
-                const perfil = perfiles[estratoKey];
-                if (!perfil) return;
-
-                let html = `
-                    <!-- Tarjeta del estrato -->
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="bg-blue-600 text-white text-2xl px-5 py-2 rounded-xl font-bold">${perfil.nombre}</span>
-                            <span class="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium">
-                                <i class="fa-regular fa-file-lines mr-1"></i> ${perfil.competencias.length} competencias
-                            </span>
-                        </div>
-                        <p class="text-slate-600">Estas son las competencias, descriptores e indicadores que evaluará la prueba. Haz clic en cada tarjeta para ver los detalles.</p>
-                    </div>
-
-                    <!-- COMPETENCIAS (acordeón) -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-brain text-purple-600"></i> 
-                            Competencias a evaluar por el MEP
-                        </h3>
-                        <div class="space-y-2" id="competencias-lista">
-                `;
-
-                perfil.competencias.forEach((comp, idx) => {
-                    html += `
-                        <div class="competencia-card border border-slate-200 overflow-hidden">
-                            <div class="bg-slate-50 p-4 flex justify-between items-center competencia-titulo" data-index="${idx}">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xs font-mono ${comp.area === 'SABER' ? 'bg-blue-200 text-blue-800' : 'bg-green-200 text-green-800'} px-3 py-1 rounded-full font-bold">
-                                        ${comp.area}
-                                    </span>
-                                    <span class="font-semibold text-slate-800">${comp.codigo} ${comp.titulo}</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down text-slate-400 transition-transform"></i>
-                            </div>
-                            <div class="p-4 hidden competencia-detalle border-t">
-                                <div class="mb-4">
-                                    <span class="font-medium text-slate-700 flex items-center gap-1">
-                                        <i class="fa-regular fa-note-sticky text-blue-500"></i> Descriptores:
-                                    </span>
-                                    <ul class="list-disc list-inside text-slate-600 mt-2 space-y-1">
-                                        ${comp.descriptores.map(d => `<li class="ml-2 text-sm">${d}</li>`).join('')}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <span class="font-medium text-slate-700 flex items-center gap-1">
-                                        <i class="fa-regular fa-hand-peace text-green-600"></i> Indicadores (lo que evaluarán):
-                                    </span>
-                                    <div class="mt-2">
-                                        ${comp.indicadores.map(i => `<span class="indicador-item">${i}</span>`).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                html += `</div></div>`;
-
-                // SIMULADOR (preguntas base)
-                html += `
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <i class="fa-regular fa-pen-to-square text-green-600"></i> 
-                            Simulador de práctica
-                        </h3>
-                        <p class="text-sm text-slate-500 mb-6">Las preguntas del tutor se agregarán aquí automáticamente.</p>
-                        <div id="simulador-container" class="space-y-6">
-                `;
-
-                perfil.preguntas_base.forEach((p, idx) => {
-                    html += `
-                        <div class="pregunta-card" data-pregunta-idx="${idx}">
-                            <p class="font-semibold text-slate-800 mb-4">${idx+1}. ${p.pregunta}</p>
-                            <div class="space-y-3 mb-4">
-                                ${p.opciones.map((opt, optIdx) => `
-                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
-                                        <input type="radio" name="preg_${idx}" value="${optIdx}" id="opt_${idx}_${optIdx}" class="w-4 h-4 text-blue-600">
-                                        <label for="opt_${idx}_${optIdx}" class="text-slate-700 cursor-pointer flex-1">${opt}</label>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="feedback hidden text-sm p-3 rounded-lg" id="fb_${idx}"></div>
-                            <div class="flex gap-2 mt-2">
-                                <span class="badge-ley"><i class="fa-regular fa-file-lines mr-1"></i>${p.ley}</span>
-                                <span class="badge-articulo"><i class="fa-regular fa-bookmark mr-1"></i>${p.articulo}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                html += `</div></div>`;
-                contenidoDiv.innerHTML = html;
-
-                // Eventos para acordeón de competencias
-                document.querySelectorAll('.competencia-titulo').forEach(titulo => {
-                    titulo.addEventListener('click', function() {
-                        const card = this.closest('.competencia-card');
-                        const detalle = card.querySelector('.competencia-detalle');
-                        const icon = this.querySelector('.fa-chevron-down');
-                        detalle.classList.toggle('hidden');
-                        icon.classList.toggle('rotate-180');
-                    });
-                });
-
-                // Eventos para preguntas base
-                document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                    radio.addEventListener('change', manejarRespuestaRadio);
-                });
-            }
-
-            // --------------------------------------------------------------
-            // EVENTOS DEL CHAT
-            // --------------------------------------------------------------
+            
             btnEnviar.addEventListener('click', () => {
                 const mensaje = chatInput.value.trim();
                 if (!mensaje) return;
@@ -1035,54 +885,58 @@
                 setTimeout(() => {
                     const respuesta = procesarConsulta(mensaje);
                     agregarMensajeChat(respuesta, false);
-                }, 300);
+                }, 500);
             });
-
+            
             chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    btnEnviar.click();
-                }
+                if (e.key === 'Enter') btnEnviar.click();
             });
-
-            // Sugerencias rápidas
+            
             document.querySelectorAll('.sugerencia-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    let texto = btn.textContent;
-                    // Limpiar emojis al inicio
-                    texto = texto.replace(/^[📋⚖️📊📘📖]/, '').trim();
+                    let texto = btn.textContent.replace(/^[^\s]+\s/, '');
                     chatInput.value = texto;
                     btnEnviar.click();
                 });
             });
-
-            // Selector de estrato
+            
             selectorBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const estrato = this.dataset.estrato;
-                    estratoActual = estrato;
+                    neurona.estado.estratoActual = estrato;
                     
                     selectorBtns.forEach(b => {
-                        b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                        b.classList.remove('bg-blue-600', 'text-white');
                         b.classList.add('bg-slate-100', 'text-slate-700');
                     });
                     this.classList.remove('bg-slate-100', 'text-slate-700');
-                    this.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                    this.classList.add('bg-blue-600', 'text-white');
                     
-                    renderizarEstrato(estrato);
+                    renderizarMapaCompetencias();
+                    renderizarCompetencias();
                     
-                    // Mensaje de bienvenida específico por estrato
-                    setTimeout(() => {
-                        agregarMensajeChat(`✅ Cambiaste a **${perfiles[estrato].nombre}**. Ya puedes ver tus competencias específicas. ¿Necesás ayuda con alguna ley?`, false);
-                    }, 500);
+                    agregarMensajeChat(`✅ Cambiaste a **${neurona.perfiles[estrato].nombre}**. Voy a adaptar mis preguntas a tu nuevo perfil.`, false);
                 });
             });
-
+            
             // Inicializar
+            document.getElementById('fecha-actual').textContent = new Date().toLocaleDateString('es-CR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
             document.querySelector('button[data-estrato="tecnico"]').click();
             
-            // Mensaje de bienvenida del tutor
+            agregarMensajeChat("🧠 **¡Hola! Soy tu neurona de aprendizaje.** He analizado tu perfil y estoy lista para adaptarme a ti. Podés pedirme que explique leyes, genere preguntas, o analice tu progreso. ¿Por dónde empezamos?", false);
+            
+            // Generar primera pregunta de bienvenida
             setTimeout(() => {
-                agregarMensajeChat("👋 **¡Bienvenido!** Soy tu tutor especializado en normativa MEP. Recordá que en las pruebas evalúan **competencias**, no memoria. Por eso mis preguntas son situaciones prácticas. ¿Empezamos?", false);
+                const pregunta = neurona.generarPregunta();
+                if (pregunta) {
+                    agregarPreguntaAlSimulador(pregunta);
+                }
             }, 1000);
         })();
     </script>
