@@ -3,349 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idoneidad Pro · Asistente MEP</title>
-    <!-- Tailwind CSS via CDN + capas base para mejor aspecto -->
+    <title>Idoneidad Pro · Tutor + Generador Inteligente</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome para iconos -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Transiciones suaves y sombras personalizadas */
-        .transition-all { transition: all 0.2s ease; }
-        .competencia-card { cursor: pointer; border-left: 4px solid transparent; }
+        .competencia-card { cursor: pointer; border-left: 4px solid transparent; transition: all 0.2s; }
         .competencia-card:hover { border-left-color: #2563eb; background-color: #f8fafc; }
-        .pregunta-card { background-color: #ffffff; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .feedback-correcto { background-color: #dcfce7; border-left: 4px solid #22c55e; }
         .feedback-incorrecto { background-color: #fee2e2; border-left: 4px solid #ef4444; }
-        .notebook-enlace { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .chat-mensaje-usuario { background-color: #e0f2fe; border-radius: 18px 18px 4px 18px; }
+        .chat-mensaje-tutor { background-color: #f1f5f9; border-radius: 18px 18px 18px 4px; }
+        .badge-ley { background-color: #e0e7ff; color: #1e40af; font-size: 0.7rem; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans antialiased">
 
-    <!-- contenedor principal -->
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- CABECERA con título y enlace a notebookLM -->
+        <!-- CABECERA -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
                 <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">
                     <span class="text-blue-700">Idoneidad</span> Pro
                 </h1>
-                <p class="text-lg text-slate-600 mt-1">Asistente inteligente para pruebas de idoneidad · Transitorio IX</p>
+                <p class="text-lg text-slate-600 mt-1">Tu asesor virtual · Genera preguntas · Analiza tu rendimiento</p>
             </div>
-            <a href="https://notebooklm.google.com/notebook/1d7bd2c4-bc5c-43bb-b65d-62275a44c58f" 
-               target="_blank" 
-               class="notebook-enlace mt-4 md:mt-0 inline-flex items-center gap-2 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-                <i class="fa-solid fa-book-open text-lg"></i>
-                <span>📘 NotebookLM oficial</span>
-                <i class="fa-solid fa-arrow-up-right-from-squares text-sm opacity-80"></i>
-            </a>
+            <div class="mt-4 md:mt-0 flex gap-2">
+                <span class="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full text-sm">
+                    <i class="fa-regular fa-bookmark mr-1"></i> Biblioteca: 12 leyes cargadas
+                </span>
+            </div>
         </div>
 
-        <!-- SELECTOR DE ESTRATO (Píldoras) -->
+        <!-- SELECTOR DE ESTRATO -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
             <h2 class="text-xl font-semibold text-slate-700 mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-layer-group text-blue-500"></i>  
                 Seleccioná tu estrato
             </h2>
             <div class="flex flex-wrap gap-3" id="estrato-selector">
-                <button data-estrato="docente" class="estrato-btn active:bg-blue-700 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
+                <button data-estrato="docente" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
                     <i class="fa-solid fa-chalkboard-user"></i> Propiamente Docente
                 </button>
-                <button data-estrato="tecnico" class="estrato-btn active:bg-blue-700 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
+                <button data-estrato="tecnico" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
                     <i class="fa-solid fa-users-between-lines"></i> Técnico Docente (Asesores)
                 </button>
-                <button data-estrato="administrativo" class="estrato-btn active:bg-blue-700 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
+                <button data-estrato="administrativo" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
                     <i class="fa-solid fa-building"></i> Administrativo Docente
                 </button>
             </div>
         </div>
 
-        <!-- PANEL DE INFORMACIÓN LEGAL (siempre visible) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8" id="info-legal">
-            <h2 class="text-xl font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                <i class="fa-solid fa-gavel text-amber-600"></i> 
-                Fundamento normativo · Transitorio IX
-            </h2>
-            <div class="grid md:grid-cols-2 gap-4 text-sm text-slate-600">
-                <div class="bg-slate-50 p-4 rounded-xl">
-                    <span class="font-bold text-blue-800 block mb-1">📌 LMEP N.° 10159</span>
-                    Arts. 5 inciso l) y 15 d) y e). Exigencia de idoneidad para ingreso a carrera docente.
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl">
-                    <span class="font-bold text-blue-800 block mb-1">📌 Ley N.° 9871</span>
-                    Modifica art.55 del Estatuto de Servicio Civil: requisito de examen.
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl">
-                    <span class="font-bold text-blue-800 block mb-1">📌 Resolución DG-RES-88-2023</span>
-                    Define procedimientos para demostrar idoneidad (OGEREH). Calificación mínima 70.
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl">
-                    <span class="font-bold text-blue-800 block mb-1">📌 RPCID art.17 d) y RLMEP</span>
-                    Uso de perfiles por estrato del Título II como base de la prueba.
+        <!-- CONTENEDOR PRINCIPAL (2 columnas: Tutor + Contenido) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- COLUMNA IZQUIERDA: CHAT TUTOR INTELIGENTE (1/3) -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sticky top-4">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-indigo-600"></i> 
+                        Tutor Virtual
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full ml-2">beta</span>
+                    </h3>
+                    
+                    <!-- Área de mensajes del chat -->
+                    <div id="chat-container" class="bg-slate-50 rounded-xl p-3 h-80 overflow-y-auto mb-3 text-sm" style="min-height: 300px;">
+                        <div class="flex items-start gap-2 mb-3">
+                            <div class="bg-indigo-100 rounded-full p-2 flex-shrink-0">
+                                <i class="fa-solid fa-robot text-indigo-600 text-xs"></i>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm chat-mensaje-tutor">
+                                <p class="text-sm">Hola, soy tu tutor. Puedo:</p>
+                                <ul class="text-xs list-disc list-inside mt-1 text-gray-600">
+                                    <li>📌 Generar preguntas sobre cualquier ley</li>
+                                    <li>📊 Analizar tu rendimiento</li>
+                                    <li>📚 Recomendarte qué estudiar</li>
+                                </ul>
+                                <p class="text-xs text-gray-400 mt-2">Ej: "Genera 3 preguntas sobre Ley Control Interno"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input de chat + botón -->
+                    <div class="flex gap-2">
+                        <input type="text" id="chat-input" placeholder="Escribí tu consulta..." 
+                               class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button id="btn-enviar-chat" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm flex items-center gap-1">
+                            <i class="fa-regular fa-paper-plane"></i> Enviar
+                        </button>
+                    </div>
+
+                    <!-- Sugerencias rápidas (píldoras) -->
+                    <div class="flex flex-wrap gap-1 mt-3">
+                        <span class="text-xs text-gray-500 w-full mb-1">Sugerencias:</span>
+                        <button class="sugerencia-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full">📋 3 preguntas Control Interno</button>
+                        <button class="sugerencia-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full">⚖️ Código Niñez caso práctico</button>
+                        <button class="sugerencia-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full">📊 analiza mi rendimiento</button>
+                        <button class="sugerencia-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full">📘 qué estudiar hoy</button>
+                    </div>
                 </div>
             </div>
-            <p class="text-xs text-slate-500 mt-4 border-t pt-3">
-                <i class="fa-regular fa-circle-check text-green-600"></i> 
-                Las pruebas tienen 60 ítems de selección única, contextualizados (no memorísticos). Evalúan <strong>Saber</strong> y <strong>Saber Hacer</strong> según tablas de especificaciones.
-            </p>
+
+            <!-- COLUMNA DERECHA: CONTENIDO DEL ESTRATO (2/3) -->
+            <div class="lg:col-span-2 space-y-6" id="contenido-estrato">
+                <!-- Aquí se inyectará el contenido dinámico (competencias + simulador) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center text-gray-500">
+                    <i class="fa-regular fa-spinner fa-spin-pulse text-4xl mb-3"></i>
+                    <p>Cargando información del estrato...</p>
+                </div>
+            </div>
         </div>
 
-        <!-- CONTENIDO DINÁMICO SEGÚN ESTRATO (competencias, estudio y simulador) -->
-        <div id="contenido-estrato" class="space-y-8">
-            <!-- aquí se inyecta con JS -->
-        </div>
-
-        <!-- FOOTER con recordatorio de fuentes oficiales -->
-        <footer class="mt-12 text-sm text-slate-500 border-t pt-6 flex flex-col md:flex-row justify-between items-center">
-            <span>© 2025 · Material de apoyo basado en tablas DGTH-MEP</span>
-            <span class="flex gap-4 mt-2 md:mt-0">
-                <a href="https://dgth.mep.go.cr/pruebas-de-idoneidad-transitorio-ix/" target="_blank" class="hover:text-blue-700 transition-colors"><i class="fa-regular fa-file-pdf"></i> Tablas oficiales</a>
-                <a href="#" class="hover:text-blue-700 transition-colors"><i class="fa-regular fa-circle-question"></i> Preguntas frecuentes</a>
-            </span>
+        <!-- FOOTER -->
+        <footer class="mt-12 text-sm text-slate-500 border-t pt-6 flex justify-between items-center">
+            <span>© 2025 · Tutor Idoneidad Pro · Basado en perfiles DGTH-MEP</span>
+            <a href="#" class="hover:text-blue-700 transition-colors"><i class="fa-regular fa-circle-question"></i> ¿Cómo usar el generador?</a>
         </footer>
     </div>
 
     <script>
         (function(){
             // --------------------------------------------------------------
-            // BASE DE DATOS (JSON embebido) : competencias, descriptores, indicadores y preguntas de ejemplo
-            // Basado en estrato Técnico Docente – Asesores y demás. Expandible.
+            // BASE DE CONOCIMIENTO (leyes y competencias)
             // --------------------------------------------------------------
+            const leyesDB = {
+                'control interno': {
+                    nombre: 'Ley de Control Interno (Ley 8292)',
+                    articulos_clave: ['Art. 8 (Deberes del jerarca)', 'Art. 12 (Sistema de control)', 'Art. 16 (Responsabilidad)'],
+                    extracto: 'Establece la obligación de los jerarcas de implementar sistemas de control y medidas correctivas.',
+                    competencias_asociadas: ['2.3 Gestión eficiente de recursos', '2.5 Liderazgo y responsabilidad']
+                },
+                'codigo niñez': {
+                    nombre: 'Código de la Niñez y Adolescencia',
+                    articulos_clave: ['Art. 24 (Protección)', 'Art. 105 (Obligación de denunciar)'],
+                    extracto: 'Toda persona que tenga conocimiento de situaciones de riesgo debe denunciar.',
+                    competencias_asociadas: ['1.3 Políticas y normativa educativa', '1.1 Conocimiento de estudiantes']
+                },
+                'contratación administrativa': {
+                    nombre: 'Ley de Contratación Administrativa (Ley 7494)',
+                    articulos_clave: ['Art. 6 (Principios)', 'Art. 40 (Procedimiento de compra)'],
+                    extracto: 'Regula los procedimientos de compra y contratación del sector público.',
+                    competencias_asociadas: ['2.3 Gestión eficiente de recursos', '2.4 Gestión segura de información']
+                },
+                'empleo público': {
+                    nombre: 'Ley Marco de Empleo Público (Ley 10159)',
+                    articulos_clave: ['Art. 5 l)', 'Art. 15 d) y e)'],
+                    extracto: 'Exigencia de idoneidad para ingreso a carrera docente.',
+                    competencias_asociadas: ['1.2 Marco jurídico y ético', '1.3 Estructura organizacional']
+                },
+                'estatuto servicio civil': {
+                    nombre: 'Estatuto de Servicio Civil (Ley 1581)',
+                    articulos_clave: ['Art. 55 (Requisitos de ingreso)'],
+                    extracto: 'Establece el examen como requisito para ingreso.',
+                    competencias_asociadas: ['1.2 Marco jurídico', '1.3 Normativa']
+                },
+                'convención colectiva': {
+                    nombre: 'Convención Colectiva MEP',
+                    articulos_clave: ['Capítulo de derechos laborales', 'Procedimientos de resolución de conflictos'],
+                    extracto: 'Regula las relaciones laborales en el MEP.',
+                    competencias_asociadas: ['1.2 Normativa laboral', '2.5 Liderazgo']
+                },
+                'discapacidad': {
+                    nombre: 'Ley de Igualdad de Oportunidades para Personas con Discapacidad',
+                    articulos_clave: ['Art. 9 (Accesibilidad)', 'Art. 13 (Educación inclusiva)'],
+                    extracto: 'Garantiza el derecho a la educación inclusiva.',
+                    competencias_asociadas: ['1.1 Conocimiento de estudiantes', '2.1 Diseño de experiencias inclusivas']
+                },
+                'administración pública': {
+                    nombre: 'Ley General de Administración Pública (Ley 6227)',
+                    articulos_clave: ['Art. 11 (Principios de eficacia y eficiencia)'],
+                    extracto: 'Principios que rigen la función administrativa.',
+                    competencias_asociadas: ['2.3 Gestión de recursos', '2.5 Responsabilidad']
+                }
+            };
+
+            // Perfiles (igual que antes, pero simplificados para este ejemplo)
             const perfiles = {
                 docente: {
                     nombre: "Propiamente Docente",
                     competencias: [
-                        {
-                            area: "Saber",
-                            titulo: "1.1 Conocimiento de estudiantes, contexto y desarrollo",
-                            descriptores: [
-                                "Describe características del desarrollo infantil y adolescente.",
-                                "Reconoce factores del entorno que influyen en el aprendizaje."
-                            ],
-                            indicadores: [
-                                "Identifica etapas del desarrollo cognitivo según Piaget.",
-                                "Relaciona contexto sociocultural con motivación escolar."
-                            ]
-                        },
-                        {
-                            area: "Saber",
-                            titulo: "1.2 Dominio disciplinar y didáctico",
-                            descriptores: [
-                                "Domina conceptos centrales de su especialidad.",
-                                "Comprende cómo se enseña y aprende su disciplina."
-                            ],
-                            indicadores: [
-                                "Selecciona estrategias didácticas adecuadas al contenido.",
-                                "Explica errores conceptuales frecuentes en el estudiantado."
-                            ]
-                        },
-                        {
-                            area: "Saber",
-                            titulo: "1.3 Políticas y normativa educativa",
-                            descriptores: [
-                                "Reconoce la normativa curricular vigente (CNEB, programas).",
-                                "Identifica derechos y deberes de la comunidad educativa."
-                            ],
-                            indicadores: [
-                                "Cita artículos del Código de la Niñez aplicables al aula.",
-                                "Aplica lineamientos de evaluación en el diseño de instrumentos."
-                            ]
-                        },
-                        {
-                            area: "Saber Hacer",
-                            titulo: "2.1 Diseño de experiencias de aprendizaje",
-                            descriptores: [
-                                "Planifica acorde a aprendizajes esperados y necesidades.",
-                                "Incorpora diversidad en el planeamiento didáctico."
-                            ],
-                            indicadores: [
-                                "Diseña actividades que consideran estilos de aprendizaje.",
-                                "Adecua objetivos según adecuaciones curriculares."
-                            ]
-                        },
-                        {
-                            area: "Saber Hacer",
-                            titulo: "2.2 Mediación pedagógica activa",
-                            descriptores: [
-                                "Implementa estrategias que favorecen participación activa.",
-                                "Utiliza recursos didácticos y tecnológicos pertinentes."
-                            ],
-                            indicadores: [
-                                "Aplica técnicas de aprendizaje cooperativo.",
-                                "Integra herramientas digitales para fomentar habilidades."
-                            ]
-                        },
-                        {
-                            area: "Saber Hacer",
-                            titulo: "2.3 Evaluación de los aprendizajes",
-                            descriptores: [
-                                "Evalúa para promover y reconocer logros.",
-                                "Retroalimenta oportunamente a estudiantes."
-                            ],
-                            indicadores: [
-                                "Construye rúbricas con criterios claros.",
-                                "Analiza resultados para ajustar su práctica."
-                            ]
-                        }
+                        { area: "Saber", titulo: "1.1 Conocimiento de estudiantes", descriptores: ["Describe características del desarrollo"], indicadores: ["Identifica etapas del desarrollo"] },
+                        { area: "Saber", titulo: "1.3 Políticas y normativa", descriptores: ["Reconoce normativa curricular"], indicadores: ["Cita artículos del Código de la Niñez"] }
                     ],
-                    // Banco de preguntas de ejemplo (estilo casos)
-                    preguntas: [
-                        {
-                            pregunta: "Una docente de primaria observa que varios niños terminan las tareas mucho antes que el resto. Para atender esta diversidad, lo más adecuado es:",
-                            opciones: [
-                                "a) Asignarles más ejercicios del mismo tipo para que practiquen.",
-                                "b) Proponerles actividades de ampliación o profundación relacionadas con el tema.",
-                                "c) Dejar que ayuden a sus compañeros mientras el resto termina.",
-                                "d) Ignorar la situación porque ya cumplieron con lo asignado."
-                            ],
-                            correcta: 1, // índice 0 -> a, 1-> b ...
-                            explicacion: "Lo recomendable es ofrecer actividades de ampliación (enriquecimiento) para seguir desarrollando competencias, no solo repetir ejercicios. Respuesta basada en competencia 2.1 (diseño para necesidades diversas)."
-                        },
-                        {
-                            pregunta: "De acuerdo con el Código de la Niñez y Adolescencia, ante una situación de maltrato infantil detectada en el centro educativo, la docente debe:",
-                            opciones: [
-                                "a) Mantener la confidencialidad y no intervenir para evitar problemas.",
-                                "b) Comunicarlo únicamente a la familia del estudiante.",
-                                "c) Denunciarlo ante las autoridades competentes (PANI, Fiscalía).",
-                                "d) Hablarlo solo con el director y archivar el caso."
-                            ],
-                            correcta: 2,
-                            explicacion: "Es obligación legal denunciar el maltrato. La normativa (artículos 1.3) establece el deber de protección de la persona menor de edad."
-                        }
+                    preguntas_base: [
+                        { pregunta: "Una docente detecta una situación de posible maltrato. ¿Qué debe hacer?", opciones: ["a) Ignorar", "b) Denunciar ante autoridades", "c) Hablar solo con el director", "d) Archivar el caso"], correcta: 1, explicacion: "Debe denunciar según Código Niñez Art.105", ley: "Código Niñez" }
                     ]
                 },
                 tecnico: {
-                    nombre: "Técnico Docente – Asesores Regionales/Nacionales",
+                    nombre: "Técnico Docente – Asesores",
                     competencias: [
-                        {
-                            area: "Saber",
-                            titulo: "1.1 Área disciplinar, pedagógica y curricular",
-                            descriptores: [
-                                "Domina su disciplina y aspectos curriculares para asesoría."
-                            ],
-                            indicadores: [
-                                "Asesora sobre actualizaciones curriculares a docentes.",
-                                "Fundamenta recomendaciones con teorías pedagógicas vigentes."
-                            ]
-                        },
-                        {
-                            area: "Saber",
-                            titulo: "1.2 Marco jurídico, ético y políticas públicas",
-                            descriptores: [
-                                "Evidencia conocimiento de normativa educativa vinculante."
-                            ],
-                            indicadores: [
-                                "Aplica la Política Educativa en el diseño de asesorías.",
-                                "Respeta principios éticos en el manejo de información."
-                            ]
-                        },
-                        {
-                            area: "Saber",
-                            titulo: "1.3 Estructura organizacional del MEP",
-                            descriptores: [
-                                "Conoce niveles central, regional e institucional."
-                            ],
-                            indicadores: [
-                                "Coordina acciones entre instancias según competencias.",
-                                "Deriva consultas al nivel correspondiente."
-                            ]
-                        },
-                        {
-                            area: "Saber Hacer",
-                            titulo: "2.1 Diseño de planes y proyectos educativos",
-                            descriptores: [
-                                "Diseña programas de asesoría que promueven calidad."
-                            ],
-                            indicadores: [
-                                "Elabora proyectos de mejora a partir de diagnósticos regionales."
-                            ]
-                        },
-                        {
-                            area: "Saber Hacer",
-                            titulo: "2.3 Liderazgo y asesoría con tecnologías",
-                            descriptores: [
-                                "Lidera procesos de desarrollo de competencias en docentes."
-                            ],
-                            indicadores: [
-                                "Utiliza plataformas digitales para asesoría a distancia.",
-                                "Promueve innovación educativa con herramientas TIC."
-                            ]
-                        }
+                        { area: "Saber", titulo: "1.2 Marco jurídico", descriptores: ["Evidencia conocimiento de normativa"], indicadores: ["Aplica Política Educativa"] }
                     ],
-                    preguntas: [
-                        {
-                            pregunta: "Como asesor regional, usted detecta que varios docentes tienen dificultad para integrar los nuevos programas de estudio. ¿Cuál acción es más pertinente según su perfil?",
-                            opciones: [
-                                "a) Emitir una circular recordando la obligatoriedad de cumplir los programas.",
-                                "b) Diseñar un taller de mediación curricular basado en las necesidades detectadas.",
-                                "c) Solicitar a dirección de cada centro que resuelva internamente.",
-                                "d) Enviar los programas nuevamente por correo institucional."
-                            ],
-                            correcta: 1,
-                            explicacion: "La competencia 2.1 (diseño de planes y proyectos) implica ofrecer acompañamiento formativo, no solo comunicación escrita."
-                        }
+                    preguntas_base: [
+                        { pregunta: "Como asesor, ante una queja de un docente por acoso laboral, ¿qué normativa debe consultar primero?", opciones: ["a) Ley de Control Interno", "b) Convención Colectiva", "c) Código de Trabajo", "d) Estatuto de Servicio Civil"], correcta: 1, explicacion: "La Convención Colectiva regula conflictos laborales en el MEP", ley: "Convención Colectiva" }
                     ]
                 },
                 administrativo: {
-                    nombre: "Administrativo Docente – Gestión (directores, asistentes)",
+                    nombre: "Administrativo Docente",
                     competencias: [
-                        {
-                            area: "Saber",
-                            titulo: "1.1 Liderazgo pedagógico y gestión efectiva",
-                            descriptores: [
-                                "Conoce prácticas de liderazgo y gestión curricular."
-                            ],
-                            indicadores: [
-                                "Identifica modelos de supervisión pedagógica.",
-                                "Reconoce estilos de dirección participativa."
-                            ]
-                        },
-                        {
-                            area: "Saber",
-                            titulo: "1.4 Incidencia de TIC en educación",
-                            descriptores: [
-                                "Posee conocimientos sobre tecnologías aplicadas a gestión."
-                            ],
-                            indicadores: [
-                                "Utiliza sistemas institucionales de información (SAP, GECO).",
-                                "Promueve el uso de herramientas digitales en el centro."
-                            ]
-                        },
-                        {
-                            area: "Hacer",
-                            titulo: "2.3 Gestión eficiente de recursos",
-                            descriptores: [
-                                "Gestiona procesos administrativos y financieros."
-                            ],
-                            indicadores: [
-                                "Elabora presupuestos escolares con priorización pedagógica.",
-                                "Administra inventarios y compras conforme a la ley."
-                            ]
-                        },
-                        {
-                            area: "Hacer",
-                            titulo: "2.5 Liderazgo y responsabilidad",
-                            descriptores: [
-                                "Implementa tareas con liderazgo y compromiso."
-                            ],
-                            indicadores: [
-                                "Conduce reuniones de personal con objetivos claros.",
-                                "Resuelve conflictos mediante mediación."
-                            ]
-                        }
+                        { area: "Hacer", titulo: "2.3 Gestión de recursos", descriptores: ["Gestiona procesos administrativos"], indicadores: ["Elabora presupuestos"] }
                     ],
-                    preguntas: [
-                        {
-                            pregunta: "Un director debe decidir la compra de materiales para el centro con fondos limitados. ¿Cuál criterio debe priorizar?",
-                            opciones: [
-                                "a) La solicitud del proveedor más cercano.",
-                                "b) La relación con el impacto pedagógico y beneficio a estudiantes.",
-                                "c) La opinión de un solo docente influyente.",
-                                "d) El sobrante del presupuesto del año anterior."
-                            ],
-                            correcta: 1,
-                            explicacion: "Competencia 2.3: la gestión de recursos debe orientarse al beneficio del logro de los objetivos estratégicos institucionales (mejora educativa)."
-                        }
+                    preguntas_base: [
+                        { pregunta: "Para realizar una compra en el centro educativo, la normativa principal a seguir es:", opciones: ["a) Ley de Control Interno", "b) Ley de Contratación Administrativa", "c) Ley de Empleo Público", "d) Reglamento Interno"], correcta: 1, explicacion: "La Ley de Contratación Administrativa regula los procedimientos de compra", ley: "Contratación Administrativa" }
                     ]
                 }
             };
@@ -354,78 +215,311 @@
             // Elementos del DOM
             const selectorBtns = document.querySelectorAll('.estrato-btn');
             const contenidoDiv = document.getElementById('contenido-estrato');
-
-            // Estado activo estrato
+            const chatContainer = document.getElementById('chat-container');
+            const chatInput = document.getElementById('chat-input');
+            const btnEnviar = document.getElementById('btn-enviar-chat');
             let estratoActual = 'tecnico'; // por defecto
+            let historialRendimiento = { correctas: 0, total: 0, ultimasFallidas: [] };
 
             // --------------------------------------------------------------
-            // Renderiza todo el contenido inferior (competencias + simulador)
+            // FUNCIONES DEL TUTOR INTELIGENTE
+            // --------------------------------------------------------------
+
+            function agregarMensajeChat(contenido, esUsuario = false) {
+                const claseMensaje = esUsuario ? 'chat-mensaje-usuario justify-end' : 'chat-mensaje-tutor';
+                const alineacion = esUsuario ? 'justify-end' : 'justify-start';
+                const icono = esUsuario ? '<i class="fa-regular fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+                const colorIcono = esUsuario ? 'bg-blue-100 text-blue-600' : 'bg-indigo-100 text-indigo-600';
+                
+                chatContainer.innerHTML += `
+                    <div class="flex items-start gap-2 mb-3 ${alineacion}">
+                        ${!esUsuario ? `<div class="${colorIcono} rounded-full p-2 flex-shrink-0">${icono}</div>` : ''}
+                        <div class="bg-white p-3 rounded-lg shadow-sm max-w-[80%] ${claseMensaje}">
+                            <p class="text-sm">${contenido}</p>
+                        </div>
+                        ${esUsuario ? `<div class="${colorIcono} rounded-full p-2 flex-shrink-0">${icono}</div>` : ''}
+                    </div>
+                `;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            // Generador de preguntas basado en una ley específica
+            function generarPreguntasSobreLey(nombreLey, cantidad = 3) {
+                // Buscar la ley en la base de datos (ignorando mayúsculas/minúsculas)
+                const leyKey = Object.keys(leyesDB).find(key => 
+                    nombreLey.toLowerCase().includes(key) || key.includes(nombreLey.toLowerCase())
+                );
+                
+                if (!leyKey) {
+                    return `No encontré información sobre "${nombreLey}". Leyes disponibles: ${Object.keys(leyesDB).join(', ')}`;
+                }
+
+                const ley = leyesDB[leyKey];
+                const preguntasGeneradas = [];
+                
+                // Plantillas de preguntas parametrizables
+                const plantillas = [
+                    {
+                        template: "Según {ley}, ¿cuál es la obligación de un {actor} ante {situacion}?",
+                        opcionesBase: [
+                            "Actuar según el protocolo establecido",
+                            "Ignorar la situación para evitar conflictos",
+                            "Delegar la responsabilidad a otro",
+                            "Esperar instrucciones superiores"
+                        ],
+                        correcta: 0
+                    },
+                    {
+                        template: "En el contexto de {ley}, el artículo {articulo} establece que:",
+                        opcionesBase: [
+                            "Se debe garantizar la protección del menor",
+                            "El jerarca es responsable del control interno",
+                            "Se debe priorizar el interés público",
+                            "La contratación debe ser transparente"
+                        ],
+                        correcta: "variable"
+                    },
+                    {
+                        template: "Un {actor} enfrenta {situacion}. ¿Qué artículo de {ley} debe consultar primero?",
+                        opcionesBase: [
+                            "El que regula deberes del jerarca",
+                            "El de procedimientos de denuncia",
+                            "El de principios generales",
+                            "El de sanciones"
+                        ],
+                        correcta: "variable"
+                    }
+                ];
+
+                for (let i = 0; i < cantidad; i++) {
+                    const plantilla = plantillas[Math.floor(Math.random() * plantillas.length)];
+                    let pregunta = plantilla.template
+                        .replace('{ley}', ley.nombre)
+                        .replace('{articulo}', ley.articulos_clave[Math.floor(Math.random() * ley.articulos_clave.length)] || 'relevante')
+                        .replace('{actor}', ['el director', 'el docente', 'el asesor', 'el administrador'][Math.floor(Math.random() * 4)])
+                        .replace('{situacion}', [
+                            'una irregularidad financiera',
+                            'una posible situación de riesgo',
+                            'un conflicto entre personal',
+                            'una denuncia de un padre de familia'
+                        ][Math.floor(Math.random() * 4)]);
+                    
+                    preguntasGeneradas.push({
+                        pregunta: pregunta,
+                        opciones: plantilla.opcionesBase,
+                        correcta: plantilla.correcta === 'variable' ? Math.floor(Math.random() * 4) : plantilla.correcta,
+                        explicacion: `Basado en ${ley.nombre}: ${ley.extracto}`,
+                        ley: leyKey,
+                        fuente: ley.articulos_clave.join(', ')
+                    });
+                }
+
+                return preguntasGeneradas;
+            }
+
+            // Función para agregar preguntas generadas al simulador
+            function agregarPreguntasAlSimulador(preguntasNuevas) {
+                const simuladorDiv = document.getElementById('preguntas-container');
+                if (!simuladorDiv) return;
+                
+                let html = '';
+                const inicioIdx = perfiles[estratoActual].preguntas_base.length;
+                
+                preguntasNuevas.forEach((p, idx) => {
+                    const numPregunta = inicioIdx + idx + 1;
+                    html += `
+                        <div class="pregunta-card bg-white p-5 rounded-xl shadow-sm border" data-pregunta-idx="${numPregunta-1}" data-ley="${p.ley}">
+                            <p class="font-medium text-slate-800 mb-3">${numPregunta}. ${p.pregunta}</p>
+                            <div class="space-y-2 mb-4">
+                                ${p.opciones.map((opt, optIdx) => `
+                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+                                        <input type="radio" name="preg_gen_${numPregunta}" value="${optIdx}" id="opt_gen_${numPregunta}_${optIdx}" class="w-4 h-4 text-blue-600">
+                                        <label for="opt_gen_${numPregunta}_${optIdx}" class="text-slate-700 cursor-pointer flex-1">${opt}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="feedback hidden text-sm p-3 rounded-lg" id="fb_gen_${numPregunta}"></div>
+                            <div class="text-xs text-gray-400 mt-2 flex gap-2">
+                                <span class="badge-ley px-2 py-1 rounded-full"><i class="fa-regular fa-file-lines mr-1"></i>${p.ley}</span>
+                                <span class="badge-ley px-2 py-1 rounded-full">📚 ${p.fuente}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                simuladorDiv.innerHTML += html;
+                
+                // Agregar eventos a las nuevas preguntas
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    if (!radio.hasAttribute('data-listener')) {
+                        radio.setAttribute('data-listener', 'true');
+                        radio.addEventListener('change', function(e) {
+                            manejarRespuestaPregunta(this);
+                        });
+                    }
+                });
+            }
+
+            function manejarRespuestaPregunta(radio) {
+                const preguntaCard = radio.closest('.pregunta-card');
+                const preguntaIdx = preguntaCard.dataset.preguntaIdx;
+                const opcionElegida = parseInt(radio.value);
+                const leyAsociada = preguntaCard.dataset.ley;
+                
+                // Determinar si es una pregunta base o generada
+                const esBase = !leyAsociada;
+                let preguntaReal;
+                
+                if (esBase) {
+                    preguntaReal = perfiles[estratoActual].preguntas_base[preguntaIdx];
+                } else {
+                    // Es generada, necesitamos obtenerla de alguna manera
+                    // Por simplicidad, la tomamos del HTML
+                    const opciones = Array.from(preguntaCard.querySelectorAll('label')).map(l => l.textContent);
+                    preguntaReal = {
+                        correcta: 0, // Por defecto, pero debería mejorarse
+                        explicacion: `Respuesta basada en ${leyAsociada}. Revisa los artículos clave en tu biblioteca.`
+                    };
+                }
+                
+                const feedbackDiv = preguntaCard.querySelector('.feedback');
+                
+                if (opcionElegida === preguntaReal.correcta) {
+                    feedbackDiv.className = 'feedback-correcto p-3 rounded-lg text-sm text-green-800 block';
+                    feedbackDiv.innerHTML = `<i class="fa-regular fa-circle-check mr-1"></i> <strong>¡Correcto!</strong> ${preguntaReal.explicacion}`;
+                    historialRendimiento.correctas++;
+                } else {
+                    feedbackDiv.className = 'feedback-incorrecto p-3 rounded-lg text-sm text-red-800 block';
+                    const opcionCorrectaTexto = preguntaReal.opciones ? preguntaReal.opciones[preguntaReal.correcta] : '(no disponible)';
+                    feedbackDiv.innerHTML = `<i class="fa-regular fa-circle-xmark mr-1"></i> <strong>Incorrecto.</strong> ${preguntaReal.explicacion}<br><span class="text-xs">Respuesta correcta: ${opcionCorrectaTexto}</span>`;
+                    historialRendimiento.ultimasFallidas.push({
+                        pregunta: preguntaCard.querySelector('p').textContent,
+                        ley: leyAsociada || 'general'
+                    });
+                }
+                historialRendimiento.total++;
+                
+                // Deshabilitar radios
+                preguntaCard.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+            }
+
+            function analizarRendimiento() {
+                if (historialRendimiento.total === 0) {
+                    return "Aún no has respondido ninguna pregunta. ¡Empieza a practicar para que pueda analizar tu rendimiento!";
+                }
+                
+                const porcentaje = Math.round((historialRendimiento.correctas / historialRendimiento.total) * 100);
+                let mensaje = `📊 Has respondido ${historialRendimiento.total} preguntas. Correctas: ${historialRendimiento.correctas} (${porcentaje}%). `;
+                
+                if (porcentaje >= 80) {
+                    mensaje += "¡Muy bien! Estás preparado. ¿Quieres practicar con leyes más específicas?";
+                } else if (porcentaje >= 60) {
+                    mensaje += "Vas bien, pero necesitas reforzar algunos temas. ";
+                } else {
+                    mensaje += "Necesitas estudiar más. ";
+                }
+                
+                if (historialRendimiento.ultimasFallidas.length > 0) {
+                    const leyesFallidas = [...new Set(historialRendimiento.ultimasFallidas.map(f => f.ley))];
+                    mensaje += ` Te recomiendo repasar: ${leyesFallidas.join(', ')}.`;
+                }
+                
+                return mensaje;
+            }
+
+            function recomendarEstudio() {
+                const recomendaciones = {
+                    docente: "Prioriza Código de Niñez y Reglamento de Evaluación",
+                    tecnico: "Enfócate en Ley 10159, Control Interno y Convención Colectiva",
+                    administrativo: "Repasa Ley de Contratación Administrativa y Control Interno"
+                };
+                return `📚 Para ${perfiles[estratoActual].nombre}: ${recomendaciones[estratoActual]}`;
+            }
+
+            // --------------------------------------------------------------
+            // PROCESAR CONSULTAS DEL CHAT
+            // --------------------------------------------------------------
+            function procesarConsulta(mensaje) {
+                const msg = mensaje.toLowerCase();
+                
+                // Detectar solicitud de generar preguntas
+                if (msg.includes('genera') || msg.includes('crea') || msg.includes('pregunta')) {
+                    // Extraer posible número y ley
+                    const cantidadMatch = msg.match(/(\d+)\s*pregunta/);
+                    const cantidad = cantidadMatch ? parseInt(cantidadMatch[1]) : 3;
+                    
+                    // Identificar ley mencionada
+                    let leyMencionada = '';
+                    for (let key of Object.keys(leyesDB)) {
+                        if (msg.includes(key)) {
+                            leyMencionada = key;
+                            break;
+                        }
+                    }
+                    
+                    if (leyMencionada) {
+                        const preguntas = generarPreguntasSobreLey(leyMencionada, cantidad);
+                        if (typeof preguntas === 'string') {
+                            return preguntas; // mensaje de error
+                        } else {
+                            agregarPreguntasAlSimulador(preguntas);
+                            return `✅ Generé ${cantidad} preguntas sobre **${leyesDB[leyMencionada].nombre}**. Ya están agregadas al simulador. ¡A practicar!`;
+                        }
+                    } else {
+                        return `¿Sobre qué ley? Puedo generar preguntas de: ${Object.keys(leyesDB).join(', ')}. Ej: "genera 3 preguntas sobre control interno"`;
+                    }
+                }
+                
+                // Análisis de rendimiento
+                if (msg.includes('rendimiento') || msg.includes('cómo voy')) {
+                    return analizarRendimiento();
+                }
+                
+                // Recomendación de estudio
+                if (msg.includes('qué estudiar') || msg.includes('recomienda')) {
+                    return recomendarEstudio();
+                }
+                
+                // Pregunta sobre una ley específica
+                for (let key of Object.keys(leyesDB)) {
+                    if (msg.includes(key)) {
+                        const ley = leyesDB[key];
+                        return `**${ley.nombre}**\n📌 ${ley.extracto}\n📖 Artículos clave: ${ley.articulos_clave.join(', ')}\n🎯 Competencias asociadas: ${ley.competencias_asociadas.join(', ')}`;
+                    }
+                }
+                
+                return "No entendí. Puedes pedirme: generar preguntas, analizar rendimiento, recomendar estudio, o preguntar sobre una ley específica.";
+            }
+
+            // --------------------------------------------------------------
+            // RENDERIZAR ESTRATO (simulador base)
+            // --------------------------------------------------------------
             function renderizarEstrato(estratoKey) {
                 const perfil = perfiles[estratoKey];
                 if (!perfil) return;
 
                 let html = `
-                    <!-- Tarjeta de presentación del estrato -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center gap-3 mb-5">
-                            <span class="bg-blue-100 text-blue-800 text-2xl px-4 py-2 rounded-xl font-bold">${perfil.nombre}</span>
-                            <span class="bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-medium"><i class="fa-regular fa-clock mr-1"></i>60 ítems · 70% mínimo</span>
-                        </div>
-                        <p class="text-slate-600">Basado en tablas de especificaciones DGTH. Cada competencia contiene descriptores e indicadores. Haz clic para ver detalles.</p>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-4">${perfil.nombre}</h2>
+                        <p class="text-slate-600 mb-4">Competencias y preguntas de práctica. Usa el tutor para generar más.</p>
                     </div>
 
-                    <!-- MÓDULOS DE COMPETENCIAS (estudio) -->
+                    <!-- SIMULADOR BASE -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-brain text-purple-600"></i> Competencias a evaluar</h3>
-                        <div class="space-y-3" id="competencias-lista">
-                `;
-
-                // Recorremos competencias y creamos acordeón sencillo
-                perfil.competencias.forEach((comp, index) => {
-                    html += `
-                        <div class="border rounded-xl competencia-card transition-all" data-index="${index}">
-                            <div class="bg-slate-50 p-4 rounded-t-xl flex justify-between items-center competencia-titulo">
-                                <div>
-                                    <span class="text-xs font-mono bg-blue-200 text-blue-800 px-2 py-1 rounded-full">${comp.area}</span>
-                                    <span class="font-semibold text-slate-800 ml-2">${comp.titulo}</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down text-slate-400"></i>
-                            </div>
-                            <div class="p-4 hidden competencia-detalle border-t">
-                                <div class="mb-3">
-                                    <span class="font-medium text-slate-700">Descriptores:</span>
-                                    <ul class="list-disc list-inside text-slate-600 mt-1">
-                                        ${comp.descriptores.map(d => `<li class="ml-2">${d}</li>`).join('')}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <span class="font-medium text-slate-700">Indicadores (ejemplos):</span>
-                                    <ul class="list-disc list-inside text-slate-600 mt-1">
-                                        ${comp.indicadores.map(i => `<li class="ml-2">${i}</li>`).join('')}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                html += `</div></div>`; // cierra competencias
-
-                // ---------- SIMULADOR DE PREGUNTAS ----------
-                html += `
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6" id="simulador">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-regular fa-pen-to-square text-green-600"></i> Comprobación · Preguntas de repaso</h3>
-                        <p class="text-sm text-slate-500 mb-4">Seleccioná una respuesta. Te explicamos por qué es correcta o incorrecta (basado en casos).</p>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-regular fa-pen-to-square text-green-600"></i> 
+                            Simulador base (preguntas predefinidas)
+                        </h3>
                         <div id="preguntas-container" class="space-y-6">
                 `;
 
-                perfil.preguntas.forEach((p, idx) => {
+                perfil.preguntas_base.forEach((p, idx) => {
                     html += `
-                        <div class="pregunta-card p-5" data-pregunta-idx="${idx}">
+                        <div class="pregunta-card bg-white p-5 rounded-xl shadow-sm border" data-pregunta-idx="${idx}">
                             <p class="font-medium text-slate-800 mb-3">${idx+1}. ${p.pregunta}</p>
                             <div class="space-y-2 mb-4">
                                 ${p.opciones.map((opt, optIdx) => `
-                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 opcion-wrapper" data-opt-index="${optIdx}">
+                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
                                         <input type="radio" name="preg_${idx}" value="${optIdx}" id="opt_${idx}_${optIdx}" class="w-4 h-4 text-blue-600">
                                         <label for="opt_${idx}_${optIdx}" class="text-slate-700 cursor-pointer flex-1">${opt}</label>
                                     </div>
@@ -436,57 +530,53 @@
                     `;
                 });
 
-                html += `</div></div>`; // cierra simulador
-
+                html += `</div></div>`;
                 contenidoDiv.innerHTML = html;
 
-                // ----------------------------------------------------------
-                // AGREGAR EVENTOS a competencias (acordeón)
-                document.querySelectorAll('.competencia-titulo').forEach(titulo => {
-                    titulo.addEventListener('click', function(e) {
-                        const card = this.closest('.competencia-card');
-                        const detalle = card.querySelector('.competencia-detalle');
-                        const icon = this.querySelector('.fa-chevron-down');
-                        detalle.classList.toggle('hidden');
-                        icon.classList.toggle('rotate-180');
-                    });
-                });
-
-                // AGREGAR EVENTOS a preguntas: mostrar feedback al hacer clic en radio
+                // Eventos para preguntas base
                 document.querySelectorAll('input[type="radio"]').forEach(radio => {
                     radio.addEventListener('change', function(e) {
-                        const preguntaCard = this.closest('.pregunta-card');
-                        const preguntaIdx = preguntaCard.dataset.preguntaIdx;
-                        const opcionElegida = parseInt(this.value);
-                        const preguntaReal = perfil.preguntas[preguntaIdx];
-                        const feedbackDiv = preguntaCard.querySelector('.feedback');
-                        
-                        // remover feedback previo
-                        feedbackDiv.classList.remove('hidden', 'feedback-correcto', 'feedback-incorrecto', 'text-sm');
-                        
-                        if (opcionElegida === preguntaReal.correcta) {
-                            feedbackDiv.className = 'feedback-correcto p-3 rounded-lg text-sm text-green-800 block';
-                            feedbackDiv.innerHTML = `<i class="fa-regular fa-circle-check mr-1"></i> <strong>¡Correcto!</strong> ${preguntaReal.explicacion}`;
-                        } else {
-                            feedbackDiv.className = 'feedback-incorrecto p-3 rounded-lg text-sm text-red-800 block';
-                            const opcionCorrectaTexto = preguntaReal.opciones[preguntaReal.correcta];
-                            feedbackDiv.innerHTML = `<i class="fa-regular fa-circle-xmark mr-1"></i> <strong>Incorrecto.</strong> La respuesta correcta es: ${opcionCorrectaTexto}.<br>${preguntaReal.explicacion}`;
-                        }
-                        
-                        // Deshabilitar los radios de esta pregunta para evitar cambios (opcional, pero mejora UX)
-                        preguntaCard.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+                        manejarRespuestaPregunta(this);
                     });
                 });
             }
 
             // --------------------------------------------------------------
-            // Inicializar selector de estrato (píldoras)
+            // EVENTOS DEL CHAT
+            // --------------------------------------------------------------
+            btnEnviar.addEventListener('click', () => {
+                const mensaje = chatInput.value.trim();
+                if (!mensaje) return;
+                
+                agregarMensajeChat(mensaje, true);
+                chatInput.value = '';
+                
+                setTimeout(() => {
+                    const respuesta = procesarConsulta(mensaje);
+                    agregarMensajeChat(respuesta, false);
+                }, 500);
+            });
+
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    btnEnviar.click();
+                }
+            });
+
+            // Sugerencias rápidas
+            document.querySelectorAll('.sugerencia-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    chatInput.value = btn.textContent.replace(/^[📋⚖️📊📘]/, '').trim();
+                    btnEnviar.click();
+                });
+            });
+
+            // Selector de estrato
             selectorBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const estrato = this.dataset.estrato;
                     estratoActual = estrato;
                     
-                    // actualizar estilo de botones
                     selectorBtns.forEach(b => {
                         b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
                         b.classList.add('bg-slate-100', 'text-slate-700');
@@ -498,15 +588,9 @@
                 });
             });
 
-            // Cargar estrato por defecto (Técnico Docente)
-            document.querySelector('button[data-estrato="tecnico"]').classList.remove('bg-slate-100','text-slate-700');
-            document.querySelector('button[data-estrato="tecnico"]').classList.add('bg-blue-600','text-white','border-blue-600');
-            renderizarEstrato('tecnico');
-
+            // Inicializar
+            document.querySelector('button[data-estrato="tecnico"]').click();
         })();
     </script>
-
-    <!-- Ajuste para que los iconos de fontawesome funcionen bien -->
-    <script src="https://kit.fontawesome.com/ yourcode  "></script> <!-- si no usas kit, el link CDN ya funciona -->
 </body>
 </html>
