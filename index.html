@@ -3,21 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 IDOMEP · Asesor Nacional</title>
-    <!-- Tailwind + Font Awesome + PDF.js -->
+    <title>🎓 IDOMEP v2.0 · Asesor Nacional</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        body { background: #f0f9ff; }
+        body { background: #f0f9ff; font-family: system-ui, sans-serif; }
         .card { background: white; border-radius: 24px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .competencia-badge { background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
         .ruta-item { transition: all 0.3s; cursor: pointer; border: 2px solid transparent; }
         .ruta-item.disponible:hover { transform: translateY(-4px); border-color: #3b82f6; }
         .heart-full { color: #ef4444; }
-        .medalla { transition: all 0.3s; filter: grayscale(0.7); }
-        .medalla.obtenida { filter: grayscale(0); }
         .tab-button.active { background: #2563eb; color: white; }
+        .tooltip-completo {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            margin-bottom: 8px;
+            padding: 12px;
+            background: #1e293b;
+            color: white;
+            font-size: 0.75rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+            z-index: 100;
+            max-width: 90%;
+            white-space: normal;
+            word-break: break-word;
+        }
+        .group:hover .tooltip-completo { display: block; }
     </style>
 </head>
 <body class="min-h-screen p-4">
@@ -25,10 +45,12 @@
     <!-- BARRA SUPERIOR -->
     <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b shadow-sm mb-4">
         <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
-            <span class="font-bold text-xl">🎓 IDOMEP <span class="text-blue-600">v1</span></span>
+            <span class="font-bold text-xl">🎓 IDOMEP <span class="text-blue-600">v2.0</span></span>
             <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
                 <button data-tab="inicio" class="tab-button px-4 py-1.5 rounded-lg text-sm active">📚 Inicio</button>
                 <button data-tab="duolingo" class="tab-button px-4 py-1.5 rounded-lg text-sm">🎮 IdoMep</button>
+                <button data-tab="simulador" class="tab-button px-4 py-1.5 rounded-lg text-sm">📝 Simulacro</button>
+                <button data-tab="reporte" class="tab-button px-4 py-1.5 rounded-lg text-sm">📊 Progreso</button>
             </div>
         </div>
     </div>
@@ -38,14 +60,14 @@
         <div id="tab-inicio" class="tab-content block">
             <div class="card mb-6 border-l-8 border-blue-600">
                 <h2 class="text-2xl font-bold mb-2">📚 Sistema de Estudio MEP</h2>
-                <p class="text-gray-600">Cargue sus 40+ documentos. El sistema los usará para generar preguntas personalizadas.</p>
+                <p class="text-gray-600">Cargue sus documentos. El sistema generará preguntas personalizadas.</p>
                 <div class="mt-3 text-sm bg-blue-50 p-3 rounded-lg">
-                    <span class="font-medium">Fundamento:</span> LMEP N.º 10159 (arts.5l,15d-e) · Ley N.º9871 · Resolución DG-RES-88-2023 · Calificación mínima 70
+                    <span class="font-medium">Fundamento:</span> LMEP N.º 10159 · Ley N.º9871 · Resolución DG-RES-88-2023 · Calificación mínima 70
                 </div>
             </div>
 
             <div class="card mb-6">
-                <h3 class="font-bold text-lg mb-4">🎯 Seleccione su estrato (Título II)</h3>
+                <h3 class="font-bold text-lg mb-4">🎯 Seleccione su estrato</h3>
                 <div class="flex flex-wrap gap-3" id="selector-estrato">
                     <button data-estrato="docente" class="estrato-btn px-5 py-2 rounded-full bg-slate-100 hover:bg-blue-100">Propiamente Docente</button>
                     <button data-estrato="tecnico" class="estrato-btn px-5 py-2 rounded-full bg-blue-600 text-white">Técnico Docente (Asesores)</button>
@@ -54,9 +76,12 @@
             </div>
 
             <div class="card mb-6">
-                <h3 class="font-bold text-lg mb-4">📁 Cargue SUS documentos (PDF o DOCX)</h3>
-                <p class="text-sm text-amber-600 mb-3">Seleccione todos sus archivos. El sistema los leerá automáticamente.</p>
-                <input type="file" id="carga-docs" multiple accept=".pdf,.docx,.txt" class="mb-4 w-full p-2 border rounded-lg">
+                <h3 class="font-bold text-lg mb-4">📁 Cargue sus documentos</h3>
+                <p class="text-sm text-amber-600 mb-3">
+                    📌 Formatos: <strong>PDF y TXT</strong> (máx 20MB). 
+                    Los DOCX deben convertirse antes.
+                </p>
+                <input type="file" id="carga-docs" multiple accept=".pdf,.txt" class="mb-4 w-full p-2 border rounded-lg">
                 <div id="lista-docs" class="text-sm max-h-40 overflow-y-auto bg-slate-50 p-3 rounded-lg hidden"></div>
                 <div id="progreso-carga" class="text-xs text-gray-500 mt-2"></div>
             </div>
@@ -69,20 +94,39 @@
 
         <!-- ========== TAB IDOMEP ========== -->
         <div id="tab-duolingo" class="tab-content hidden">
-            <!-- Panel XP/Vidas -->
+            <!-- Panel XP/Vidas/Racha -->
             <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl shadow-xl p-6 mb-6 text-white">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-4">
                     <div class="flex items-center gap-4">
                         <span class="text-4xl">🎮</span>
                         <div>
-                            <h2 class="text-2xl font-black">IDOMEP · Ruta de dominio</h2>
+                            <h2 class="text-2xl font-black">Ruta de dominio</h2>
                             <p class="text-blue-100">Competencias MEP · Basado en sus documentos</p>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <div><span class="text-sm">NIVEL</span><div class="text-2xl font-bold" id="nivel-duolingo">1</div></div>
-                        <div class="w-24"><span class="text-sm">XP</span><div class="text-sm"><span id="xp-duolingo">0</span>/200</div></div>
+                    <div class="flex gap-6">
+                        <div class="text-center">
+                            <span class="text-sm">NIVEL</span>
+                            <div class="text-2xl font-bold" id="nivel-duolingo">1</div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-sm">RANGO</span>
+                            <div class="text-lg font-bold" id="rango-duolingo">Bronce</div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-sm">RACHA</span>
+                            <div class="text-lg font-bold" id="racha-duolingo">0</div>
+                        </div>
                         <div class="flex text-2xl" id="vidas-duolingo">❤️❤️❤️</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>XP: <span id="xp-duolingo">0</span></span>
+                        <span>Siguiente nivel: <span id="xp-siguiente">200</span></span>
+                    </div>
+                    <div class="w-full bg-white/30 h-3 rounded-full overflow-hidden">
+                        <div class="bg-yellow-400 h-3 rounded-full" id="barra-xp-duolingo" style="width:0%"></div>
                     </div>
                 </div>
             </div>
@@ -104,13 +148,67 @@
                 </div>
             </div>
         </div>
+
+        <!-- ========== TAB SIMULADOR ========== -->
+        <div id="tab-simulador" class="tab-content hidden">
+            <div class="card mb-6">
+                <h2 class="text-2xl font-bold mb-4">📝 Simulacro oficial (60 preguntas)</h2>
+                <p class="mb-4">Responda 60 preguntas. Mínimo 70% para aprobar.</p>
+                <div class="flex gap-4 mb-6">
+                    <button id="btn-iniciar-simulacro" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">
+                        Iniciar nuevo simulacro
+                    </button>
+                </div>
+                <div id="estado-simulacro" class="hidden mb-4 p-4 bg-blue-50 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <span>Progreso: <span id="simulacro-progreso">0/60</span></span>
+                        <span>Correctas: <span id="simulacro-correctas">0</span></span>
+                        <span>Nota actual: <span id="simulacro-nota">0%</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-2 rounded-full mt-2">
+                        <div class="bg-blue-600 h-2 rounded-full" id="simulacro-barra" style="width:0%"></div>
+                    </div>
+                </div>
+                <div id="simulacro-container" class="min-h-[300px]"></div>
+                <div id="resultado-simulador" class="mt-6"></div>
+            </div>
+        </div>
+
+        <!-- ========== TAB REPORTE ========== -->
+        <div id="tab-reporte" class="tab-content hidden">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6">📊 Mi progreso</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">Rendimiento por competencia</h3>
+                        <div id="reporte-competencias" class="space-y-4"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">Gráfico de dominio</h3>
+                        <canvas id="radar-competencias" width="300" height="300"></canvas>
+                    </div>
+                </div>
+                <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-bold text-lg mb-2">📈 Estadísticas globales</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="estadisticas-globales"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
         // ============================================
-        // PERFILES MEP (COMPLETOS CON SUS INDICADORES)
+        // CONFIGURACIÓN Y CONSTANTES
+        // ============================================
+        const VERSION = '2.0';
+        const XP_POR_NIVEL = 200;
+        const MAX_INTENTOS_RECURSION = 10;
+        const MAX_FRAGMENTO_INTENTOS = 20;
+
+        // ============================================
+        // PERFILES MEP (COMPLETOS)
         // ============================================
         const perfilesMEP = {
             tecnico: {
@@ -119,39 +217,71 @@
                     { codigo: '1.1', nombre: 'Área disciplinar, pedagógica y curricular', saber: true,
                       indicadores: ['Domina su disciplina', 'Asesora sobre actualizaciones curriculares', 'Fundamenta con teorías pedagógicas'] },
                     { codigo: '1.2', nombre: 'Marco jurídico, ético y políticas públicas', saber: true,
-                      indicadores: ['Aplica Política Educativa', 'Interpreta normativa vinculante (Leyes 10159, 8292, 7494, 6227, 1581, 7600)'] },
+                      indicadores: ['Aplica Política Educativa', 'Interpreta normativa vinculante'] },
                     { codigo: '1.3', nombre: 'Estructura organizacional del MEP', saber: true,
-                      indicadores: ['Coordina entre niveles central, regional e institucional', 'Aplica circulares y lineamientos'] },
+                      indicadores: ['Coordina entre niveles', 'Aplica circulares y lineamientos'] },
                     { codigo: '2.1', nombre: 'Diseño de planes, programas y proyectos', saber: false,
-                      indicadores: ['Elabora proyectos alineados a PPPJ 2026-2030', 'Diseña estrategias de intervención'] },
+                      indicadores: ['Elabora proyectos alineados a PPPJ', 'Diseña estrategias'] },
                     { codigo: '2.3', nombre: 'Liderazgo, asesoría y TIC', saber: false,
-                      indicadores: ['Utiliza plataformas digitales', 'Promueve innovación educativa con TIC', 'Aplica Modelo de Gobernanza TIC'] }
+                      indicadores: ['Utiliza plataformas digitales', 'Promueve innovación'] }
                 ]
             },
             docente: {
                 nombre: 'Propiamente Docente',
                 competencias: [
-                    { codigo: '1.1', nombre: 'Conocimiento de estudiantes y contexto', saber: true, indicadores: ['Identifica etapas del desarrollo', 'Reconoce factores socioculturales'] },
-                    { codigo: '1.2', nombre: 'Dominio disciplinar y didáctico', saber: true, indicadores: ['Selecciona estrategias didácticas', 'Aplica metodologías activas (CBL, Design Thinking, ABJ)'] },
-                    { codigo: '1.3', nombre: 'Políticas y normativa educativa', saber: true, indicadores: ['Cita Código de Niñez', 'Aplica lineamientos de evaluación'] },
-                    { codigo: '2.1', nombre: 'Diseño de experiencias de aprendizaje', saber: false, indicadores: ['Adecua objetivos', 'Selecciona recursos'] },
-                    { codigo: '2.2', nombre: 'Mediación pedagógica', saber: false, indicadores: ['Aplica aprendizaje cooperativo', 'Integra TIC'] },
-                    { codigo: '2.3', nombre: 'Evaluación de aprendizajes', saber: false, indicadores: ['Construye rúbricas', 'Analiza resultados'] }
+                    { codigo: '1.1', nombre: 'Conocimiento de estudiantes', saber: true, indicadores: ['Identifica desarrollo', 'Reconoce factores'] },
+                    { codigo: '1.2', nombre: 'Dominio disciplinar', saber: true, indicadores: ['Selecciona estrategias', 'Aplica metodologías'] },
+                    { codigo: '1.3', nombre: 'Políticas y normativa', saber: true, indicadores: ['Cita Código Niñez', 'Aplica evaluación'] },
+                    { codigo: '2.1', nombre: 'Diseño de experiencias', saber: false, indicadores: ['Adecua objetivos', 'Selecciona recursos'] },
+                    { codigo: '2.2', nombre: 'Mediación pedagógica', saber: false, indicadores: ['Aplica cooperativo', 'Integra TIC'] },
+                    { codigo: '2.3', nombre: 'Evaluación', saber: false, indicadores: ['Construye rúbricas', 'Analiza resultados'] }
                 ]
             },
             administrativo: {
                 nombre: 'Administrativo Docente',
                 competencias: [
-                    { codigo: '1.1', nombre: 'Liderazgo pedagógico y gestión', saber: true, indicadores: ['Identifica modelos de supervisión', 'Reconoce estilos de dirección'] },
-                    { codigo: '1.4', nombre: 'Tecnologías en educación', saber: true, indicadores: ['Usa sistemas institucionales', 'Conoce políticas de seguridad'] },
-                    { codigo: '2.3', nombre: 'Gestión de recursos', saber: false, indicadores: ['Elabora presupuestos', 'Aplica Ley de Contratación 7494'] },
-                    { codigo: '2.4', nombre: 'Gestión segura de información', saber: false, indicadores: ['Aplica protocolos de datos', 'Resguarda documentación'] },
-                    { codigo: '2.5', nombre: 'Liderazgo y responsabilidad', saber: false, indicadores: ['Conduce reuniones', 'Resuelve conflictos'] }
+                    { codigo: '1.1', nombre: 'Liderazgo pedagógico', saber: true, indicadores: ['Modelos de supervisión'] },
+                    { codigo: '1.4', nombre: 'Tecnologías', saber: true, indicadores: ['Usa sistemas', 'Seguridad'] },
+                    { codigo: '2.3', nombre: 'Gestión de recursos', saber: false, indicadores: ['Presupuestos', 'Contratación'] },
+                    { codigo: '2.4', nombre: 'Seguridad información', saber: false, indicadores: ['Protocolos', 'Resguardo'] },
+                    { codigo: '2.5', nombre: 'Liderazgo', saber: false, indicadores: ['Reuniones', 'Conflictos'] }
                 ]
             }
         };
 
-        // Ruta de competencias (orden de aprendizaje)
+        // ============================================
+        // PATRONES POR COMPETENCIA (REGEX)
+        // ============================================
+        const patronesCompetencia = {
+            '1.1': [
+                /\b(didáctica|metodología|pedagogía|curricular|currículum)\b/i,
+                /\b(STEAM|PNFT)\b/i,
+                /\bguía\s+(docente|didáctica)\b/i,
+                /\b(aprendizaje|enseñanza)\s+(activo|significativo)\b/i
+            ],
+            '1.2': [
+                /\b(ley|artículo|reglamento|normativa|política|ética)\b/i,
+                /\b(art\.?\s*\d+)|(artículo\s*\d+[°ª]?)\b/i,
+                /\b(ley\s*N?°?\s*\d{4})\b/i,
+                /\b(10159|8292|6227|1581|7494|7600|9871)\b/
+            ],
+            '1.3': [
+                /\b(estructura|organización|nivel)\s+(central|regional|institucional)\b/i,
+                /\b(circular|lineamiento|directriz)\b/i
+            ],
+            '2.1': [
+                /\b(plan|programa|proyecto|diseño)\s+(educativo|pedagógico)\b/i,
+                /\b(PPPJ|marco\s+estratégico)\b/i
+            ],
+            '2.3': [
+                /\b(TIC|tecnolog[íi]a|digital|innovación)\b/i,
+                /\b(MITDE|gobernanza|transformación\s+digital)\b/i
+            ]
+        };
+
+        // ============================================
+        // RUTA DE COMPETENCIAS
+        // ============================================
         const rutaDuolingo = [
             { codigo: '1.1', nombre: 'Área disciplinar', tipo: '📘', estado: 'disponible' },
             { codigo: '1.2', nombre: 'Marco jurídico', tipo: '📘', estado: 'bloqueado' },
@@ -164,237 +294,315 @@
         // VARIABLES GLOBALES
         // ============================================
         let estratoActual = 'tecnico';
-        let documentos = []; // Aquí se guardarán los PDFs procesados
-        let generadorActivo = false;
-        
-        // Estado gamificado
-        let estadoDuolingo = JSON.parse(localStorage.getItem('estadoDuolingo')) || {
-            '1.1': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
-            '1.2': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
-            '1.3': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
-            '2.1': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
-            '2.3': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] }
+        let documentos = [];
+        let generador = null;
+        let frasesUsadas = JSON.parse(localStorage.getItem('frasesUsadas')) || {};
+
+        // Progreso del usuario (con checksum)
+        let progresoUsuario = cargarProgreso() || {
+            version: VERSION,
+            nivel: { actual: 1, xp: 0, xpSiguiente: 200, rango: 'Bronce' },
+            racha: { actual: 0, maxima: 0, ultimaFecha: null },
+            competencias: {
+                '1.1': { nivel: 0, xp: 0, dominada: false },
+                '1.2': { nivel: 0, xp: 0, dominada: false },
+                '1.3': { nivel: 0, xp: 0, dominada: false },
+                '2.1': { nivel: 0, xp: 0, dominada: false },
+                '2.3': { nivel: 0, xp: 0, dominada: false }
+            },
+            estadisticas: {
+                totalPreguntas: 0,
+                totalCorrectas: 0,
+                totalIncorrectas: 0,
+                simulacrosCompletados: 0,
+                simulacrosAprobados: 0
+            },
+            historial: []
         };
-        
-        let progresoGlobal = JSON.parse(localStorage.getItem('progresoGlobal')) || { xpTotal: 0, nivel: 1 };
-        let competenciaActual = '1.1';
+
+        // Estado del simulador
+        const simulador = {
+            activo: false,
+            preguntas: [],
+            respondidas: 0,
+            correctas: 0,
+            resultadosPorCompetencia: {
+                '1.1': { total: 0, correctas: 0 },
+                '1.2': { total: 0, correctas: 0 },
+                '1.3': { total: 0, correctas: 0 },
+                '2.1': { total: 0, correctas: 0 },
+                '2.3': { total: 0, correctas: 0 }
+            },
+            inicio: null
+        };
+
         let preguntaActual = null;
+        let competenciaActual = '1.1';
 
         // ============================================
-        // GENERADOR INTELIGENTE DE PREGUNTAS
+        // FUNCIONES DE SEGURIDAD Y CHKECKSUM
+        // ============================================
+        function calcularChecksum(obj) {
+            const str = JSON.stringify(obj) + 'IDOMEP_SECRET_2026';
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            return hash;
+        }
+
+        function guardarProgreso() {
+            const copia = {...progresoUsuario};
+            delete copia._checksum;
+            copia._checksum = calcularChecksum(copia);
+            localStorage.setItem('progresoIDOMEP', JSON.stringify(copia));
+        }
+
+        function cargarProgreso() {
+            const guardado = localStorage.getItem('progresoIDOMEP');
+            if (!guardado) return null;
+            
+            try {
+                const data = JSON.parse(guardado);
+                const checksum = data._checksum;
+                delete data._checksum;
+                
+                if (calcularChecksum(data) !== checksum) {
+                    console.warn('Posible manipulación detectada');
+                    return null;
+                }
+                return data;
+            } catch {
+                return null;
+            }
+        }
+
+        // ============================================
+        // FUNCIONES DE PROCESAMIENTO DE DOCUMENTOS
+        // ============================================
+        async function procesarArchivoSeguro(archivo) {
+            try {
+                if (archivo.size > 20 * 1024 * 1024) {
+                    throw new Error('Archivo muy grande (máx 20MB)');
+                }
+                
+                const ext = archivo.name.split('.').pop().toLowerCase();
+                if (!['pdf', 'txt'].includes(ext)) {
+                    throw new Error('Formato no soportado. Use PDF o TXT');
+                }
+                
+                let contenido = '';
+                
+                if (ext === 'pdf') {
+                    const arrayBuffer = await archivo.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    const maxPaginas = Math.min(pdf.numPages, 50);
+                    
+                    for (let i = 1; i <= maxPaginas; i++) {
+                        try {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            contenido += content.items.map(item => item.str).join(' ') + ' ';
+                        } catch (pageError) {
+                            console.warn(`Error en página ${i}:`, pageError);
+                        }
+                    }
+                } else {
+                    contenido = await archivo.text();
+                }
+                
+                contenido = contenido
+                    .toLowerCase()
+                    .replace(/[^\w\sáéíóúñü.,;:()\-]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                
+                return {
+                    nombre: archivo.name,
+                    contenido: contenido,
+                    tamaño: archivo.size,
+                    paginas: ext === 'pdf' ? pdf.numPages : 1
+                };
+                
+            } catch (error) {
+                return { error: true, nombre: archivo.name, mensaje: error.message };
+            }
+        }
+
+        // ============================================
+        // GENERADOR DE PREGUNTAS (MEJORADO)
         // ============================================
         class GeneradorPreguntas {
             constructor(docs) {
                 this.documentos = docs;
-                this.historial = JSON.parse(localStorage.getItem('historialPreguntas')) || {};
-                this.frasesUsadas = JSON.parse(localStorage.getItem('frasesUsadas')) || {};
             }
-        
-            // Extraer opciones incorrectas del MISMO documento
-            generarOpcionesIncorrectas(texto, documento, fragmentoCorrecto) {
-                // Dividir el documento en frases
-                const frases = documento.split(/[.!?]+/).filter(f => f.trim().length > 30);
+
+            detectarCompetencia(texto, competenciaCodigo) {
+                const patrones = patronesCompetencia[competenciaCodigo];
+                if (!patrones) return false;
+                return patrones.some(patron => patron.test(texto));
+            }
+
+            extraerFragmentos(doc, competenciaCodigo) {
+                const texto = doc.contenido;
+                const oraciones = texto.split(/[.!?]+/).filter(o => o.trim().length > 50);
+                return oraciones.filter(o => this.detectarCompetencia(o, competenciaCodigo));
+            }
+
+            fraseUsada(competencia, frase) {
+                if (!frasesUsadas[competencia]) return false;
+                const hash = frase.substring(0, 50);
+                return frasesUsadas[competencia].includes(hash);
+            }
+
+            marcarFraseUsada(competencia, frase) {
+                if (!frasesUsadas[competencia]) frasesUsadas[competencia] = [];
+                const hash = frase.substring(0, 50);
+                frasesUsadas[competencia].push(hash);
+                if (frasesUsadas[competencia].length > 100) frasesUsadas[competencia] = frasesUsadas[competencia].slice(-50);
+                localStorage.setItem('frasesUsadas', JSON.stringify(frasesUsadas));
+            }
+
+            generarCaso(fragmento, competencia, documento) {
+                const actores = {
+                    '1.1': ['docente de primaria', 'docente de secundaria', 'equipo docente'],
+                    '1.2': ['director', 'asesor legal', 'comité de ética'],
+                    '1.3': ['asesor regional', 'coordinador', 'director de nivel'],
+                    '2.1': ['equipo de planificación', 'comité técnico', 'asesor de proyectos'],
+                    '2.3': ['coordinador TIC', 'asesor tecnológico', 'equipo de innovación']
+                };
                 
-                // Excluir la frase correcta y frases muy similares
+                const situaciones = [
+                    'enfrenta la siguiente situación',
+                    'debe tomar una decisión',
+                    'recibe una consulta',
+                    'observa la siguiente situación'
+                ];
+                
+                const actor = actores[competencia]?.[Math.floor(Math.random() * actores[competencia].length)] || 'funcionario';
+                const situacion = situaciones[Math.floor(Math.random() * situaciones.length)];
+                const contexto = fragmento.substring(0, 150).trim();
+                
+                return {
+                    caso: `Un ${actor} ${situacion}:\n\n"${contexto}..."`,
+                    pregunta: `Según el documento "${documento}", ¿cuál es la actuación correcta?`,
+                    contextoCompleto: fragmento
+                };
+            }
+
+            generarOpcionesIncorrectas(doc, fragmentoCorrecto) {
+                const frases = doc.contenido.split(/[.!?]+/).filter(f => f.trim().length > 30);
                 const frasesIncorrectas = frases.filter(f => 
                     !fragmentoCorrecto.includes(f.substring(0, 30)) && 
-                    !f.includes('artículo') && // Evitar artículos legales en incorrectas
-                    f.length < 150
+                    f.length < 200
                 );
                 
-                // Seleccionar 3 frases diferentes al azar
                 const seleccionadas = [];
-                const copiaFrases = [...frasesIncorrectas];
+                const copia = [...frasesIncorrectas];
                 
                 for (let i = 0; i < 3; i++) {
-                    if (copiaFrases.length === 0) break;
-                    const idx = Math.floor(Math.random() * copiaFrases.length);
-                    seleccionadas.push(copiaFrases.splice(idx, 1)[0]);
+                    if (copia.length === 0) break;
+                    const idx = Math.floor(Math.random() * copia.length);
+                    seleccionadas.push(copia.splice(idx, 1)[0]);
                 }
                 
-                // Si no hay suficientes, usar frases genéricas pero relacionadas
                 while (seleccionadas.length < 3) {
-                    seleccionadas.push(`Interpretación incorrecta de ${texto.substring(0, 30)}...`);
+                    seleccionadas.push(`Interpretación alternativa no respaldada por ${doc.nombre}`);
                 }
                 
                 return seleccionadas;
             }
-        
-            generarPregunta(competenciaCodigo) {
+
+            extraerReferencia(texto) {
+                const artMatch = texto.match(/(art[íi]culo\s+\d+)/i);
+                if (artMatch) return artMatch[0];
+                const leyMatch = texto.match(/(ley\s+\d+)/i);
+                if (leyMatch) return leyMatch[0];
+                return '';
+            }
+
+            determinarNivel(texto) {
+                if (texto.includes('artículo') || texto.includes('ley') || texto.includes('circular')) return 'normativo';
+                if (texto.includes('ejemplo') || texto.includes('caso')) return 'aplicado';
+                return 'conceptual';
+            }
+
+            generarPregunta(competenciaCodigo, intentos = 0) {
+                if (intentos > MAX_INTENTOS_RECURSION) {
+                    console.warn('Máximos intentos alcanzados');
+                    return null;
+                }
+                
                 if (this.documentos.length === 0) return null;
                 
-                // Seleccionar documento aleatorio
                 const doc = this.documentos[Math.floor(Math.random() * this.documentos.length)];
+                let fragmentos = this.extraerFragmentos(doc, competenciaCodigo);
                 
-                // Extraer fragmentos relevantes
-                const fragmentos = this.extraerFragmentos(doc, competenciaCodigo);
-                if (fragmentos.length === 0) return this.generarPregunta(competenciaCodigo);
+                if (fragmentos.length === 0) {
+                    const todasLasOraciones = doc.contenido.split(/[.!?]+/).filter(o => o.trim().length > 60);
+                    fragmentos = todasLasOraciones.length > 0 ? todasLasOraciones : [doc.contenido.substring(0, 300)];
+                }
                 
-                // Seleccionar fragmento NO usado antes
+                if (fragmentos.length === 0) {
+                    return this.generarPregunta(competenciaCodigo, intentos + 1);
+                }
+                
                 let fragmento;
-                let intentos = 0;
+                let fragmentoIntentos = 0;
                 do {
                     fragmento = fragmentos[Math.floor(Math.random() * fragmentos.length)];
-                    intentos++;
-                } while (this.fraseUsada(fragmento) && intentos < 10);
+                    fragmentoIntentos++;
+                } while (this.fraseUsada(competenciaCodigo, fragmento) && fragmentoIntentos < MAX_FRAGMENTO_INTENTOS);
                 
-                // Marcar como usada
-                this.marcarFraseUsada(fragmento);
+                if (fragmentoIntentos >= MAX_FRAGMENTO_INTENTOS) {
+                    frasesUsadas[competenciaCodigo] = [];
+                    fragmento = fragmentos[Math.floor(Math.random() * fragmentos.length)];
+                }
                 
-                // Determinar nivel y XP
+                this.marcarFraseUsada(competenciaCodigo, fragmento);
+                
                 const nivel = this.determinarNivel(fragmento);
                 const xp = nivel === 'normativo' ? 20 : (nivel === 'aplicado' ? 15 : 10);
-                
-                // Extraer referencia legal si existe
                 const referencia = this.extraerReferencia(fragmento);
+                const caso = this.generarCaso(fragmento, competenciaCodigo, doc.nombre);
                 
-                // Generar opciones incorrectas del MISMO documento
-                const incorrectas = this.generarOpcionesIncorrectas(
-                    doc.contenido, 
-                    doc.contenido, 
-                    fragmento
-                );
+                const incorrectas = this.generarOpcionesIncorrectas(doc, fragmento);
                 
-                // Crear las 4 opciones (1 correcta + 3 incorrectas)
                 const opciones = [
                     { 
-                        texto: fragmento.substring(0, 150) + '...', 
+                        texto: fragmento.substring(0, 200) + (fragmento.length > 200 ? '...' : ''), 
                         correcta: true,
-                        fundamento: `✅ Correcto. Este fragmento de ${doc.nombre} ${referencia ? `(${referencia})` : ''} es la base normativa.`
+                        fundamento: `✅ Correcto. ${doc.nombre} ${referencia ? `(${referencia})` : ''}`
                     }
                 ];
                 
-                // Agregar incorrectas
-                incorrectas.forEach((inc, idx) => {
+                incorrectas.forEach(inc => {
                     opciones.push({
-                        texto: inc.substring(0, 120) + '...',
+                        texto: inc.substring(0, 150) + (inc.length > 150 ? '...' : ''),
                         correcta: false,
-                        fundamento: `❌ Incorrecto. Esta interpretación no se ajusta a ${doc.nombre}. La correcta se basa en: "${fragmento.substring(0, 100)}..."`
+                        fundamento: `❌ Incorrecto. La interpretación correcta está en ${doc.nombre}`
                     });
                 });
                 
-                // ROTAR posición de la respuesta correcta
-                const opcionCorrecta = opciones.shift(); // Sacar la correcta
-                const posicionCorrecta = Math.floor(Math.random() * 4); // Posición aleatoria 0-3
-                opciones.splice(posicionCorrecta, 0, opcionCorrecta); // Insertar en posición aleatoria
+                const correcta = opciones.shift();
+                const posCorrecta = Math.floor(Math.random() * 4);
+                opciones.splice(posCorrecta, 0, correcta);
                 
                 return {
                     id: `gen_${Date.now()}_${Math.random()}`,
                     competencia: competenciaCodigo,
-                    texto: `Basado en el documento "${doc.nombre}", ¿cuál de las siguientes afirmaciones es CORRECTA según la normativa?`,
+                    texto: `${caso.caso}\n\n${caso.pregunta}`,
                     opciones: opciones,
-                    correcta: posicionCorrecta, // Guardar dónde quedó la correcta
-                    fundamento: opcionCorrecta.fundamento,
+                    correcta: posCorrecta,
+                    fundamento: correcta.fundamento,
                     documento: doc.nombre,
                     nivel: nivel,
                     xp: xp,
                     referencia: referencia
                 };
             }
-        
-            fraseUsada(frase) {
-                if (!this.frasesUsadas[competenciaActual]) return false;
-                const hash = frase.substring(0, 50);
-                return this.frasesUsadas[competenciaActual]?.includes(hash);
-            }
-        
-            marcarFraseUsada(frase) {
-                if (!this.frasesUsadas[competenciaActual]) {
-                    this.frasesUsadas[competenciaActual] = [];
-                }
-                const hash = frase.substring(0, 50);
-                this.frasesUsadas[competenciaActual].push(hash);
-                // Limitar historial
-                if (this.frasesUsadas[competenciaActual].length > 50) {
-                    this.frasesUsadas[competenciaActual].shift();
-                }
-                localStorage.setItem('frasesUsadas', JSON.stringify(this.frasesUsadas));
-            }
-        
-            extraerReferencia(texto) {
-                const artMatch = texto.match(/(art[íi]culo\s+\d+)/i);
-                if (artMatch) return artMatch[0];
-                const leyMatch = texto.match(/(ley\s+\d+)/i);
-                if (leyMatch) return leyMatch[0];
-                const circMatch = texto.match(/(circular\s+[a-z0-9-]+)/i);
-                if (circMatch) return circMatch[0];
-                return '';
-            }
-        
-            extraerFragmentos(doc, competenciaCodigo) {
-                const texto = doc.contenido;
-                const oraciones = texto.split(/[.!?]+/).filter(o => o.trim().length > 50);
-                
-                const keywords = {
-                    '1.1': ['didáctica', 'metodología', 'pedagogía', 'curriculum', 'STEAM', 'PNFT', 'guía', 'docente'],
-                    '1.2': ['ley', 'artículo', 'reglamento', 'normativa', 'política', 'ética', 'código', 'estatuto', 'convención', '10159', '8292', '6227'],
-                    '1.3': ['circular', 'lineamiento', 'organización', 'estructura', 'nivel', 'central', 'regional'],
-                    '2.1': ['plan', 'programa', 'proyecto', 'diseño', 'estrategia', 'PPPJ'],
-                    '2.3': ['tecnología', 'TIC', 'digital', 'innovación', 'MITDE', 'gobernanza']
-                };
-                
-                return oraciones.filter(o => 
-                    keywords[competenciaCodigo]?.some(k => o.includes(k))
-                );
-            }
-        
-            determinarNivel(texto) {
-                if (texto.includes('artículo') || texto.includes('ley') || texto.includes('circular')) {
-                    return 'normativo';
-                }
-                if (texto.includes('ejemplo') || texto.includes('caso') || texto.includes('aplicación')) {
-                    return 'aplicado';
-                }
-                return 'conceptual';
-            }
         }
-
-        // ============================================
-        // FUNCIONES DE CARGA DE DOCUMENTOS
-        // ============================================
-        document.getElementById('carga-docs').addEventListener('change', async function(e) {
-            const archivos = Array.from(e.target.files);
-            documentos = [];
-            const listaDiv = document.getElementById('lista-docs');
-            const progresoDiv = document.getElementById('progreso-carga');
-            listaDiv.innerHTML = '';
-            
-            for (let i = 0; i < archivos.length; i++) {
-                const archivo = archivos[i];
-                progresoDiv.innerHTML = `Procesando ${i+1}/${archivos.length}: ${archivo.name}...`;
-                
-                try {
-                    let contenido = '';
-                    if (archivo.name.toLowerCase().endsWith('.pdf')) {
-                        const arrayBuffer = await archivo.arrayBuffer();
-                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                        for (let j = 1; j <= pdf.numPages; j++) {
-                            const page = await pdf.getPage(j);
-                            const content = await page.getTextContent();
-                            contenido += content.items.map(item => item.str).join(' ') + ' ';
-                        }
-                    } else {
-                        contenido = await archivo.text();
-                    }
-                    
-                    contenido = contenido.toLowerCase().replace(/[^\w\sáéíóúñü.,;:()\-]/g, ' ').replace(/\s+/g, ' ');
-                    
-                    documentos.push({
-                        nombre: archivo.name,
-                        contenido: contenido
-                    });
-                    
-                    listaDiv.innerHTML += `<div class="py-1 text-xs text-green-600">✅ ${archivo.name}</div>`;
-                } catch (error) {
-                    listaDiv.innerHTML += `<div class="py-1 text-xs text-red-600">❌ Error en ${archivo.name}</div>`;
-                }
-            }
-            
-            generador = new GeneradorPreguntas(documentos);
-            listaDiv.classList.remove('hidden');
-            progresoDiv.innerHTML = `✅ ${documentos.length} documentos listos para generar preguntas`;
-            generadorActivo = true;
-        });
 
         // ============================================
         // FUNCIONES DE INTERFAZ
@@ -403,11 +611,15 @@
             const perfil = perfilesMEP[estratoActual];
             let html = '';
             perfil.competencias.forEach(comp => {
+                const nivel = progresoUsuario.competencias[comp.codigo]?.nivel || 0;
                 html += `
                     <div class="p-3 bg-slate-50 rounded-lg border-l-4 border-blue-500">
-                        <span class="text-xs font-mono ${comp.saber ? 'bg-blue-200' : 'bg-green-200'} px-2 py-1 rounded-full">
-                            ${comp.saber ? 'SABER' : 'HACER'}
-                        </span>
+                        <div class="flex justify-between">
+                            <span class="text-xs font-mono ${comp.saber ? 'bg-blue-200' : 'bg-green-200'} px-2 py-1 rounded-full">
+                                ${comp.saber ? 'SABER' : 'HACER'}
+                            </span>
+                            <span class="text-xs">Nivel ${nivel}</span>
+                        </div>
                         <span class="font-medium block mt-1">${comp.codigo} ${comp.nombre}</span>
                         <div class="mt-2 flex flex-wrap gap-1">
                             ${comp.indicadores.map(i => `<span class="text-xs bg-white px-2 py-1 rounded-full">✓ ${i}</span>`).join('')}
@@ -422,7 +634,7 @@
             const container = document.getElementById('ruta-container');
             let html = '';
             rutaDuolingo.forEach(item => {
-                const estado = estadoDuolingo[item.codigo];
+                const estado = progresoUsuario.competencias[item.codigo];
                 html += `
                     <div class="ruta-item ${item.estado} bg-slate-50 p-4 rounded-xl text-center" data-codigo="${item.codigo}">
                         <div class="text-3xl mb-2">${item.tipo}</div>
@@ -430,8 +642,9 @@
                         <div class="text-xs text-gray-600">${item.nombre}</div>
                         ${item.estado === 'disponible' ? `
                             <div class="w-full bg-gray-200 h-1 rounded-full mt-2">
-                                <div class="bg-blue-600 h-1 rounded-full" style="width: ${estado.porcentaje || 0}%"></div>
+                                <div class="bg-blue-600 h-1 rounded-full" style="width: ${estado?.nivel * 20 || 0}%"></div>
                             </div>
+                            <div class="text-xs mt-1">Nivel ${estado?.nivel || 0}</div>
                         ` : '<div class="text-xs text-gray-400 mt-2">🔒 Bloqueado</div>'}
                     </div>
                 `;
@@ -447,14 +660,48 @@
         }
 
         function actualizarUIDuolingo() {
-            const xp = progresoGlobal.xpTotal;
-            document.getElementById('nivel-duolingo').textContent = Math.floor(xp / 200) + 1;
-            document.getElementById('xp-duolingo').textContent = xp % 200;
+            const xp = progresoUsuario.nivel.xp;
+            const nivel = progresoUsuario.nivel.actual;
+            const xpSiguiente = nivel * XP_POR_NIVEL;
+            const xpActualNivel = xp - ((nivel-1) * XP_POR_NIVEL);
+            const porcentaje = (xpActualNivel / XP_POR_NIVEL) * 100;
             
-            const vidas = estadoDuolingo[competenciaActual]?.vidas || 3;
+            document.getElementById('nivel-duolingo').textContent = nivel;
+            document.getElementById('xp-duolingo').textContent = xp;
+            document.getElementById('xp-siguiente').textContent = nivel * XP_POR_NIVEL;
+            document.getElementById('barra-xp-duolingo').style.width = Math.min(100, porcentaje) + '%';
+            document.getElementById('rango-duolingo').textContent = progresoUsuario.nivel.rango;
+            document.getElementById('racha-duolingo').textContent = progresoUsuario.racha.actual;
+            
+            const vidas = 3 - Math.floor(progresoUsuario.estadisticas.totalIncorrectas / 5);
             let vidasHtml = '';
             for (let i = 0; i < 3; i++) vidasHtml += i < vidas ? '❤️' : '🤍';
             document.getElementById('vidas-duolingo').innerHTML = vidasHtml;
+        }
+
+        function actualizarRango() {
+            const xp = progresoUsuario.nivel.xp;
+            if (xp >= 2000) progresoUsuario.nivel.rango = 'Idóneo';
+            else if (xp >= 1000) progresoUsuario.nivel.rango = 'Oro';
+            else if (xp >= 500) progresoUsuario.nivel.rango = 'Plata';
+            else progresoUsuario.nivel.rango = 'Bronce';
+        }
+
+        function actualizarRacha(acerto) {
+            const hoy = new Date().toDateString();
+            
+            if (acerto) {
+                if (progresoUsuario.racha.ultimaFecha === hoy) return;
+                
+                if (progresoUsuario.racha.ultimaFecha === new Date(Date.now() - 86400000).toDateString()) {
+                    progresoUsuario.racha.actual++;
+                } else {
+                    progresoUsuario.racha.actual = 1;
+                }
+                
+                progresoUsuario.racha.maxima = Math.max(progresoUsuario.racha.maxima, progresoUsuario.racha.actual);
+                progresoUsuario.racha.ultimaFecha = hoy;
+            }
         }
 
         function cargarPregunta() {
@@ -472,24 +719,33 @@
             
             preguntaActual = pregunta;
             
+            const compNombre = rutaDuolingo.find(r => r.codigo === competenciaActual).nombre;
             document.getElementById('competencia-actual-tag').innerHTML = 
-                `${rutaDuolingo.find(r => r.codigo === competenciaActual).tipo} ${competenciaActual} ${rutaDuolingo.find(r => r.codigo === competenciaActual).nombre}`;
+                `${rutaDuolingo.find(r => r.codigo === competenciaActual).tipo} ${competenciaActual} ${compNombre}`;
             
-            const nivelesEtiqueta = { conceptual: '🟢 Conceptual', aplicado: '🟡 Aplicado', normativo: '🔴 Normativo' };
-            document.getElementById('nivel-pregunta-tag').textContent = nivelesEtiqueta[pregunta.nivel];
+            const niveles = { conceptual: '🟢 Conceptual', aplicado: '🟡 Aplicado', normativo: '🔴 Normativo' };
+            document.getElementById('nivel-pregunta-tag').textContent = niveles[pregunta.nivel] || '🟢 Conceptual';
             
             let html = `
                 <div>
-                    <p class="text-lg font-medium mb-6">${pregunta.texto}</p>
+                    <p class="text-lg font-medium mb-4 whitespace-pre-line">${pregunta.texto}</p>
                     <div class="space-y-3 mb-6">
             `;
             
             pregunta.opciones.forEach((op, idx) => {
                 html += `
-                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer"
+                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer relative group"
                            onclick="seleccionarOpcion(this, ${idx})">
-                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold">${String.fromCharCode(65 + idx)}</span>
-                        <span>${op.texto}</span>
+                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <span class="text-sm block">${op.texto}</span>
+                            <div class="hidden group-hover:block absolute left-0 right-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 max-w-lg">
+                                <div class="font-bold mb-1 text-yellow-300">📄 Texto completo:</div>
+                                ${op.texto}
+                            </div>
+                        </div>
                     </label>
                 `;
             });
@@ -498,7 +754,7 @@
                     </div>
                     <button id="btn-responder" onclick="responderPregunta()" 
                             class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold" disabled>
-                        Verificar
+                        Verificar respuesta
                     </button>
                 </div>
                 <div id="feedback-duolingo" class="hidden mt-4"></div>
@@ -521,37 +777,46 @@
         function responderPregunta() {
             if (window.opcionSeleccionada === undefined || !preguntaActual) return;
             
-            const estado = estadoDuolingo[competenciaActual];
             const esCorrecta = window.opcionSeleccionada === preguntaActual.correcta;
             
-            estado.preguntasRespondidas.push(preguntaActual.id);
-            
+            // Actualizar estadísticas
+            progresoUsuario.estadisticas.totalPreguntas++;
             if (esCorrecta) {
-                estado.preguntasDominadas.push(preguntaActual.id);
-                estado.correctasConsecutivas++;
-                estado.xp += preguntaActual.xp;
-                progresoGlobal.xpTotal += preguntaActual.xp;
+                progresoUsuario.estadisticas.totalCorrectas++;
+                progresoUsuario.nivel.xp += preguntaActual.xp;
+                
+                // Actualizar competencia
+                if (progresoUsuario.competencias[preguntaActual.competencia]) {
+                    progresoUsuario.competencias[preguntaActual.competencia].xp += preguntaActual.xp;
+                    progresoUsuario.competencias[preguntaActual.competencia].nivel = 
+                        Math.floor(progresoUsuario.competencias[preguntaActual.competencia].xp / 100) + 1;
+                }
             } else {
-                estado.vidas--;
-                estado.correctasConsecutivas = 0;
+                progresoUsuario.estadisticas.totalIncorrectas++;
             }
             
-            estado.porcentaje = (estado.preguntasDominadas.length / estado.preguntasRespondidas.length) * 100;
+            // Actualizar racha
+            actualizarRacha(esCorrecta);
             
-            localStorage.setItem('estadoDuolingo', JSON.stringify(estadoDuolingo));
-            localStorage.setItem('progresoGlobal', JSON.stringify(progresoGlobal));
+            // Calcular nivel por XP total
+            progresoUsuario.nivel.actual = Math.floor(progresoUsuario.nivel.xp / XP_POR_NIVEL) + 1;
+            actualizarRango();
+            
+            guardarProgreso();
             
             const feedback = document.getElementById('feedback-duolingo');
             const opcionElegida = preguntaActual.opciones[window.opcionSeleccionada];
-            const correcta = preguntaActual.opciones.find(o => o.correcta);
             
             feedback.innerHTML = `
                 <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 ${esCorrecta ? 'border-green-500' : 'border-red-500'}">
                     <h4 class="font-bold text-lg mb-2">${esCorrecta ? '✅ Correcto' : '❌ Incorrecto'}</h4>
                     <div class="bg-${esCorrecta ? 'green' : 'red'}-50 p-4 rounded-lg">
-                        <p class="font-medium">${esCorrecta ? 'Fundamento' : 'Error común'}:</p>
+                        <p class="font-medium">${esCorrecta ? 'Fundamento' : 'Error'}:</p>
                         <p>${esCorrecta ? preguntaActual.fundamento : opcionElegida.fundamento}</p>
-                        ${!esCorrecta ? `<p class="mt-2 font-medium">✅ Correcta: ${correcta.texto}</p>` : ''}
+                        ${!esCorrecta ? `
+                            <p class="mt-2 font-medium">✅ Correcta era:</p>
+                            <p>${preguntaActual.opciones[preguntaActual.correcta].texto}</p>
+                        ` : ''}
                     </div>
                     <button onclick="siguientePregunta()" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg">Continuar</button>
                 </div>
@@ -569,17 +834,275 @@
         }
 
         // ============================================
+        // SIMULADOR
+        // ============================================
+        function iniciarSimulador() {
+            if (!generador || documentos.length === 0) {
+                alert('Debe cargar documentos primero');
+                return false;
+            }
+            
+            const preguntas = [];
+            const competencias = ['1.1', '1.2', '1.3', '2.1', '2.3'];
+            const distribucion = [14, 14, 12, 10, 10];
+            
+            competencias.forEach((comp, idx) => {
+                for (let i = 0; i < distribucion[idx]; i++) {
+                    const pregunta = generador.generarPregunta(comp);
+                    if (pregunta) preguntas.push(pregunta);
+                }
+            });
+            
+            while (preguntas.length < 60) {
+                const comp = competencias[Math.floor(Math.random() * competencias.length)];
+                const pregunta = generador.generarPregunta(comp);
+                if (pregunta) preguntas.push(pregunta);
+            }
+            
+            simulador.activo = true;
+            simulador.preguntas = preguntas.slice(0, 60);
+            simulador.respondidas = 0;
+            simulador.correctas = 0;
+            simulador.inicio = Date.now();
+            
+            for (let comp in simulador.resultadosPorCompetencia) {
+                simulador.resultadosPorCompetencia[comp] = { total: 0, correctas: 0 };
+            }
+            
+            document.getElementById('estado-simulacro').classList.remove('hidden');
+            document.getElementById('resultado-simulador').innerHTML = '';
+            mostrarPreguntaSimulador(0);
+        }
+
+        function mostrarPreguntaSimulador(index) {
+            if (index >= simulador.preguntas.length) {
+                finalizarSimulador();
+                return;
+            }
+            
+            const pregunta = simulador.preguntas[index];
+            
+            let html = `
+                <div class="pregunta-simulador">
+                    <p class="text-sm text-gray-500 mb-2">Pregunta ${index+1} de 60</p>
+                    <p class="text-lg font-medium mb-4 whitespace-pre-line">${pregunta.texto}</p>
+                    <div class="space-y-3 mb-6">
+            `;
+            
+            pregunta.opciones.forEach((op, idx) => {
+                html += `
+                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer"
+                           onclick="seleccionarOpcionSimulador(this, ${idx}, ${index})">
+                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold">${String.fromCharCode(65 + idx)}</span>
+                        <span>${op.texto}</span>
+                    </label>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <button id="btn-simulador" onclick="responderSimulador(${index})" 
+                            class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold" disabled>
+                        Responder
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('simulacro-container').innerHTML = html;
+            window.preguntaSimuladorActual = pregunta;
+        }
+
+        function seleccionarOpcionSimulador(label, idx, index) {
+            document.querySelectorAll('.pregunta-simulador label').forEach(l => {
+                l.classList.remove('bg-blue-100', 'border-blue-500');
+                l.querySelector('span:first-child').classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+            });
+            label.classList.add('bg-blue-100', 'border-blue-500');
+            label.querySelector('span:first-child').classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+            document.getElementById('btn-simulador').disabled = false;
+            window.opcionSimuladorSeleccionada = { idx, index };
+        }
+
+        function responderSimulador(index) {
+            if (!window.opcionSimuladorSeleccionada || window.opcionSimuladorSeleccionada.index !== index) return;
+            
+            const pregunta = simulador.preguntas[index];
+            const esCorrecta = window.opcionSimuladorSeleccionada.idx === pregunta.correcta;
+            
+            simulador.respondidas++;
+            if (esCorrecta) simulador.correctas++;
+            
+            // Registrar por competencia
+            if (!simulador.resultadosPorCompetencia[pregunta.competencia]) {
+                simulador.resultadosPorCompetencia[pregunta.competencia] = { total: 0, correctas: 0 };
+            }
+            simulador.resultadosPorCompetencia[pregunta.competencia].total++;
+            if (esCorrecta) simulador.resultadosPorCompetencia[pregunta.competencia].correctas++;
+            
+            // Actualizar UI
+            document.getElementById('simulacro-progreso').textContent = `${simulador.respondidas}/60`;
+            document.getElementById('simulacro-correctas').textContent = simulador.correctas;
+            const nota = Math.round((simulador.correctas / simulador.respondidas) * 100);
+            document.getElementById('simulacro-nota').textContent = nota + '%';
+            document.getElementById('simulacro-barra').style.width = (simulador.respondidas / 60 * 100) + '%';
+            
+            // Siguiente pregunta
+            setTimeout(() => {
+                mostrarPreguntaSimulador(index + 1);
+            }, 500);
+        }
+
+        function finalizarSimulador() {
+            simulador.activo = false;
+            
+            const tiempoSegundos = Math.round((Date.now() - simulador.inicio) / 1000);
+            const minutos = Math.floor(tiempoSegundos / 60);
+            const segundos = tiempoSegundos % 60;
+            
+            const porcentaje = (simulador.correctas / 60) * 100;
+            const aprobado = porcentaje >= 70;
+            
+            // Actualizar estadísticas globales
+            progresoUsuario.estadisticas.simulacrosCompletados++;
+            if (aprobado) progresoUsuario.estadisticas.simulacrosAprobados++;
+            guardarProgreso();
+            
+            let reporte = `
+                <div class="bg-white p-6 rounded-xl shadow-lg mt-6">
+                    <h3 class="text-2xl font-bold mb-4 ${aprobado ? 'text-green-600' : 'text-red-600'}">
+                        ${aprobado ? '✅ APROBADO' : '❌ NO APROBADO'}
+                    </h3>
+                    <p class="mb-2">Resultado: ${simulador.correctas}/60 (${porcentaje.toFixed(1)}%)</p>
+                    <p class="mb-4">Tiempo: ${minutos}:${segundos.toString().padStart(2, '0')}</p>
+                    
+                    <h4 class="font-bold mt-4 mb-2">📊 Desempeño por competencia:</h4>
+                    <div class="space-y-2">
+            `;
+            
+            for (let [comp, res] of Object.entries(simulador.resultadosPorCompetencia)) {
+                const compNombre = rutaDuolingo.find(r => r.codigo === comp)?.nombre || comp;
+                const compPorc = res.total > 0 ? (res.correctas / res.total * 100).toFixed(1) : 0;
+                const color = compPorc >= 70 ? 'text-green-600' : (compPorc >= 50 ? 'text-yellow-600' : 'text-red-600');
+                
+                reporte += `
+                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span class="font-medium">${comp} - ${compNombre.substring(0, 30)}...</span>
+                        <span class="${color} font-bold">${res.correctas}/${res.total} (${compPorc}%)</span>
+                    </div>
+                `;
+            }
+            
+            reporte += `
+                    </div>
+                    <button onclick="iniciarSimulador()" class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg">
+                        Nuevo simulacro
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('resultado-simulador').innerHTML = reporte;
+            document.getElementById('simulacro-container').innerHTML = '';
+            document.getElementById('estado-simulacro').classList.add('hidden');
+        }
+
+        // ============================================
+        // REPORTE DE COMPETENCIAS
+        // ============================================
+        function generarReporteCompetencias() {
+            const container = document.getElementById('reporte-competencias');
+            if (!container) return;
+            
+            let html = '';
+            
+            for (let [codigo, data] of Object.entries(progresoUsuario.competencias)) {
+                const competencia = perfilesMEP[estratoActual]?.competencias.find(c => c.codigo === codigo);
+                const nombre = competencia?.nombre || codigo;
+                
+                const porcentaje = data.nivel * 20; // Nivel 5 = 100%
+                const colorBarra = porcentaje >= 80 ? 'bg-green-500' : (porcentaje >= 50 ? 'bg-yellow-500' : 'bg-red-500');
+                
+                html += `
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-medium text-sm">${codigo} - ${nombre.substring(0, 30)}</span>
+                            <span class="text-sm font-bold">${data.nivel}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
+                            <div class="${colorBarra} h-4 rounded-full" style="width: ${porcentaje}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">XP: ${data.xp} · ${data.dominada ? '✅ Dominada' : 'En progreso'}</p>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            // Gráfico radar
+            const ctx = document.getElementById('radar-competencias').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['1.1', '1.2', '1.3', '2.1', '2.3'],
+                    datasets: [{
+                        label: 'Nivel de dominio',
+                        data: [
+                            progresoUsuario.competencias['1.1'].nivel * 20,
+                            progresoUsuario.competencias['1.2'].nivel * 20,
+                            progresoUsuario.competencias['1.3'].nivel * 20,
+                            progresoUsuario.competencias['2.1'].nivel * 20,
+                            progresoUsuario.competencias['2.3'].nivel * 20
+                        ],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3b82f6',
+                        pointBackgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    scales: { r: { min: 0, max: 100 } }
+                }
+            });
+            
+            // Estadísticas globales
+            const stats = document.getElementById('estadisticas-globales');
+            stats.innerHTML = `
+                <div class="p-3 bg-white rounded-lg shadow">
+                    <span class="text-sm text-gray-500">Total preguntas</span>
+                    <p class="text-2xl font-bold">${progresoUsuario.estadisticas.totalPreguntas}</p>
+                </div>
+                <div class="p-3 bg-white rounded-lg shadow">
+                    <span class="text-sm text-gray-500">Correctas</span>
+                    <p class="text-2xl font-bold text-green-600">${progresoUsuario.estadisticas.totalCorrectas}</p>
+                </div>
+                <div class="p-3 bg-white rounded-lg shadow">
+                    <span class="text-sm text-gray-500">Simulacros</span>
+                    <p class="text-2xl font-bold">${progresoUsuario.estadisticas.simulacrosCompletados}</p>
+                </div>
+                <div class="p-3 bg-white rounded-lg shadow">
+                    <span class="text-sm text-gray-500">Aprobados</span>
+                    <p class="text-2xl font-bold text-blue-600">${progresoUsuario.estadisticas.simulacrosAprobados}</p>
+                </div>
+            `;
+        }
+
+        // ============================================
         // EVENTOS
         // ============================================
+        
+        // Tabs
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
                 document.getElementById(`tab-${this.dataset.tab}`).classList.remove('hidden');
+                
+                if (this.dataset.tab === 'reporte') {
+                    generarReporteCompetencias();
+                }
             });
         });
 
+        // Selector de estrato
         document.querySelectorAll('#selector-estrato .estrato-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#selector-estrato .estrato-btn').forEach(b => {
@@ -592,6 +1115,42 @@
                 renderizarCompetencias();
             });
         });
+
+        // Carga de documentos
+        document.getElementById('carga-docs').addEventListener('change', async function(e) {
+            const archivos = Array.from(e.target.files);
+            documentos = [];
+            const listaDiv = document.getElementById('lista-docs');
+            const progresoDiv = document.getElementById('progreso-carga');
+            listaDiv.innerHTML = '';
+            
+            for (let i = 0; i < archivos.length; i++) {
+                const archivo = archivos[i];
+                progresoDiv.innerHTML = `Procesando ${i+1}/${archivos.length}: ${archivo.name}...`;
+                
+                const resultado = await procesarArchivoSeguro(archivo);
+                
+                if (resultado.error) {
+                    listaDiv.innerHTML += `<div class="py-1 text-xs text-red-600">❌ ${resultado.nombre}: ${resultado.mensaje}</div>`;
+                } else {
+                    documentos.push(resultado);
+                    listaDiv.innerHTML += `<div class="py-1 text-xs text-green-600">✅ ${resultado.nombre}</div>`;
+                }
+            }
+            
+            generador = new GeneradorPreguntas(documentos);
+            listaDiv.classList.remove('hidden');
+            progresoDiv.innerHTML = `✅ ${documentos.length} documentos listos`;
+        });
+
+        // Botón iniciar simulacro
+        document.getElementById('btn-iniciar-simulacro').addEventListener('click', iniciarSimulador);
+
+        // Autoguardado cada 30 segundos
+        setInterval(guardarProgreso, 30000);
+
+        // Guardar al salir
+        window.addEventListener('beforeunload', guardarProgreso);
 
         // Inicializar
         renderizarCompetencias();
