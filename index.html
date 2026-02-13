@@ -1,305 +1,513 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IDOMEP · Simulador Transitorio IX</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 IDOMEP · Asesor Nacional</title>
+    <!-- Tailwind + Font Awesome + PDF.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        body { background: #f0f9ff; }
+        .card { background: white; border-radius: 24px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .competencia-badge { background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .ruta-item { transition: all 0.3s; cursor: pointer; border: 2px solid transparent; }
+        .ruta-item.disponible:hover { transform: translateY(-4px); border-color: #3b82f6; }
+        .heart-full { color: #ef4444; }
+        .medalla { transition: all 0.3s; filter: grayscale(0.7); }
+        .medalla.obtenida { filter: grayscale(0); }
+        .tab-button.active { background: #2563eb; color: white; }
+    </style>
 </head>
+<body class="min-h-screen p-4">
 
-<body class="bg-slate-100 min-h-screen p-6">
+    <!-- BARRA SUPERIOR -->
+    <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b shadow-sm mb-4">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
+            <span class="font-bold text-xl">🎓 IDOMEP <span class="text-blue-600">v1</span></span>
+            <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
+                <button data-tab="inicio" class="tab-button px-4 py-1.5 rounded-lg text-sm active">📚 Inicio</button>
+                <button data-tab="duolingo" class="tab-button px-4 py-1.5 rounded-lg text-sm">🎮 IdoMep</button>
+            </div>
+        </div>
+    </div>
 
-<!-- ================== HEADER ================== -->
+    <div class="max-w-7xl mx-auto">
+        <!-- ========== TAB INICIO ========== -->
+        <div id="tab-inicio" class="tab-content block">
+            <div class="card mb-6 border-l-8 border-blue-600">
+                <h2 class="text-2xl font-bold mb-2">📚 Sistema de Estudio MEP</h2>
+                <p class="text-gray-600">Cargue sus 40+ documentos. El sistema los usará para generar preguntas personalizadas.</p>
+                <div class="mt-3 text-sm bg-blue-50 p-3 rounded-lg">
+                    <span class="font-medium">Fundamento:</span> LMEP N.º 10159 (arts.5l,15d-e) · Ley N.º9871 · Resolución DG-RES-88-2023 · Calificación mínima 70
+                </div>
+            </div>
 
-<div class="bg-indigo-900 text-white p-6 rounded-xl shadow-lg mb-6">
-<h1 class="text-3xl font-bold">IDOMEP · Preparación Estrato Técnico Docente</h1>
+            <div class="card mb-6">
+                <h3 class="font-bold text-lg mb-4">🎯 Seleccione su estrato (Título II)</h3>
+                <div class="flex flex-wrap gap-3" id="selector-estrato">
+                    <button data-estrato="docente" class="estrato-btn px-5 py-2 rounded-full bg-slate-100 hover:bg-blue-100">Propiamente Docente</button>
+                    <button data-estrato="tecnico" class="estrato-btn px-5 py-2 rounded-full bg-blue-600 text-white">Técnico Docente (Asesores)</button>
+                    <button data-estrato="administrativo" class="estrato-btn px-5 py-2 rounded-full bg-slate-100 hover:bg-blue-100">Administrativo Docente</button>
+                </div>
+            </div>
 
-<p class="mt-3 text-sm">
-Simulador formativo basado en competencias del Título II.
-No sustituye la prueba oficial del MEP.
-</p>
+            <div class="card mb-6">
+                <h3 class="font-bold text-lg mb-4">📁 Cargue SUS documentos (PDF o DOCX)</h3>
+                <p class="text-sm text-amber-600 mb-3">Seleccione todos sus archivos. El sistema los leerá automáticamente.</p>
+                <input type="file" id="carga-docs" multiple accept=".pdf,.docx,.txt" class="mb-4 w-full p-2 border rounded-lg">
+                <div id="lista-docs" class="text-sm max-h-40 overflow-y-auto bg-slate-50 p-3 rounded-lg hidden"></div>
+                <div id="progreso-carga" class="text-xs text-gray-500 mt-2"></div>
+            </div>
 
-<div class="mt-4 text-xs bg-white/20 p-3 rounded-lg">
-Fundamento normativo:<br>
-Art.2 RPCID · Art.5 inc.l y Art.15 LMEP 10159 · Ley 9871 ·
-Resolución DG-RES-88-2023 · Art.17 inc.d RPCID<br>
-Prueba oficial: 60 ítems · Selección única · Nota mínima: 70
-</div>
+            <div class="card">
+                <h3 class="font-bold text-lg mb-4">📋 Competencias a evaluar</h3>
+                <div id="competencias-container" class="space-y-3"></div>
+            </div>
+        </div>
 
-<div class="mt-4 flex gap-3 flex-wrap">
-<a href="https://dgth.mep.go.cr/pruebas-de-idoneidad-transitorio-ix/"
-target="_blank"
-class="bg-white text-indigo-900 px-3 py-2 rounded font-semibold">
-Tablas oficiales DGTH
-</a>
+        <!-- ========== TAB IDOMEP ========== -->
+        <div id="tab-duolingo" class="tab-content hidden">
+            <!-- Panel XP/Vidas -->
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl shadow-xl p-6 mb-6 text-white">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <span class="text-4xl">🎮</span>
+                        <div>
+                            <h2 class="text-2xl font-black">IDOMEP · Ruta de dominio</h2>
+                            <p class="text-blue-100">Competencias MEP · Basado en sus documentos</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div><span class="text-sm">NIVEL</span><div class="text-2xl font-bold" id="nivel-duolingo">1</div></div>
+                        <div class="w-24"><span class="text-sm">XP</span><div class="text-sm"><span id="xp-duolingo">0</span>/200</div></div>
+                        <div class="flex text-2xl" id="vidas-duolingo">❤️❤️❤️</div>
+                    </div>
+                </div>
+            </div>
 
-<a href="https://notebooklm.google.com/notebook/1d7bd2c4-bc5c-43bb-b65d-62275a44c58f"
-target="_blank"
-class="bg-yellow-400 text-black px-3 py-2 rounded font-semibold">
-Abrir mis lecturas en NotebookLM
-</a>
-</div>
-</div>
+            <!-- Ruta de competencias -->
+            <div class="card mb-6">
+                <h3 class="font-bold text-lg mb-4">🗺️ Ruta de aprendizaje</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="ruta-container"></div>
+            </div>
 
-<!-- ================== COMPETENCIAS ================== -->
+            <!-- Pregunta actual -->
+            <div class="card">
+                <div id="pregunta-header" class="flex justify-between items-center mb-4">
+                    <span class="bg-indigo-100 px-3 py-1 rounded-full text-sm" id="competencia-actual-tag">📘 1.1 Área disciplinar</span>
+                    <span class="text-xs text-gray-500" id="nivel-pregunta-tag">🟢 Conceptual</span>
+                </div>
+                <div id="pregunta-container" class="min-h-[300px]">
+                    <div class="text-center text-gray-500 py-12">Cargue documentos en Inicio y seleccione una competencia</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="bg-white p-4 rounded-xl shadow mb-6">
-<h2 class="font-bold mb-3">Competencias evaluadas (Estrato Técnico Docente)</h2>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-<div class="bg-green-100 p-2 rounded">1.1 Dominio disciplinar</div>
-<div class="bg-green-100 p-2 rounded">1.2 Marco jurídico</div>
-<div class="bg-green-100 p-2 rounded">1.3 Estructura MEP</div>
-<div class="bg-green-100 p-2 rounded">1.4 Dinámica global</div>
-<div class="bg-blue-100 p-2 rounded">2.1 Diseño pedagógico</div>
-<div class="bg-blue-100 p-2 rounded">2.2 Gestión educativa</div>
-<div class="bg-blue-100 p-2 rounded">2.3 Liderazgo asesoría</div>
-<div class="bg-blue-100 p-2 rounded">2.4 Investigación y recursos</div>
-</div>
-</div>
+        // ============================================
+        // PERFILES MEP (COMPLETOS CON SUS INDICADORES)
+        // ============================================
+        const perfilesMEP = {
+            tecnico: {
+                nombre: 'Técnico Docente (Asesores)',
+                competencias: [
+                    { codigo: '1.1', nombre: 'Área disciplinar, pedagógica y curricular', saber: true,
+                      indicadores: ['Domina su disciplina', 'Asesora sobre actualizaciones curriculares', 'Fundamenta con teorías pedagógicas'] },
+                    { codigo: '1.2', nombre: 'Marco jurídico, ético y políticas públicas', saber: true,
+                      indicadores: ['Aplica Política Educativa', 'Interpreta normativa vinculante (Leyes 10159, 8292, 7494, 6227, 1581, 7600)'] },
+                    { codigo: '1.3', nombre: 'Estructura organizacional del MEP', saber: true,
+                      indicadores: ['Coordina entre niveles central, regional e institucional', 'Aplica circulares y lineamientos'] },
+                    { codigo: '2.1', nombre: 'Diseño de planes, programas y proyectos', saber: false,
+                      indicadores: ['Elabora proyectos alineados a PPPJ 2026-2030', 'Diseña estrategias de intervención'] },
+                    { codigo: '2.3', nombre: 'Liderazgo, asesoría y TIC', saber: false,
+                      indicadores: ['Utiliza plataformas digitales', 'Promueve innovación educativa con TIC', 'Aplica Modelo de Gobernanza TIC'] }
+                ]
+            },
+            docente: {
+                nombre: 'Propiamente Docente',
+                competencias: [
+                    { codigo: '1.1', nombre: 'Conocimiento de estudiantes y contexto', saber: true, indicadores: ['Identifica etapas del desarrollo', 'Reconoce factores socioculturales'] },
+                    { codigo: '1.2', nombre: 'Dominio disciplinar y didáctico', saber: true, indicadores: ['Selecciona estrategias didácticas', 'Aplica metodologías activas (CBL, Design Thinking, ABJ)'] },
+                    { codigo: '1.3', nombre: 'Políticas y normativa educativa', saber: true, indicadores: ['Cita Código de Niñez', 'Aplica lineamientos de evaluación'] },
+                    { codigo: '2.1', nombre: 'Diseño de experiencias de aprendizaje', saber: false, indicadores: ['Adecua objetivos', 'Selecciona recursos'] },
+                    { codigo: '2.2', nombre: 'Mediación pedagógica', saber: false, indicadores: ['Aplica aprendizaje cooperativo', 'Integra TIC'] },
+                    { codigo: '2.3', nombre: 'Evaluación de aprendizajes', saber: false, indicadores: ['Construye rúbricas', 'Analiza resultados'] }
+                ]
+            },
+            administrativo: {
+                nombre: 'Administrativo Docente',
+                competencias: [
+                    { codigo: '1.1', nombre: 'Liderazgo pedagógico y gestión', saber: true, indicadores: ['Identifica modelos de supervisión', 'Reconoce estilos de dirección'] },
+                    { codigo: '1.4', nombre: 'Tecnologías en educación', saber: true, indicadores: ['Usa sistemas institucionales', 'Conoce políticas de seguridad'] },
+                    { codigo: '2.3', nombre: 'Gestión de recursos', saber: false, indicadores: ['Elabora presupuestos', 'Aplica Ley de Contratación 7494'] },
+                    { codigo: '2.4', nombre: 'Gestión segura de información', saber: false, indicadores: ['Aplica protocolos de datos', 'Resguarda documentación'] },
+                    { codigo: '2.5', nombre: 'Liderazgo y responsabilidad', saber: false, indicadores: ['Conduce reuniones', 'Resuelve conflictos'] }
+                ]
+            }
+        };
 
-<!-- ================== PROGRESO ================== -->
+        // Ruta de competencias (orden de aprendizaje)
+        const rutaDuolingo = [
+            { codigo: '1.1', nombre: 'Área disciplinar', tipo: '📘', estado: 'disponible' },
+            { codigo: '1.2', nombre: 'Marco jurídico', tipo: '📘', estado: 'bloqueado' },
+            { codigo: '1.3', nombre: 'Estructura MEP', tipo: '📘', estado: 'bloqueado' },
+            { codigo: '2.1', nombre: 'Diseño proyectos', tipo: '🛠️', estado: 'bloqueado' },
+            { codigo: '2.3', nombre: 'Liderazgo TIC', tipo: '🛠️', estado: 'bloqueado' }
+        ];
 
-<div class="bg-white p-4 rounded-xl shadow mb-6">
-<p>Total ítems: 60 · Selección única · 4 opciones</p>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let estratoActual = 'tecnico';
+        let documentos = []; // Aquí se guardarán los PDFs procesados
+        let generadorActivo = false;
+        
+        // Estado gamificado
+        let estadoDuolingo = JSON.parse(localStorage.getItem('estadoDuolingo')) || {
+            '1.1': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
+            '1.2': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
+            '1.3': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
+            '2.1': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] },
+            '2.3': { xp:0, vidas:3, nivelActual:'conceptual', correctasConsecutivas:0, porcentaje:0, preguntasDominadas:[], preguntasRespondidas:[] }
+        };
+        
+        let progresoGlobal = JSON.parse(localStorage.getItem('progresoGlobal')) || { xpTotal: 0, nivel: 1 };
+        let competenciaActual = '1.1';
+        let preguntaActual = null;
 
-<div class="mt-3 bg-slate-200 rounded-full h-4">
-<div id="barra" class="bg-green-500 h-4 rounded-full" style="width:0%"></div>
-</div>
+        // ============================================
+        // GENERADOR INTELIGENTE DE PREGUNTAS
+        // ============================================
+        class GeneradorPreguntas {
+            constructor(docs) {
+                this.documentos = docs;
+                this.historial = JSON.parse(localStorage.getItem('historialPreguntas')) || {};
+            }
 
-<p class="mt-2">
-Progreso: <span id="progresoTexto">0%</span>
-</p>
-</div>
+            // Extraer fragmentos relevantes de un documento
+            extraerFragmentos(doc, competenciaCodigo) {
+                const texto = doc.contenido;
+                const oraciones = texto.split(/[.!?]+/).filter(o => o.trim().length > 40);
+                
+                // Palabras clave por competencia
+                const keywords = {
+                    '1.1': ['didáctica', 'metodología', 'pedagogía', 'curriculum', 'STEAM', 'PNFT', 'guía', 'docente', 'aprendizaje'],
+                    '1.2': ['ley', 'artículo', 'reglamento', 'normativa', 'política', 'ética', 'código', 'estatuto', 'convención', '10159', '8292', '6227', '1581', '7494', '7600'],
+                    '1.3': ['circular', 'lineamiento', 'organización', 'estructura', 'nivel', 'central', 'regional', 'institucional'],
+                    '2.1': ['plan', 'programa', 'proyecto', 'diseño', 'estrategia', 'PPPJ', 'marco'],
+                    '2.3': ['tecnología', 'TIC', 'digital', 'innovación', 'MITDE', 'gobernanza', 'transformación']
+                };
+                
+                // Filtrar oraciones relevantes para esta competencia
+                const relevantes = oraciones.filter(o => 
+                    keywords[competenciaCodigo]?.some(k => o.includes(k))
+                );
+                
+                return relevantes.length > 0 ? relevantes : oraciones;
+            }
 
-<!-- ================== AREA PREGUNTAS ================== -->
+            generarPregunta(competenciaCodigo) {
+                if (this.documentos.length === 0) return null;
+                
+                // Seleccionar documento aleatorio
+                const doc = this.documentos[Math.floor(Math.random() * this.documentos.length)];
+                const fragmentos = this.extraerFragmentos(doc, competenciaCodigo);
+                
+                if (fragmentos.length === 0) return this.generarPregunta(competenciaCodigo);
+                
+                const fragmento = fragmentos[Math.floor(Math.random() * fragmentos.length)];
+                
+                // Determinar nivel de la pregunta
+                let nivel = 'conceptual';
+                if (fragmento.includes('artículo') || fragmento.includes('ley')) nivel = 'normativo';
+                else if (fragmento.includes('ejemplo') || fragmento.includes('caso')) nivel = 'aplicado';
+                
+                // Extraer posible artículo/ley
+                const articuloMatch = fragmento.match(/(art[íi]culo\s+\d+)/i);
+                const leyMatch = fragmento.match(/(ley\s+\d+)/i);
+                const referencia = articuloMatch ? articuloMatch[0] : (leyMatch ? leyMatch[0] : '');
+                
+                // Generar opciones
+                const opciones = [
+                    { texto: `Aplicar lo establecido en ${doc.nombre}`, correcta: true,
+                      fundamento: `Según ${doc.nombre}: "${fragmento.substring(0, 150)}..."` },
+                    { texto: 'Actuar según criterio personal', correcta: false,
+                      fundamento: 'Debe basarse en documentos oficiales, no en opiniones' },
+                    { texto: 'Consultar informalmente con colegas', correcta: false,
+                      fundamento: 'Los procedimientos deben ser formales y documentados' },
+                    { texto: 'Esperar directrices superiores sin actuar', correcta: false,
+                      fundamento: 'La omisión puede generar responsabilidad administrativa' }
+                ];
+                
+                return {
+                    id: `gen_${Date.now()}_${Math.random()}`,
+                    competencia: competenciaCodigo,
+                    texto: `Según el documento "${doc.nombre}", ¿cuál es la actuación correcta?\n\n"${fragmento.substring(0, 200)}..."`,
+                    opciones: opciones,
+                    correcta: 0,
+                    fundamento: opciones[0].fundamento + (referencia ? ` (${referencia})` : ''),
+                    documento: doc.nombre,
+                    nivel: nivel,
+                    xp: nivel === 'normativo' ? 20 : (nivel === 'aplicado' ? 15 : 10)
+                };
+            }
+        }
 
-<div class="bg-white p-6 rounded-xl shadow mb-6">
-<div id="preguntaArea"></div>
-</div>
+        let generador = null;
 
-<div class="text-center">
-<button onclick="iniciarSimulador()"
-class="bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold">
-Iniciar simulación completa
-</button>
-</div>
+        // ============================================
+        // FUNCIONES DE CARGA DE DOCUMENTOS
+        // ============================================
+        document.getElementById('carga-docs').addEventListener('change', async function(e) {
+            const archivos = Array.from(e.target.files);
+            documentos = [];
+            const listaDiv = document.getElementById('lista-docs');
+            const progresoDiv = document.getElementById('progreso-carga');
+            listaDiv.innerHTML = '';
+            
+            for (let i = 0; i < archivos.length; i++) {
+                const archivo = archivos[i];
+                progresoDiv.innerHTML = `Procesando ${i+1}/${archivos.length}: ${archivo.name}...`;
+                
+                try {
+                    let contenido = '';
+                    if (archivo.name.toLowerCase().endsWith('.pdf')) {
+                        const arrayBuffer = await archivo.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        for (let j = 1; j <= pdf.numPages; j++) {
+                            const page = await pdf.getPage(j);
+                            const content = await page.getTextContent();
+                            contenido += content.items.map(item => item.str).join(' ') + ' ';
+                        }
+                    } else {
+                        contenido = await archivo.text();
+                    }
+                    
+                    contenido = contenido.toLowerCase().replace(/[^\w\sáéíóúñü.,;:()\-]/g, ' ').replace(/\s+/g, ' ');
+                    
+                    documentos.push({
+                        nombre: archivo.name,
+                        contenido: contenido
+                    });
+                    
+                    listaDiv.innerHTML += `<div class="py-1 text-xs text-green-600">✅ ${archivo.name}</div>`;
+                } catch (error) {
+                    listaDiv.innerHTML += `<div class="py-1 text-xs text-red-600">❌ Error en ${archivo.name}</div>`;
+                }
+            }
+            
+            generador = new GeneradorPreguntas(documentos);
+            listaDiv.classList.remove('hidden');
+            progresoDiv.innerHTML = `✅ ${documentos.length} documentos listos para generar preguntas`;
+            generadorActivo = true;
+        });
 
-<!-- ================== SCRIPT ================== -->
+        // ============================================
+        // FUNCIONES DE INTERFAZ
+        // ============================================
+        function renderizarCompetencias() {
+            const perfil = perfilesMEP[estratoActual];
+            let html = '';
+            perfil.competencias.forEach(comp => {
+                html += `
+                    <div class="p-3 bg-slate-50 rounded-lg border-l-4 border-blue-500">
+                        <span class="text-xs font-mono ${comp.saber ? 'bg-blue-200' : 'bg-green-200'} px-2 py-1 rounded-full">
+                            ${comp.saber ? 'SABER' : 'HACER'}
+                        </span>
+                        <span class="font-medium block mt-1">${comp.codigo} ${comp.nombre}</span>
+                        <div class="mt-2 flex flex-wrap gap-1">
+                            ${comp.indicadores.map(i => `<span class="text-xs bg-white px-2 py-1 rounded-full">✓ ${i}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('competencias-container').innerHTML = html;
+        }
 
-<script>
+        function renderizarRuta() {
+            const container = document.getElementById('ruta-container');
+            let html = '';
+            rutaDuolingo.forEach(item => {
+                const estado = estadoDuolingo[item.codigo];
+                html += `
+                    <div class="ruta-item ${item.estado} bg-slate-50 p-4 rounded-xl text-center" data-codigo="${item.codigo}">
+                        <div class="text-3xl mb-2">${item.tipo}</div>
+                        <div class="font-bold text-sm">${item.codigo}</div>
+                        <div class="text-xs text-gray-600">${item.nombre}</div>
+                        ${item.estado === 'disponible' ? `
+                            <div class="w-full bg-gray-200 h-1 rounded-full mt-2">
+                                <div class="bg-blue-600 h-1 rounded-full" style="width: ${estado.porcentaje || 0}%"></div>
+                            </div>
+                        ` : '<div class="text-xs text-gray-400 mt-2">🔒 Bloqueado</div>'}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.ruta-item.disponible').forEach(item => {
+                item.addEventListener('click', function() {
+                    competenciaActual = this.dataset.codigo;
+                    cargarPregunta();
+                });
+            });
+        }
 
-// =====================================================
-// BANCO DISTRIBUIDO POR COMPETENCIAS
-// =====================================================
+        function actualizarUIDuolingo() {
+            const xp = progresoGlobal.xpTotal;
+            document.getElementById('nivel-duolingo').textContent = Math.floor(xp / 200) + 1;
+            document.getElementById('xp-duolingo').textContent = xp % 200;
+            
+            const vidas = estadoDuolingo[competenciaActual]?.vidas || 3;
+            let vidasHtml = '';
+            for (let i = 0; i < 3; i++) vidasHtml += i < vidas ? '❤️' : '🤍';
+            document.getElementById('vidas-duolingo').innerHTML = vidasHtml;
+        }
 
-const banco = {
+        function cargarPregunta() {
+            if (!generador) {
+                document.getElementById('pregunta-container').innerHTML = `
+                    <div class="text-center text-amber-600 py-12">
+                        <p class="font-medium">Primero cargue sus documentos en la pestaña INICIO</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const pregunta = generador.generarPregunta(competenciaActual);
+            if (!pregunta) return;
+            
+            preguntaActual = pregunta;
+            
+            document.getElementById('competencia-actual-tag').innerHTML = 
+                `${rutaDuolingo.find(r => r.codigo === competenciaActual).tipo} ${competenciaActual} ${rutaDuolingo.find(r => r.codigo === competenciaActual).nombre}`;
+            
+            const nivelesEtiqueta = { conceptual: '🟢 Conceptual', aplicado: '🟡 Aplicado', normativo: '🔴 Normativo' };
+            document.getElementById('nivel-pregunta-tag').textContent = nivelesEtiqueta[pregunta.nivel];
+            
+            let html = `
+                <div>
+                    <p class="text-lg font-medium mb-6">${pregunta.texto}</p>
+                    <div class="space-y-3 mb-6">
+            `;
+            
+            pregunta.opciones.forEach((op, idx) => {
+                html += `
+                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer"
+                           onclick="seleccionarOpcion(this, ${idx})">
+                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold">${String.fromCharCode(65 + idx)}</span>
+                        <span>${op.texto}</span>
+                    </label>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <button id="btn-responder" onclick="responderPregunta()" 
+                            class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold" disabled>
+                        Verificar
+                    </button>
+                </div>
+                <div id="feedback-duolingo" class="hidden mt-4"></div>
+            `;
+            
+            document.getElementById('pregunta-container').innerHTML = html;
+        }
 
-"1.1":[
-{texto:"Debe actualizar lineamientos curriculares. ¿Qué demuestra dominio disciplinar?",
-opciones:[
-{t:"Analizar fundamentos pedagógicos y curriculares vigentes",c:true},
-{t:"Aplicar modelos sin revisión",c:false},
-{t:"Improvisar estrategias",c:false},
-{t:"Evitar actualización normativa",c:false}
-]}
-],
+        function seleccionarOpcion(label, idx) {
+            document.querySelectorAll('#pregunta-container label').forEach(l => {
+                l.classList.remove('bg-blue-100', 'border-blue-500');
+                l.querySelector('span:first-child').classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+            });
+            label.classList.add('bg-blue-100', 'border-blue-500');
+            label.querySelector('span:first-child').classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+            document.getElementById('btn-responder').disabled = false;
+            window.opcionSeleccionada = idx;
+        }
 
-"1.2":[
-{texto:"Una persona interina consulta sobre Transitorio IX. ¿Qué corresponde?",
-opciones:[
-{t:"Verificar requisitos según RPCID y LMEP",c:true},
-{t:"Aprobar sin revisión formal",c:false},
-{t:"Aplicar criterio personal",c:false},
-{t:"Omitir normativa vigente",c:false}
-]}
-],
+        function responderPregunta() {
+            if (window.opcionSeleccionada === undefined || !preguntaActual) return;
+            
+            const estado = estadoDuolingo[competenciaActual];
+            const esCorrecta = window.opcionSeleccionada === preguntaActual.correcta;
+            
+            estado.preguntasRespondidas.push(preguntaActual.id);
+            
+            if (esCorrecta) {
+                estado.preguntasDominadas.push(preguntaActual.id);
+                estado.correctasConsecutivas++;
+                estado.xp += preguntaActual.xp;
+                progresoGlobal.xpTotal += preguntaActual.xp;
+            } else {
+                estado.vidas--;
+                estado.correctasConsecutivas = 0;
+            }
+            
+            estado.porcentaje = (estado.preguntasDominadas.length / estado.preguntasRespondidas.length) * 100;
+            
+            localStorage.setItem('estadoDuolingo', JSON.stringify(estadoDuolingo));
+            localStorage.setItem('progresoGlobal', JSON.stringify(progresoGlobal));
+            
+            const feedback = document.getElementById('feedback-duolingo');
+            const opcionElegida = preguntaActual.opciones[window.opcionSeleccionada];
+            const correcta = preguntaActual.opciones.find(o => o.correcta);
+            
+            feedback.innerHTML = `
+                <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 ${esCorrecta ? 'border-green-500' : 'border-red-500'}">
+                    <h4 class="font-bold text-lg mb-2">${esCorrecta ? '✅ Correcto' : '❌ Incorrecto'}</h4>
+                    <div class="bg-${esCorrecta ? 'green' : 'red'}-50 p-4 rounded-lg">
+                        <p class="font-medium">${esCorrecta ? 'Fundamento' : 'Error común'}:</p>
+                        <p>${esCorrecta ? preguntaActual.fundamento : opcionElegida.fundamento}</p>
+                        ${!esCorrecta ? `<p class="mt-2 font-medium">✅ Correcta: ${correcta.texto}</p>` : ''}
+                    </div>
+                    <button onclick="siguientePregunta()" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg">Continuar</button>
+                </div>
+            `;
+            feedback.classList.remove('hidden');
+            document.getElementById('btn-responder').disabled = true;
+            
+            actualizarUIDuolingo();
+            renderizarRuta();
+        }
 
-"1.3":[
-{texto:"Se requiere coordinación entre nivel central y regional. ¿Qué es clave?",
-opciones:[
-{t:"Comprender estructura organizacional del MEP",c:true},
-{t:"Actuar sin comunicación formal",c:false},
-{t:"Ignorar jerarquías",c:false},
-{t:"Evitar coordinación institucional",c:false}
-]}
-],
+        function siguientePregunta() {
+            document.getElementById('feedback-duolingo').classList.add('hidden');
+            cargarPregunta();
+        }
 
-"1.4":[
-{texto:"Una política digital impacta procesos pedagógicos. ¿Qué debe hacer?",
-opciones:[
-{t:"Analizar contexto global y local antes de decidir",c:true},
-{t:"Ignorar lineamientos internacionales",c:false},
-{t:"Aplicar decisiones sin diagnóstico",c:false},
-{t:"Evitar innovación",c:false}
-]}
-],
+        // ============================================
+        // EVENTOS
+        // ============================================
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                document.getElementById(`tab-${this.dataset.tab}`).classList.remove('hidden');
+            });
+        });
 
-"2.1":[
-{texto:"Debe diseñar plan pedagógico regional. ¿Qué es indispensable?",
-opciones:[
-{t:"Diagnóstico contextual y alineación curricular",c:true},
-{t:"Copiar modelo sin análisis",c:false},
-{t:"Improvisar actividades",c:false},
-{t:"Aplicar estrategia única para todos",c:false}
-]}
-],
+        document.querySelectorAll('#selector-estrato .estrato-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#selector-estrato .estrato-btn').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white');
+                    b.classList.add('bg-slate-100');
+                });
+                this.classList.remove('bg-slate-100');
+                this.classList.add('bg-blue-600', 'text-white');
+                estratoActual = this.dataset.estrato;
+                renderizarCompetencias();
+            });
+        });
 
-"2.2":[
-{texto:"Se implementa proyecto educativo regional. ¿Qué demuestra gestión adecuada?",
-opciones:[
-{t:"Planificación, seguimiento y evaluación del proyecto",c:true},
-{t:"Ejecución sin monitoreo",c:false},
-{t:"Delegar sin supervisión",c:false},
-{t:"No documentar resultados",c:false}
-]}
-],
-
-"2.3":[
-{texto:"Debe liderar asesoría innovadora con tecnología. ¿Qué prioriza?",
-opciones:[
-{t:"Fortalecer competencias con uso estratégico TIC",c:true},
-{t:"Uso libre sin lineamientos",c:false},
-{t:"Tecnología sin capacitación",c:false},
-{t:"Evitar herramientas digitales",c:false}
-]}
-],
-
-"2.4":[
-{texto:"Se requiere elaborar recurso educativo innovador. ¿Qué es fundamental?",
-opciones:[
-{t:"Sustento investigativo y pertinencia pedagógica",c:true},
-{t:"Repetir material antiguo",c:false},
-{t:"No validar contenido",c:false},
-{t:"Omitir contexto estudiantil",c:false}
-]}
-]
-
-};
-
-// =====================================================
-// CONFIGURACIÓN
-// =====================================================
-
-const distribucion = {
-"1.1":8,
-"1.2":10,
-"1.3":6,
-"1.4":6,
-"2.1":10,
-"2.2":8,
-"2.3":6,
-"2.4":6
-};
-
-let examen=[];
-let indice=0;
-let correctas=0;
-let total=60;
-
-// =====================================================
-// GENERAR EXAMEN
-// =====================================================
-
-function generarExamen(){
-examen=[];
-for(let comp in distribucion){
-for(let i=0;i<distribucion[comp];i++){
-examen.push({
-comp:comp,
-pregunta:banco[comp][0]
-});
-}
-}
-}
-
-// =====================================================
-// INICIAR
-// =====================================================
-
-function iniciarSimulador(){
-indice=0;
-correctas=0;
-generarExamen();
-mostrarPregunta();
-}
-
-// =====================================================
-// MOSTRAR
-// =====================================================
-
-function mostrarPregunta(){
-
-if(indice>=total){
-finalizar();
-return;
-}
-
-const actual=examen[indice];
-
-let html=`<h3 class="font-bold mb-2">Ítem ${indice+1} de 60</h3>`;
-html+=`<p class="mb-4">${actual.pregunta.texto}</p>`;
-
-actual.pregunta.opciones.forEach((op,i)=>{
-html+=`
-<div class="mb-2 p-2 border rounded cursor-pointer hover:bg-slate-100"
-onclick="responder(${i})">
-${op.t}
-</div>
-`;
-});
-
-document.getElementById("preguntaArea").innerHTML=html;
-}
-
-// =====================================================
-// RESPONDER
-// =====================================================
-
-function responder(i){
-const actual=examen[indice];
-
-if(actual.pregunta.opciones[i].c) correctas++;
-
-indice++;
-actualizarBarra();
-mostrarPregunta();
-}
-
-// =====================================================
-// BARRA
-// =====================================================
-
-function actualizarBarra(){
-let progreso=Math.round((indice/total)*100);
-document.getElementById("barra").style.width=progreso+"%";
-document.getElementById("progresoTexto").innerText=progreso+"%";
-}
-
-// =====================================================
-// FINAL
-// =====================================================
-
-function finalizar(){
-
-let nota=Math.round((correctas/total)*100);
-let mensaje= nota>=70 ?
-"<span class='text-green-600 font-bold'>APROBADO</span>" :
-"<span class='text-red-600 font-bold'>NO APROBADO</span>";
-
-document.getElementById("preguntaArea").innerHTML=
-`<h2 class="text-xl font-bold mb-3">Resultado Final</h2>
-<p>Respuestas correctas: ${correctas} de 60</p>
-<p>Nota final: ${nota}</p>
-<p class="mt-2">${mensaje}</p>
-
-<button onclick="iniciarSimulador()"
-class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">
-Repetir simulación
-</button>`;
-}
-
-</script>
-
+        // Inicializar
+        renderizarCompetencias();
+        renderizarRuta();
+        actualizarUIDuolingo();
+    </script>
 </body>
 </html>
