@@ -1,1564 +1,512 @@
 <!DOCTYPE html>
-<html lang="es-CR">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Agenda Digital Profesional DRTE - Sistema Integral de Gestión">
-    <meta name="theme-color" content="#1a1a2e">
-    <title>Agenda Digital DRTE | Sistema Profesional</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Idoneidad Pro · Asistente MEP</title>
+    <!-- Tailwind CSS via CDN + capas base para mejor aspecto -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ===== RESET Y BASE PROFESIONAL ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --color-primary: #1a1a2e; --color-secondary: #16213e; --color-accent: #0f3460;
-            --color-success: #00b894; --color-warning: #fdcb6e; --color-danger: #d63031;
-            --color-info: #0984e3; --color-light: #f8f9fa; --color-dark: #2d3436;
-            --border-radius: 12px; --box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            --transition: all 0.3s ease; --glass-bg: rgba(255,255,255,0.05);
-        }
-        body {
-            font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-            color: var(--color-light); min-height: 100vh; line-height: 1.6; overflow-x: hidden;
-        }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
-        /* ===== HEADER CORPORATIVO ===== */
-        .header {
-            background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border-radius: var(--border-radius);
-            padding: 20px 30px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-            box-shadow: var(--box-shadow);
-        }
-        .brand {
-            display: flex; align-items: center; gap: 20px;
-        }
-        .logo {
-            width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center;
-            font-size: 28px; color: white; box-shadow: 0 5px 15px rgba(102,126,234,0.4);
-        }
-        .brand-info h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 5px; }
-        .brand-info p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
-        .header-controls { display: flex; gap: 15px; align-items: center; }
-        .status-badge {
-            background: rgba(0,184,148,0.2); color: var(--color-success); padding: 8px 15px;
-            border-radius: 20px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 8px;
-        }
-        .datetime { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
-
-        /* ===== BOTONES PROFESIONALES ===== */
-        .btn {
-            padding: 12px 24px; border: none; border-radius: var(--border-radius); font-weight: 600;
-            cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 10px;
-            font-size: 0.95rem; text-decoration: none; user-select: none;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-secondary { background: var(--glass-bg); color: white; border: 1px solid rgba(255,255,255,0.2); }
-        .btn-success { background: var(--color-success); color: white; }
-        .btn-danger { background: var(--color-danger); color: white; }
-        .btn-export { position: relative; }
-        .export-dropdown {
-            position: absolute; top: 100%; right: 0; background: var(--color-secondary); border-radius: var(--border-radius);
-            padding: 10px; min-width: 200px; margin-top: 10px; display: none; z-index: 1000;
-            border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--box-shadow);
-        }
-        .btn-export:hover .export-dropdown { display: block; }
-        .export-dropdown a {
-            display: block; padding: 10px 15px; color: white; text-decoration: none; border-radius: 8px;
-            transition: var(--transition); font-size: 0.9rem;
-        }
-        .export-dropdown a:hover { background: rgba(255,255,255,0.1); }
-
-        /* ===== PANEL PRINCIPAL ===== */
-        .dashboard-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px;
-        }
-        .card {
-            background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border-radius: var(--border-radius);
-            padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--box-shadow);
-        }
-        .card-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-        }
-        .card-header h2 { font-size: 1.3rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        .card-badge {
-            background: rgba(253,203,110,0.2); color: var(--color-warning); padding: 5px 12px;
-            border-radius: 15px; font-size: 0.8rem; font-weight: 500;
-        }
-
-        /* ===== ESTADÍSTICAS ===== */
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .stat-item {
-            background: var(--glass-bg); padding: 15px; border-radius: var(--border-radius);
-            display: flex; align-items: center; gap: 15px;
-        }
-        .stat-icon {
-            width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 20px;
-        }
-        .stat-icon.pending { background: rgba(253,203,110,0.2); color: var(--color-warning); }
-        .stat-icon.completed { background: rgba(0,184,148,0.2); color: var(--color-success); }
-        .stat-icon.meeting { background: rgba(9,132,227,0.2); color: var(--color-info); }
-        .stat-icon.files { background: rgba(155,89,182,0.2); color: #9b59b6; }
-        .stat-info { flex: 1; }
-        .stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 3px; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; }
-
-        /* ===== CALENDARIO ===== */
-        .calendar { margin-bottom: 30px; }
-        .calendar-nav {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-        }
-        .calendar-nav h2 { font-size: 1.5rem; font-weight: 600; }
-        .calendar-days {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 15px;
-        }
-        .calendar-weekday {
-            text-align: center; font-weight: 600; padding: 10px; color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-        }
-        .calendar-day {
-            aspect-ratio: 1; background: var(--glass-bg); border-radius: 10px; display: flex;
-            align-items: center; justify-content: center; cursor: pointer; transition: var(--transition);
-            border: 2px solid transparent;
-        }
-        .calendar-day:hover { background: rgba(255,255,255,0.15); }
-        .calendar-day.today { background: rgba(102,126,234,0.3); border-color: #667eea; }
-        .calendar-day.has-event { position: relative; }
-        .calendar-day.has-event::after {
-            content: ''; position: absolute; bottom: 8px; width: 6px; height: 6px;
-            background: var(--color-success); border-radius: 50%;
-        }
-
-        /* ===== FORMULARIO ===== */
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; margin-bottom: 8px; font-weight: 500; }
-        .form-control {
-            width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--border-radius); color: white; font-size: 1rem; transition: var(--transition);
-        }
-        .form-control:focus {
-            outline: none; border-color: #667eea; background: rgba(255,255,255,0.1);
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-        }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        textarea.form-control { min-height: 120px; resize: vertical; }
-        .file-upload {
-            border: 2px dashed rgba(255,255,255,0.3); border-radius: var(--border-radius); padding: 30px;
-            text-align: center; cursor: pointer; transition: var(--transition);
-        }
-        .file-upload:hover { border-color: #667eea; background: rgba(102,126,234,0.05); }
-        .file-upload input[type="file"] { display: none; }
-
-        /* ===== LISTA DE TAREAS ===== */
-        .task-filters {
-            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
-        }
-        .filter-btn {
-            padding: 10px 20px; background: var(--glass-bg); color: white; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; cursor: pointer; transition: var(--transition); font-size: 0.9rem;
-        }
-        .filter-btn.active { background: #667eea; border-color: #667eea; }
-        .tasks-container { min-height: 400px; }
-        .task-list { display: flex; flex-direction: column; gap: 15px; }
-        .task-item {
-            background: rgba(255,255,255,0.08); border-radius: var(--border-radius); padding: 20px;
-            border-left: 4px solid transparent; transition: var(--transition);
-        }
-        .task-item:hover { background: rgba(255,255,255,0.12); transform: translateX(5px); }
-        .task-item.pending { border-left-color: var(--color-warning); }
-        .task-item.completed { border-left-color: var(--color-success); opacity: 0.8; }
-        .task-item.urgent { border-left-color: var(--color-danger); }
-        .task-header {
-            display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;
-        }
-        .task-title { font-size: 1.1rem; font-weight: 600; flex: 1; }
-        .task-actions { display: flex; gap: 10px; }
-        .task-action-btn {
-            width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1);
-            border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: var(--transition);
-        }
-        .task-action-btn:hover { background: rgba(255,255,255,0.2); }
-        .task-meta {
-            display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;
-        }
-        .task-meta-item {
-            display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.7);
-        }
-
-        /* ===== MODALES ===== */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8);
-            display: none; align-items: center; justify-content: center; z-index: 9999;
-            backdrop-filter: blur(5px);
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--color-primary); border-radius: var(--border-radius); padding: 30px;
-            max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;
-            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            animation: modalSlideIn 0.3s ease;
-        }
-        @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;
-        }
-        .modal-close {
-            width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1);
-            border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: var(--transition);
-        }
-        .modal-close:hover { background: rgba(255,255,255,0.2); }
-
-        /* ===== NOTIFICACIONES ===== */
-        .notification-center {
-            position: fixed; bottom: 20px; right: 20px; z-index: 9998; display: flex; flex-direction: column; gap: 10px;
-        }
-        .notification {
-            background: var(--color-secondary); border-radius: var(--border-radius); padding: 15px 20px;
-            border-left: 4px solid; box-shadow: var(--box-shadow); min-width: 300px; animation: slideInRight 0.3s ease;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .notification.success { border-left-color: var(--color-success); }
-        .notification.error { border-left-color: var(--color-danger); }
-        .notification.info { border-left-color: var(--color-info); }
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .header { flex-direction: column; gap: 20px; text-align: center; }
-            .brand { justify-content: center; }
-            .form-row { grid-template-columns: 1fr; }
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .calendar-days { grid-template-columns: repeat(7, 1fr); gap: 5px; }
-            .calendar-day { font-size: 0.9rem; }
-        }
-
-        /* ===== ESTADOS DE VACÍO ===== */
-        .empty-state {
-            text-align: center; padding: 50px 20px; color: rgba(255,255,255,0.5);
-        }
-        .empty-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.5; }
+        /* Transiciones suaves y sombras personalizadas */
+        .transition-all { transition: all 0.2s ease; }
+        .competencia-card { cursor: pointer; border-left: 4px solid transparent; }
+        .competencia-card:hover { border-left-color: #2563eb; background-color: #f8fafc; }
+        .pregunta-card { background-color: #ffffff; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .feedback-correcto { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .feedback-incorrecto { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .notebook-enlace { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
     </style>
 </head>
-<body>
-    <!-- SISTEMA DE NOTIFICACIONES -->
-    <div id="notification-center" class="notification-center"></div>
+<body class="bg-slate-50 font-sans antialiased">
 
-    <!-- MODALES -->
-    <div id="task-modal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-tasks"></i> Nueva Tarea</h2>
-                <button class="modal-close" onclick="closeModal('task-modal')">
-                    <i class="fas fa-times"></i>
+    <!-- contenedor principal -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- CABECERA con título y enlace a notebookLM -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">
+                    <span class="text-blue-700">Idoneidad</span> Pro
+                </h1>
+                <p class="text-lg text-slate-600 mt-1">Asistente inteligente para pruebas de idoneidad · Transitorio IX</p>
+            </div>
+            <a href="https://notebooklm.google.com/notebook/1d7bd2c4-bc5c-43bb-b65d-62275a44c58f" 
+               target="_blank" 
+               class="notebook-enlace mt-4 md:mt-0 inline-flex items-center gap-2 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                <i class="fa-solid fa-book-open text-lg"></i>
+                <span>📘 NotebookLM oficial</span>
+                <i class="fa-solid fa-arrow-up-right-from-squares text-sm opacity-80"></i>
+            </a>
+        </div>
+
+        <!-- SELECTOR DE ESTRATO (Píldoras) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+            <h2 class="text-xl font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-blue-500"></i>  
+                Seleccioná tu estrato
+            </h2>
+            <div class="flex flex-wrap gap-3" id="estrato-selector">
+                <button data-estrato="docente" class="estrato-btn active:bg-blue-700 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
+                    <i class="fa-solid fa-chalkboard-user"></i> Propiamente Docente
+                </button>
+                <button data-estrato="tecnico" class="estrato-btn active:bg-blue-700 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
+                    <i class="fa-solid fa-users-between-lines"></i> Técnico Docente (Asesores)
+                </button>
+                <button data-estrato="administrativo" class="estrato-btn active:bg-blue-700 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all flex items-center gap-2 border-2 border-transparent">
+                    <i class="fa-solid fa-building"></i> Administrativo Docente
                 </button>
             </div>
-            <form id="task-form" onsubmit="saveTask(event)">
-                <div class="form-group">
-                    <label class="form-label">Título de la Tarea</label>
-                    <input type="text" id="task-title" class="form-control" required placeholder="Ej: Revisión de informes trimestrales">
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Fecha</label>
-                        <input type="date" id="task-date" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Prioridad</label>
-                        <select id="task-priority" class="form-control" required>
-                            <option value="">Seleccionar prioridad</option>
-                            <option value="low">🟢 Baja</option>
-                            <option value="medium">🟡 Media</option>
-                            <option value="high">🟠 Alta</option>
-                            <option value="urgent">🔴 Urgente</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Categoría</label>
-                        <select id="task-category" class="form-control" required>
-                            <option value="">Seleccionar categoría</option>
-                            <option value="pntf">📊 PNFT - Actividades Principales</option>
-                            <option value="meeting">👥 Reuniones & Coordinaciones</option>
-                            <option value="training">🎓 Capacitación & Talleres</option>
-                            <option value="design">🎨 Diseño Instruccional</option>
-                            <option value="report">📄 Informes & Documentación</option>
-                            <option value="system">💻 Sistemas & Actualización</option>
-                            <option value="other">📋 Otras Tareas</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Estado</label>
-                        <select id="task-status" class="form-control" required>
-                            <option value="pending">⏳ Pendiente</option>
-                            <option value="in-progress">🔄 En Progreso</option>
-                            <option value="completed">✅ Completado</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Descripción Detallada</label>
-                    <textarea id="task-description" class="form-control" rows="4" placeholder="Describe los detalles, objetivos y consideraciones importantes de esta tarea..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Etiquetas (separadas por comas)</label>
-                    <input type="text" id="task-tags" class="form-control" placeholder="Ej: informe, trimestre, revisión, gerencia">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Ubicación / Enlace</label>
-                    <input type="text" id="task-location" class="form-control" placeholder="Ej: Sala de juntas 3 o https://meet.google.com/xxx">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Archivos Adjuntos</label>
-                    <div class="file-upload" onclick="document.getElementById('task-files').click()">
-                        <i class="fas fa-cloud-upload-alt fa-2x"></i>
-                        <p>Arrastra archivos aquí o haz clic para subir</p>
-                        <p class="text-muted">Formatos: JPG, PNG, PDF, DOCX, XLSX (Máx. 10MB)</p>
-                        <input type="file" id="task-files" multiple style="display: none">
-                    </div>
-                    <div id="file-preview" class="mt-3"></div>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-save"></i> Guardar Tarea
-                    </button>
-                </div>
-            </form>
         </div>
+
+        <!-- PANEL DE INFORMACIÓN LEGAL (siempre visible) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8" id="info-legal">
+            <h2 class="text-xl font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-gavel text-amber-600"></i> 
+                Fundamento normativo · Transitorio IX
+            </h2>
+            <div class="grid md:grid-cols-2 gap-4 text-sm text-slate-600">
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <span class="font-bold text-blue-800 block mb-1">📌 LMEP N.° 10159</span>
+                    Arts. 5 inciso l) y 15 d) y e). Exigencia de idoneidad para ingreso a carrera docente.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <span class="font-bold text-blue-800 block mb-1">📌 Ley N.° 9871</span>
+                    Modifica art.55 del Estatuto de Servicio Civil: requisito de examen.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <span class="font-bold text-blue-800 block mb-1">📌 Resolución DG-RES-88-2023</span>
+                    Define procedimientos para demostrar idoneidad (OGEREH). Calificación mínima 70.
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <span class="font-bold text-blue-800 block mb-1">📌 RPCID art.17 d) y RLMEP</span>
+                    Uso de perfiles por estrato del Título II como base de la prueba.
+                </div>
+            </div>
+            <p class="text-xs text-slate-500 mt-4 border-t pt-3">
+                <i class="fa-regular fa-circle-check text-green-600"></i> 
+                Las pruebas tienen 60 ítems de selección única, contextualizados (no memorísticos). Evalúan <strong>Saber</strong> y <strong>Saber Hacer</strong> según tablas de especificaciones.
+            </p>
+        </div>
+
+        <!-- CONTENIDO DINÁMICO SEGÚN ESTRATO (competencias, estudio y simulador) -->
+        <div id="contenido-estrato" class="space-y-8">
+            <!-- aquí se inyecta con JS -->
+        </div>
+
+        <!-- FOOTER con recordatorio de fuentes oficiales -->
+        <footer class="mt-12 text-sm text-slate-500 border-t pt-6 flex flex-col md:flex-row justify-between items-center">
+            <span>© 2025 · Material de apoyo basado en tablas DGTH-MEP</span>
+            <span class="flex gap-4 mt-2 md:mt-0">
+                <a href="https://dgth.mep.go.cr/pruebas-de-idoneidad-transitorio-ix/" target="_blank" class="hover:text-blue-700 transition-colors"><i class="fa-regular fa-file-pdf"></i> Tablas oficiales</a>
+                <a href="#" class="hover:text-blue-700 transition-colors"><i class="fa-regular fa-circle-question"></i> Preguntas frecuentes</a>
+            </span>
+        </footer>
     </div>
 
-    <div id="export-modal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-file-export"></i> Exportar Datos</h2>
-                <button class="modal-close" onclick="closeModal('export-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div style="padding: 20px 0;">
-                <button class="btn btn-primary btn-block mb-3" onclick="exportToExcel()">
-                    <i class="fas fa-file-excel"></i> Exportar a Excel
-                </button>
-                <button class="btn btn-danger btn-block mb-3" onclick="exportToPDF()">
-                    <i class="fas fa-file-pdf"></i> Exportar a PDF
-                </button>
-                <button class="btn btn-success btn-block" onclick="exportToCSV()">
-                    <i class="fas fa-file-csv"></i> Exportar a CSV
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <div class="container">
-        <!-- HEADER CORPORATIVO -->
-        <header class="header">
-            <div class="brand">
-                <div class="logo">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <div class="brand-info">
-                    <h1>Agenda Digital DRTE</h1>
-                    <p>Sistema Profesional de Gestión Integral</p>
-                    <p style="font-size: 0.8rem; margin-top: 5px;">
-                        <i class="fas fa-user-tie"></i> Asesor Nacional | 
-                        <i class="fas fa-building"></i> Departamento de Investigación, Desarrollo e Implementación
-                    </p>
-                </div>
-            </div>
-            <div class="header-controls">
-                <div class="status-badge">
-                    <i class="fas fa-check-circle"></i> Sistema 100% Operativo
-                </div>
-                <div class="datetime" id="current-datetime">
-                    <i class="fas fa-clock"></i> Cargando fecha...
-                </div>
-                <button class="btn btn-export" onclick="showExportModal()">
-                    <i class="fas fa-file-export"></i> Exportar
-                    <div class="export-dropdown">
-                        <a onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel</a>
-                        <a onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> PDF</a>
-                        <a onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV</a>
-                        <a onclick="exportBackup()"><i class="fas fa-database"></i> Backup</a>
-                    </div>
-                </button>
-                <button class="btn btn-secondary" onclick="openBackupManager()">
-                    <i class="fas fa-shield-alt"></i> Backup
-                </button>
-            </div>
-        </header>
-
-        <!-- DASHBOARD PRINCIPAL -->
-        <div class="dashboard-grid">
-            <!-- RESUMEN DEL DÍA -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-chart-line"></i> Resumen del Día</h2>
-                    <span class="card-badge" id="today-badge">HOY</span>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-icon pending">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Tareas Pendientes</div>
-                            <div class="stat-value" id="today-pending">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon completed">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Completadas Hoy</div>
-                            <div class="stat-value" id="today-completed">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon meeting">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Reuniones</div>
-                            <div class="stat-value" id="today-meetings">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon files">
-                            <i class="fas fa-file"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Archivos</div>
-                            <div class="stat-value" id="total-files">0</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACCIONES RÁPIDAS -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-bolt"></i> Acciones Rápidas</h2>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                    <button class="btn btn-primary" onclick="openTaskModal()">
-                        <i class="fas fa-plus-circle"></i> Nueva Tarea
-                    </button>
-                    <button class="btn btn-secondary" onclick="quickMeeting()">
-                        <i class="fas fa-users"></i> Agendar Reunión
-                    </button>
-                    <button class="btn btn-success" onclick="uploadFile()">
-                        <i class="fas fa-cloud-upload-alt"></i> Subir Archivo
-                    </button>
-                    <button class="btn btn-secondary" onclick="showExportModal()">
-                        <i class="fas fa-download"></i> Exportar Datos
-                    </button>
-                </div>
-            </div>
-
-            <!-- CALENDARIO -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-calendar-alt"></i> Calendario</h2>
-                </div>
-                <div class="calendar">
-                    <div class="calendar-nav">
-                        <button class="btn btn-secondary" onclick="previousMonth()">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <h2 id="current-month">Enero 2024</h2>
-                        <button class="btn btn-secondary" onclick="nextMonth()">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <div class="calendar-days" id="calendar-days">
-                        <!-- Días generados dinámicamente -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- ESTADÍSTICAS -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-chart-bar"></i> Estadísticas</h2>
-                </div>
-                <div style="padding: 20px 0;">
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span>Tasa de Completado</span>
-                            <span id="completion-rate">0%</span>
-                        </div>
-                        <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                            <div id="completion-bar" style="height: 100%; background: var(--color-success); width: 0%; transition: width 0.5s ease;"></div>
-                        </div>
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span>Productividad Semanal</span>
-                            <span id="productivity-rate">0%</span>
-                        </div>
-                        <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                            <div id="productivity-bar" style="height: 100%; background: var(--color-info); width: 0%; transition: width 0.5s ease;"></div>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 2rem; font-weight: 700;" id="total-tasks">0</div>
-                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Total Tareas</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 2rem; font-weight: 700;" id="active-tasks">0</div>
-                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Tareas Activas</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- GESTIÓN DE TAREAS -->
-        <div class="card" style="margin-bottom: 30px;">
-            <div class="card-header">
-                <h2><i class="fas fa-tasks"></i> Gestión de Tareas</h2>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="task-search" class="form-control" style="width: 250px;" placeholder="🔍 Buscar tareas..." onkeyup="searchTasks()">
-                    <select id="task-filter" class="form-control" style="width: 150px;" onchange="filterTasks()">
-                        <option value="all">Todas las tareas</option>
-                        <option value="today">Hoy</option>
-                        <option value="pending">Pendientes</option>
-                        <option value="completed">Completadas</option>
-                        <option value="urgent">Urgentes</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="task-filters">
-                <button class="filter-btn active" onclick="setFilter('all')">Todas</button>
-                <button class="filter-btn" onclick="setFilter('today')">Hoy</button>
-                <button class="filter-btn" onclick="setFilter('pending')">Pendientes</button>
-                <button class="filter-btn" onclick="setFilter('in-progress')">En Progreso</button>
-                <button class="filter-btn" onclick="setFilter('completed')">Completadas</button>
-                <button class="filter-btn" onclick="setFilter('urgent')">Urgentes</button>
-            </div>
-
-            <div class="tasks-container">
-                <div id="task-list" class="task-list">
-                    <!-- Tareas cargadas dinámicamente -->
-                </div>
-                <div id="empty-state" class="empty-state" style="display: none;">
-                    <div class="empty-icon">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <h3>No hay tareas registradas</h3>
-                    <p>Comienza agregando tu primera tarea profesional</p>
-                    <button class="btn btn-primary" onclick="openTaskModal()" style="margin-top: 20px;">
-                        <i class="fas fa-plus"></i> Crear Primera Tarea
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- GESTIÓN DE ARCHIVOS -->
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-archive"></i> Gestión de Archivos</h2>
-                <button class="btn btn-success" onclick="uploadFile()">
-                    <i class="fas fa-cloud-upload-alt"></i> Subir Archivos
-                </button>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                <div class="stat-item">
-                    <div class="stat-icon files">
-                        <i class="fas fa-file"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-label">Total Archivos</div>
-                        <div class="stat-value" id="total-files-count">0</div>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon completed">
-                        <i class="fas fa-file-pdf"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-label">Documentos PDF</div>
-                        <div class="stat-value" id="pdf-count">0</div>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon meeting">
-                        <i class="fas fa-file-image"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-label">Imágenes</div>
-                        <div class="stat-value" id="image-count">0</div>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon pending">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-label">Espacio Usado</div>
-                        <div class="stat-value" id="storage-used">0 MB</div>
-                    </div>
-                </div>
-            </div>
-            <div id="file-list" class="task-list">
-                <!-- Archivos cargados dinámicamente -->
-            </div>
-            <div id="empty-files" class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <h3>No hay archivos subidos</h3>
-                <p>Sube evidencias, documentos o imágenes relacionadas con tus tareas</p>
-                <button class="btn btn-success" onclick="uploadFile()" style="margin-top: 20px;">
-                    <i class="fas fa-cloud-upload-alt"></i> Subir Primer Archivo
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SISTEMA PRINCIPAL DE JAVASCRIPT -->
     <script>
-        // ============================================
-        // SISTEMA DE PERSISTENCIA 100% FUNCIONAL
-        // ============================================
-
-        class AgendaDRTE {
-            constructor() {
-                this.version = '4.0.0';
-                this.currentFilter = 'all';
-                this.currentMonth = new Date().getMonth();
-                this.currentYear = new Date().getFullYear();
-                this.editingTaskId = null;
-                
-                // Inicializar sistema
-                this.init();
-            }
-
-            async init() {
-                // Iniciar reloj en tiempo real
-                this.updateDateTime();
-                setInterval(() => this.updateDateTime(), 1000);
-                
-                // Cargar datos del sistema
-                await this.loadSystemData();
-                
-                // Inicializar calendario
-                this.renderCalendar();
-                
-                // Iniciar backup automático
-                this.startAutoBackup();
-                
-                // Mostrar estado listo
-                this.showNotification('Sistema listo', 'Agenda DRTE cargada exitosamente', 'success');
-            }
-
-            // ============================================
-            // GESTIÓN DE TAREAS (CRUD COMPLETO)
-            // ============================================
-
-            async saveTask(event) {
-                event.preventDefault();
-                
-                try {
-                    const task = {
-                        id: this.editingTaskId || Date.now().toString(),
-                        title: document.getElementById('task-title').value.trim(),
-                        description: document.getElementById('task-description').value.trim(),
-                        date: document.getElementById('task-date').value,
-                        priority: document.getElementById('task-priority').value,
-                        category: document.getElementById('task-category').value,
-                        status: document.getElementById('task-status').value,
-                        tags: document.getElementById('task-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
-                        location: document.getElementById('task-location').value.trim(),
-                        createdAt: this.editingTaskId ? this.getTask(this.editingTaskId)?.createdAt || new Date().toISOString() : new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                        completedAt: document.getElementById('task-status').value === 'completed' ? new Date().toISOString() : null
-                    };
-
-                    // Validar datos requeridos
-                    if (!task.title || !task.date || !task.priority || !task.category) {
-                        throw new Error('Por favor complete todos los campos requeridos');
-                    }
-
-                    // Guardar en localStorage
-                    const tasks = this.getTasks();
-                    const taskIndex = tasks.findIndex(t => t.id === task.id);
-                    
-                    if (taskIndex > -1) {
-                        tasks[taskIndex] = task;
-                    } else {
-                        tasks.push(task);
-                    }
-                    
-                    localStorage.setItem('agenda_tasks', JSON.stringify(tasks));
-                    
-                    // Cerrar modal y actualizar interfaz
-                    this.closeModal('task-modal');
-                    this.renderTasks();
-                    this.updateStatistics();
-                    this.renderCalendar();
-                    
-                    // Mostrar notificación
-                    this.showNotification(
-                        'Tarea guardada',
-                        `"${task.title}" ha sido ${this.editingTaskId ? 'actualizada' : 'creada'} exitosamente`,
-                        'success'
-                    );
-                    
-                    // Limpiar formulario
-                    this.editingTaskId = null;
-                    document.getElementById('task-form').reset();
-                    document.getElementById('task-date').value = new Date().toISOString().split('T')[0];
-                    
-                } catch (error) {
-                    this.showNotification('Error', error.message, 'error');
-                }
-            }
-
-            getTasks() {
-                try {
-                    const tasks = localStorage.getItem('agenda_tasks');
-                    return tasks ? JSON.parse(tasks) : [];
-                } catch (error) {
-                    console.error('Error al cargar tareas:', error);
-                    return [];
-                }
-            }
-
-            getTask(id) {
-                const tasks = this.getTasks();
-                return tasks.find(task => task.id === id);
-            }
-
-            deleteTask(id) {
-                if (!confirm('¿Está seguro de eliminar esta tarea?')) return;
-                
-                try {
-                    const tasks = this.getTasks();
-                    const filteredTasks = tasks.filter(task => task.id !== id);
-                    localStorage.setItem('agenda_tasks', JSON.stringify(filteredTasks));
-                    
-                    this.renderTasks();
-                    this.updateStatistics();
-                    this.renderCalendar();
-                    
-                    this.showNotification('Tarea eliminada', 'La tarea ha sido eliminada exitosamente', 'success');
-                } catch (error) {
-                    this.showNotification('Error', 'No se pudo eliminar la tarea', 'error');
-                }
-            }
-
-            editTask(id) {
-                const task = this.getTask(id);
-                if (!task) return;
-                
-                this.editingTaskId = id;
-                
-                // Llenar formulario con datos de la tarea
-                document.getElementById('task-title').value = task.title;
-                document.getElementById('task-description').value = task.description || '';
-                document.getElementById('task-date').value = task.date;
-                document.getElementById('task-priority').value = task.priority;
-                document.getElementById('task-category').value = task.category;
-                document.getElementById('task-status').value = task.status;
-                document.getElementById('task-tags').value = task.tags?.join(', ') || '';
-                document.getElementById('task-location').value = task.location || '';
-                
-                // Abrir modal
-                this.openModal('task-modal');
-            }
-
-            toggleTaskStatus(id) {
-                const tasks = this.getTasks();
-                const taskIndex = tasks.findIndex(task => task.id === id);
-                
-                if (taskIndex > -1) {
-                    tasks[taskIndex].status = tasks[taskIndex].status === 'completed' ? 'pending' : 'completed';
-                    tasks[taskIndex].updatedAt = new Date().toISOString();
-                    tasks[taskIndex].completedAt = tasks[taskIndex].status === 'completed' ? new Date().toISOString() : null;
-                    
-                    localStorage.setItem('agenda_tasks', JSON.stringify(tasks));
-                    this.renderTasks();
-                    this.updateStatistics();
-                    
-                    const statusText = tasks[taskIndex].status === 'completed' ? 'completada' : 'marcada como pendiente';
-                    this.showNotification('Estado actualizado', `Tarea "${tasks[taskIndex].title}" ${statusText}`, 'success');
-                }
-            }
-
-            // ============================================
-            // RENDERIZADO DE INTERFAZ
-            // ============================================
-
-            renderTasks() {
-                const tasks = this.getTasks();
-                const taskList = document.getElementById('task-list');
-                const emptyState = document.getElementById('empty-state');
-                const searchTerm = document.getElementById('task-search').value.toLowerCase();
-                
-                // Aplicar filtros
-                let filteredTasks = tasks;
-                
-                if (searchTerm) {
-                    filteredTasks = filteredTasks.filter(task =>
-                        task.title.toLowerCase().includes(searchTerm) ||
-                        task.description.toLowerCase().includes(searchTerm) ||
-                        (task.tags && task.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
-                    );
-                }
-                
-                if (this.currentFilter !== 'all') {
-                    filteredTasks = filteredTasks.filter(task => {
-                        if (this.currentFilter === 'today') {
-                            return task.date === new Date().toISOString().split('T')[0];
+        (function(){
+            // --------------------------------------------------------------
+            // BASE DE DATOS (JSON embebido) : competencias, descriptores, indicadores y preguntas de ejemplo
+            // Basado en estrato Técnico Docente – Asesores y demás. Expandible.
+            // --------------------------------------------------------------
+            const perfiles = {
+                docente: {
+                    nombre: "Propiamente Docente",
+                    competencias: [
+                        {
+                            area: "Saber",
+                            titulo: "1.1 Conocimiento de estudiantes, contexto y desarrollo",
+                            descriptores: [
+                                "Describe características del desarrollo infantil y adolescente.",
+                                "Reconoce factores del entorno que influyen en el aprendizaje."
+                            ],
+                            indicadores: [
+                                "Identifica etapas del desarrollo cognitivo según Piaget.",
+                                "Relaciona contexto sociocultural con motivación escolar."
+                            ]
+                        },
+                        {
+                            area: "Saber",
+                            titulo: "1.2 Dominio disciplinar y didáctico",
+                            descriptores: [
+                                "Domina conceptos centrales de su especialidad.",
+                                "Comprende cómo se enseña y aprende su disciplina."
+                            ],
+                            indicadores: [
+                                "Selecciona estrategias didácticas adecuadas al contenido.",
+                                "Explica errores conceptuales frecuentes en el estudiantado."
+                            ]
+                        },
+                        {
+                            area: "Saber",
+                            titulo: "1.3 Políticas y normativa educativa",
+                            descriptores: [
+                                "Reconoce la normativa curricular vigente (CNEB, programas).",
+                                "Identifica derechos y deberes de la comunidad educativa."
+                            ],
+                            indicadores: [
+                                "Cita artículos del Código de la Niñez aplicables al aula.",
+                                "Aplica lineamientos de evaluación en el diseño de instrumentos."
+                            ]
+                        },
+                        {
+                            area: "Saber Hacer",
+                            titulo: "2.1 Diseño de experiencias de aprendizaje",
+                            descriptores: [
+                                "Planifica acorde a aprendizajes esperados y necesidades.",
+                                "Incorpora diversidad en el planeamiento didáctico."
+                            ],
+                            indicadores: [
+                                "Diseña actividades que consideran estilos de aprendizaje.",
+                                "Adecua objetivos según adecuaciones curriculares."
+                            ]
+                        },
+                        {
+                            area: "Saber Hacer",
+                            titulo: "2.2 Mediación pedagógica activa",
+                            descriptores: [
+                                "Implementa estrategias que favorecen participación activa.",
+                                "Utiliza recursos didácticos y tecnológicos pertinentes."
+                            ],
+                            indicadores: [
+                                "Aplica técnicas de aprendizaje cooperativo.",
+                                "Integra herramientas digitales para fomentar habilidades."
+                            ]
+                        },
+                        {
+                            area: "Saber Hacer",
+                            titulo: "2.3 Evaluación de los aprendizajes",
+                            descriptores: [
+                                "Evalúa para promover y reconocer logros.",
+                                "Retroalimenta oportunamente a estudiantes."
+                            ],
+                            indicadores: [
+                                "Construye rúbricas con criterios claros.",
+                                "Analiza resultados para ajustar su práctica."
+                            ]
                         }
-                        return task.status === this.currentFilter || task.priority === this.currentFilter;
-                    });
+                    ],
+                    // Banco de preguntas de ejemplo (estilo casos)
+                    preguntas: [
+                        {
+                            pregunta: "Una docente de primaria observa que varios niños terminan las tareas mucho antes que el resto. Para atender esta diversidad, lo más adecuado es:",
+                            opciones: [
+                                "a) Asignarles más ejercicios del mismo tipo para que practiquen.",
+                                "b) Proponerles actividades de ampliación o profundación relacionadas con el tema.",
+                                "c) Dejar que ayuden a sus compañeros mientras el resto termina.",
+                                "d) Ignorar la situación porque ya cumplieron con lo asignado."
+                            ],
+                            correcta: 1, // índice 0 -> a, 1-> b ...
+                            explicacion: "Lo recomendable es ofrecer actividades de ampliación (enriquecimiento) para seguir desarrollando competencias, no solo repetir ejercicios. Respuesta basada en competencia 2.1 (diseño para necesidades diversas)."
+                        },
+                        {
+                            pregunta: "De acuerdo con el Código de la Niñez y Adolescencia, ante una situación de maltrato infantil detectada en el centro educativo, la docente debe:",
+                            opciones: [
+                                "a) Mantener la confidencialidad y no intervenir para evitar problemas.",
+                                "b) Comunicarlo únicamente a la familia del estudiante.",
+                                "c) Denunciarlo ante las autoridades competentes (PANI, Fiscalía).",
+                                "d) Hablarlo solo con el director y archivar el caso."
+                            ],
+                            correcta: 2,
+                            explicacion: "Es obligación legal denunciar el maltrato. La normativa (artículos 1.3) establece el deber de protección de la persona menor de edad."
+                        }
+                    ]
+                },
+                tecnico: {
+                    nombre: "Técnico Docente – Asesores Regionales/Nacionales",
+                    competencias: [
+                        {
+                            area: "Saber",
+                            titulo: "1.1 Área disciplinar, pedagógica y curricular",
+                            descriptores: [
+                                "Domina su disciplina y aspectos curriculares para asesoría."
+                            ],
+                            indicadores: [
+                                "Asesora sobre actualizaciones curriculares a docentes.",
+                                "Fundamenta recomendaciones con teorías pedagógicas vigentes."
+                            ]
+                        },
+                        {
+                            area: "Saber",
+                            titulo: "1.2 Marco jurídico, ético y políticas públicas",
+                            descriptores: [
+                                "Evidencia conocimiento de normativa educativa vinculante."
+                            ],
+                            indicadores: [
+                                "Aplica la Política Educativa en el diseño de asesorías.",
+                                "Respeta principios éticos en el manejo de información."
+                            ]
+                        },
+                        {
+                            area: "Saber",
+                            titulo: "1.3 Estructura organizacional del MEP",
+                            descriptores: [
+                                "Conoce niveles central, regional e institucional."
+                            ],
+                            indicadores: [
+                                "Coordina acciones entre instancias según competencias.",
+                                "Deriva consultas al nivel correspondiente."
+                            ]
+                        },
+                        {
+                            area: "Saber Hacer",
+                            titulo: "2.1 Diseño de planes y proyectos educativos",
+                            descriptores: [
+                                "Diseña programas de asesoría que promueven calidad."
+                            ],
+                            indicadores: [
+                                "Elabora proyectos de mejora a partir de diagnósticos regionales."
+                            ]
+                        },
+                        {
+                            area: "Saber Hacer",
+                            titulo: "2.3 Liderazgo y asesoría con tecnologías",
+                            descriptores: [
+                                "Lidera procesos de desarrollo de competencias en docentes."
+                            ],
+                            indicadores: [
+                                "Utiliza plataformas digitales para asesoría a distancia.",
+                                "Promueve innovación educativa con herramientas TIC."
+                            ]
+                        }
+                    ],
+                    preguntas: [
+                        {
+                            pregunta: "Como asesor regional, usted detecta que varios docentes tienen dificultad para integrar los nuevos programas de estudio. ¿Cuál acción es más pertinente según su perfil?",
+                            opciones: [
+                                "a) Emitir una circular recordando la obligatoriedad de cumplir los programas.",
+                                "b) Diseñar un taller de mediación curricular basado en las necesidades detectadas.",
+                                "c) Solicitar a dirección de cada centro que resuelva internamente.",
+                                "d) Enviar los programas nuevamente por correo institucional."
+                            ],
+                            correcta: 1,
+                            explicacion: "La competencia 2.1 (diseño de planes y proyectos) implica ofrecer acompañamiento formativo, no solo comunicación escrita."
+                        }
+                    ]
+                },
+                administrativo: {
+                    nombre: "Administrativo Docente – Gestión (directores, asistentes)",
+                    competencias: [
+                        {
+                            area: "Saber",
+                            titulo: "1.1 Liderazgo pedagógico y gestión efectiva",
+                            descriptores: [
+                                "Conoce prácticas de liderazgo y gestión curricular."
+                            ],
+                            indicadores: [
+                                "Identifica modelos de supervisión pedagógica.",
+                                "Reconoce estilos de dirección participativa."
+                            ]
+                        },
+                        {
+                            area: "Saber",
+                            titulo: "1.4 Incidencia de TIC en educación",
+                            descriptores: [
+                                "Posee conocimientos sobre tecnologías aplicadas a gestión."
+                            ],
+                            indicadores: [
+                                "Utiliza sistemas institucionales de información (SAP, GECO).",
+                                "Promueve el uso de herramientas digitales en el centro."
+                            ]
+                        },
+                        {
+                            area: "Hacer",
+                            titulo: "2.3 Gestión eficiente de recursos",
+                            descriptores: [
+                                "Gestiona procesos administrativos y financieros."
+                            ],
+                            indicadores: [
+                                "Elabora presupuestos escolares con priorización pedagógica.",
+                                "Administra inventarios y compras conforme a la ley."
+                            ]
+                        },
+                        {
+                            area: "Hacer",
+                            titulo: "2.5 Liderazgo y responsabilidad",
+                            descriptores: [
+                                "Implementa tareas con liderazgo y compromiso."
+                            ],
+                            indicadores: [
+                                "Conduce reuniones de personal con objetivos claros.",
+                                "Resuelve conflictos mediante mediación."
+                            ]
+                        }
+                    ],
+                    preguntas: [
+                        {
+                            pregunta: "Un director debe decidir la compra de materiales para el centro con fondos limitados. ¿Cuál criterio debe priorizar?",
+                            opciones: [
+                                "a) La solicitud del proveedor más cercano.",
+                                "b) La relación con el impacto pedagógico y beneficio a estudiantes.",
+                                "c) La opinión de un solo docente influyente.",
+                                "d) El sobrante del presupuesto del año anterior."
+                            ],
+                            correcta: 1,
+                            explicacion: "Competencia 2.3: la gestión de recursos debe orientarse al beneficio del logro de los objetivos estratégicos institucionales (mejora educativa)."
+                        }
+                    ]
                 }
-                
-                // Ordenar tareas
-                filteredTasks.sort((a, b) => {
-                    const dateCompare = new Date(a.date) - new Date(b.date);
-                    if (dateCompare !== 0) return dateCompare;
-                    
-                    const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-                    return priorityOrder[a.priority] - priorityOrder[b.priority];
-                });
-                
-                // Mostrar/ocultar estado vacío
-                if (filteredTasks.length === 0) {
-                    taskList.style.display = 'none';
-                    emptyState.style.display = 'block';
-                } else {
-                    taskList.style.display = 'flex';
-                    emptyState.style.display = 'none';
-                    
-                    // Renderizar tareas
-                    taskList.innerHTML = filteredTasks.map(task => `
-                        <div class="task-item ${task.status} ${task.priority}" data-task-id="${task.id}">
-                            <div class="task-header">
-                                <div class="task-title">
-                                    <i class="fas fa-${this.getTaskIcon(task.category)}"></i>
-                                    ${task.title}
-                                </div>
-                                <div class="task-actions">
-                                    <button class="task-action-btn" onclick="agenda.toggleTaskStatus('${task.id}')" title="${task.status === 'completed' ? 'Marcar como pendiente' : 'Marcar como completada'}">
-                                        <i class="fas fa-${task.status === 'completed' ? 'undo' : 'check'}"></i>
-                                    </button>
-                                    <button class="task-action-btn" onclick="agenda.editTask('${task.id}')" title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="task-action-btn" onclick="agenda.deleteTask('${task.id}')" title="Eliminar">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            ${task.description ? `<p style="margin: 10px 0; color: rgba(255,255,255,0.8);">${task.description}</p>` : ''}
-                            <div class="task-meta">
-                                <span class="task-meta-item">
-                                    <i class="fas fa-calendar"></i> ${this.formatDate(task.date)}
-                                </span>
-                                <span class="task-meta-item">
-                                    <i class="fas fa-tag"></i> ${this.getCategoryLabel(task.category)}
-                                </span>
-                                <span class="task-meta-item">
-                                    ${this.getPriorityBadge(task.priority)}
-                                </span>
-                                ${task.location ? `<span class="task-meta-item"><i class="fas fa-map-marker-alt"></i> ${task.location}</span>` : ''}
-                            </div>
-                            ${task.tags && task.tags.length > 0 ? `
-                                <div style="margin-top: 10px;">
-                                    ${task.tags.map(tag => `<span style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; margin-right: 5px;">${tag}</span>`).join('')}
-                                </div>
-                            ` : ''}
+            };
+
+            // --------------------------------------------------------------
+            // Elementos del DOM
+            const selectorBtns = document.querySelectorAll('.estrato-btn');
+            const contenidoDiv = document.getElementById('contenido-estrato');
+
+            // Estado activo estrato
+            let estratoActual = 'tecnico'; // por defecto
+
+            // --------------------------------------------------------------
+            // Renderiza todo el contenido inferior (competencias + simulador)
+            function renderizarEstrato(estratoKey) {
+                const perfil = perfiles[estratoKey];
+                if (!perfil) return;
+
+                let html = `
+                    <!-- Tarjeta de presentación del estrato -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center gap-3 mb-5">
+                            <span class="bg-blue-100 text-blue-800 text-2xl px-4 py-2 rounded-xl font-bold">${perfil.nombre}</span>
+                            <span class="bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-medium"><i class="fa-regular fa-clock mr-1"></i>60 ítems · 70% mínimo</span>
                         </div>
-                    `).join('');
-                }
-            }
-
-            // ============================================
-            // CALENDARIO DINÁMICO
-            // ============================================
-
-            renderCalendar() {
-                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                const weekdays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-                
-                // Actualizar título del mes
-                document.getElementById('current-month').textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
-                
-                const firstDay = new Date(this.currentYear, this.currentMonth, 1);
-                const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                const startingDay = firstDay.getDay();
-                
-                // Obtener tareas para el mes actual
-                const tasks = this.getTasks();
-                const today = new Date().toISOString().split('T')[0];
-                
-                // Generar calendario
-                const calendarDays = document.getElementById('calendar-days');
-                calendarDays.innerHTML = '';
-                
-                // Días de la semana
-                weekdays.forEach(day => {
-                    const dayElement = document.createElement('div');
-                    dayElement.className = 'calendar-weekday';
-                    dayElement.textContent = day;
-                    calendarDays.appendChild(dayElement);
-                });
-                
-                // Días vacíos al inicio
-                for (let i = 0; i < startingDay; i++) {
-                    const emptyDay = document.createElement('div');
-                    emptyDay.className = 'calendar-day';
-                    calendarDays.appendChild(emptyDay);
-                }
-                
-                // Días del mes
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dateStr = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const dayTasks = tasks.filter(task => task.date === dateStr);
-                    const isToday = dateStr === today;
-                    
-                    const dayElement = document.createElement('div');
-                    dayElement.className = 'calendar-day' + (isToday ? ' today' : '') + (dayTasks.length > 0 ? ' has-event' : '');
-                    dayElement.textContent = day;
-                    dayElement.dataset.date = dateStr;
-                    
-                    if (dayTasks.length > 0) {
-                        dayElement.title = `${dayTasks.length} tarea(s) programada(s)`;
-                        dayElement.style.cursor = 'pointer';
-                        dayElement.onclick = () => this.showDayTasks(dateStr);
-                    }
-                    
-                    calendarDays.appendChild(dayElement);
-                }
-            }
-
-            previousMonth() {
-                this.currentMonth--;
-                if (this.currentMonth < 0) {
-                    this.currentMonth = 11;
-                    this.currentYear--;
-                }
-                this.renderCalendar();
-            }
-
-            nextMonth() {
-                this.currentMonth++;
-                if (this.currentMonth > 11) {
-                    this.currentMonth = 0;
-                    this.currentYear++;
-                }
-                this.renderCalendar();
-            }
-
-            // ============================================
-            // ESTADÍSTICAS Y ANÁLISIS
-            // ============================================
-
-            updateStatistics() {
-                const tasks = this.getTasks();
-                const today = new Date().toISOString().split('T')[0];
-                
-                // Estadísticas del día
-                const todayTasks = tasks.filter(task => task.date === today);
-                const todayPending = todayTasks.filter(task => task.status !== 'completed').length;
-                const todayCompleted = todayTasks.filter(task => task.status === 'completed').length;
-                const todayMeetings = tasks.filter(task => task.date === today && task.category === 'meeting').length;
-                
-                document.getElementById('today-pending').textContent = todayPending;
-                document.getElementById('today-completed').textContent = todayCompleted;
-                document.getElementById('today-meetings').textContent = todayMeetings;
-                
-                // Estadísticas generales
-                const totalTasks = tasks.length;
-                const completedTasks = tasks.filter(task => task.status === 'completed').length;
-                const activeTasks = tasks.filter(task => task.status !== 'completed').length;
-                const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-                const productivityRate = Math.min(100, Math.round((completedTasks / Math.max(1, activeTasks + completedTasks)) * 100));
-                
-                document.getElementById('total-tasks').textContent = totalTasks;
-                document.getElementById('active-tasks').textContent = activeTasks;
-                document.getElementById('completion-rate').textContent = `${completionRate}%`;
-                document.getElementById('productivity-rate').textContent = `${productivityRate}%`;
-                
-                // Actualizar barras de progreso
-                document.getElementById('completion-bar').style.width = `${completionRate}%`;
-                document.getElementById('productivity-bar').style.width = `${productivityRate}%`;
-                
-                // Actualizar badge del día
-                document.getElementById('today-badge').textContent = `HOY (${todayTasks.length})`;
-            }
-
-            // ============================================
-            // EXPORTACIÓN PROFESIONAL
-            // ============================================
-
-            exportToExcel() {
-                try {
-                    const tasks = this.getTasks();
-                    
-                    // Crear hoja de trabajo
-                    const wsData = [
-                        ['AGENDA DIGITAL DRTE - REPORTE PROFESIONAL'],
-                        ['Generado: ' + this.formatDateTime(new Date())],
-                        [''],
-                        ['ID', 'Título', 'Descripción', 'Fecha', 'Categoría', 'Prioridad', 'Estado', 'Etiquetas', 'Ubicación', 'Creado', 'Actualizado', 'Completado']
-                    ];
-                    
-                    tasks.forEach(task => {
-                        wsData.push([
-                            task.id,
-                            task.title,
-                            task.description || '',
-                            task.date,
-                            this.getCategoryLabel(task.category),
-                            this.getPriorityLabel(task.priority),
-                            this.getStatusLabel(task.status),
-                            task.tags?.join('; ') || '',
-                            task.location || '',
-                            this.formatDateTime(new Date(task.createdAt)),
-                            this.formatDateTime(new Date(task.updatedAt)),
-                            task.completedAt ? this.formatDateTime(new Date(task.completedAt)) : ''
-                        ]);
-                    });
-                    
-                    const ws = XLSX.utils.aoa_to_sheet(wsData);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Tareas DRTE');
-                    
-                    // Generar archivo
-                    const fileName = `Agenda_DRTE_${this.formatDate(new Date()).replace(/\//g, '-')}.xlsx`;
-                    XLSX.writeFile(wb, fileName);
-                    
-                    this.showNotification('Exportación exitosa', 'Reporte Excel generado correctamente', 'success');
-                    this.closeModal('export-modal');
-                    
-                } catch (error) {
-                    console.error('Error en exportación Excel:', error);
-                    this.showNotification('Error', 'No se pudo generar el reporte Excel', 'error');
-                }
-            }
-
-            exportToPDF() {
-                try {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'a4');
-                    
-                    // Título
-                    doc.setFontSize(20);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text('AGENDA DIGITAL DRTE - REPORTE PROFESIONAL', 105, 20, { align: 'center' });
-                    
-                    // Información del reporte
-                    doc.setFontSize(11);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text(`Generado: ${this.formatDateTime(new Date())}`, 105, 30, { align: 'center' });
-                    
-                    // Estadísticas
-                    doc.setFontSize(12);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text('RESUMEN ESTADÍSTICO', 20, 45);
-                    
-                    doc.setFontSize(10);
-                    doc.setFont('helvetica', 'normal');
-                    const tasks = this.getTasks();
-                    const completed = tasks.filter(t => t.status === 'completed').length;
-                    
-                    doc.text(`Total de tareas: ${tasks.length}`, 20, 55);
-                    doc.text(`Completadas: ${completed}`, 20, 62);
-                    doc.text(`Tasa de completado: ${Math.round((completed / Math.max(1, tasks.length)) * 100)}%`, 20, 69);
-                    
-                    // Tareas
-                    let yPos = 85;
-                    tasks.forEach((task, index) => {
-                        if (yPos > 270) {
-                            doc.addPage();
-                            yPos = 20;
-                        }
-                        
-                        doc.setFont('helvetica', 'bold');
-                        doc.text(`${index + 1}. ${task.title}`, 20, yPos);
-                        yPos += 7;
-                        
-                        doc.setFont('helvetica', 'normal');
-                        doc.text(`Fecha: ${task.date} | Categoría: ${this.getCategoryLabel(task.category)} | Prioridad: ${this.getPriorityLabel(task.priority)}`, 25, yPos);
-                        yPos += 5;
-                        
-                        if (task.description) {
-                            const lines = doc.splitTextToSize(task.description, 160);
-                            doc.text(lines, 25, yPos);
-                            yPos += lines.length * 5;
-                        }
-                        
-                        yPos += 10;
-                    });
-                    
-                    // Guardar PDF
-                    const fileName = `Reporte_DRTE_${this.formatDate(new Date()).replace(/\//g, '-')}.pdf`;
-                    doc.save(fileName);
-                    
-                    this.showNotification('Exportación exitosa', 'Reporte PDF generado correctamente', 'success');
-                    this.closeModal('export-modal');
-                    
-                } catch (error) {
-                    console.error('Error en exportación PDF:', error);
-                    this.showNotification('Error', 'No se pudo generar el reporte PDF', 'error');
-                }
-            }
-
-            exportToCSV() {
-                try {
-                    const tasks = this.getTasks();
-                    let csvContent = 'data:text/csv;charset=utf-8,';
-                    
-                    // Encabezados
-                    csvContent += 'ID,Título,Descripción,Fecha,Categoría,Prioridad,Estado,Etiquetas,Ubicación,Creado,Actualizado,Completado\n';
-                    
-                    // Datos
-                    tasks.forEach(task => {
-                        csvContent += [
-                            task.id,
-                            `"${task.title.replace(/"/g, '""')}"`,
-                            `"${(task.description || '').replace(/"/g, '""')}"`,
-                            task.date,
-                            this.getCategoryLabel(task.category),
-                            this.getPriorityLabel(task.priority),
-                            this.getStatusLabel(task.status),
-                            `"${(task.tags?.join('; ') || '').replace(/"/g, '""')}"`,
-                            `"${(task.location || '').replace(/"/g, '""')}"`,
-                            this.formatDateTime(new Date(task.createdAt)),
-                            this.formatDateTime(new Date(task.updatedAt)),
-                            task.completedAt ? this.formatDateTime(new Date(task.completedAt)) : ''
-                        ].join(',') + '\n';
-                    });
-                    
-                    // Descargar
-                    const encodedUri = encodeURI(csvContent);
-                    const link = document.createElement('a');
-                    link.setAttribute('href', encodedUri);
-                    link.setAttribute('download', `Tareas_DRTE_${this.formatDate(new Date()).replace(/\//g, '-')}.csv`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    this.showNotification('Exportación exitosa', 'Archivo CSV generado correctamente', 'success');
-                    this.closeModal('export-modal');
-                    
-                } catch (error) {
-                    console.error('Error en exportación CSV:', error);
-                    this.showNotification('Error', 'No se pudo generar el archivo CSV', 'error');
-                }
-            }
-
-            exportBackup() {
-                try {
-                    const backupData = {
-                        timestamp: new Date().toISOString(),
-                        version: this.version,
-                        tasks: this.getTasks(),
-                        settings: {
-                            lastBackup: new Date().toISOString(),
-                            totalTasks: this.getTasks().length
-                        }
-                    };
-                    
-                    const dataStr = JSON.stringify(backupData, null, 2);
-                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-                    
-                    const link = document.createElement('a');
-                    link.setAttribute('href', dataUri);
-                    link.setAttribute('download', `backup_drte_${this.formatDate(new Date()).replace(/\//g, '-')}.json`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    this.showNotification('Backup creado', 'Copia de seguridad exportada exitosamente', 'success');
-                    
-                } catch (error) {
-                    console.error('Error en backup:', error);
-                    this.showNotification('Error', 'No se pudo crear el backup', 'error');
-                }
-            }
-
-            // ============================================
-            // SISTEMA DE BACKUP AUTOMÁTICO
-            // ============================================
-
-            startAutoBackup() {
-                // Crear backup inicial
-                this.createAutoBackup();
-                
-                // Programar backup cada 5 minutos
-                setInterval(() => this.createAutoBackup(), 5 * 60 * 1000);
-            }
-
-            createAutoBackup() {
-                try {
-                    const backupData = {
-                        timestamp: new Date().toISOString(),
-                        tasks: this.getTasks()
-                    };
-                    
-                    // Guardar backup en localStorage
-                    const backups = JSON.parse(localStorage.getItem('agenda_backups') || '[]');
-                    backups.push(backupData);
-                    
-                    // Mantener solo los últimos 10 backups
-                    if (backups.length > 10) {
-                        backups.shift();
-                    }
-                    
-                    localStorage.setItem('agenda_backups', JSON.stringify(backups));
-                    
-                    console.log('Backup automático creado:', backupData.timestamp);
-                    
-                } catch (error) {
-                    console.error('Error en backup automático:', error);
-                }
-            }
-
-            // ============================================
-            // UTILIDADES
-            // ============================================
-
-            formatDate(dateStr) {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('es-CR', {
-                    weekday: 'short',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-            }
-
-            formatDateTime(date) {
-                return date.toLocaleString('es-CR', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-            }
-
-            updateDateTime() {
-                const now = new Date();
-                const options = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    timeZone: 'America/Costa_Rica'
-                };
-                
-                document.getElementById('current-datetime').innerHTML = 
-                    `<i class="fas fa-clock"></i> ${now.toLocaleDateString('es-CR', options)} UTC-6 🇨🇷`;
-            }
-
-            getTaskIcon(category) {
-                const icons = {
-                    'pntf': 'chart-line',
-                    'meeting': 'users',
-                    'training': 'graduation-cap',
-                    'design': 'paint-brush',
-                    'report': 'file-alt',
-                    'system': 'laptop-code',
-                    'other': 'tasks'
-                };
-                return icons[category] || 'tasks';
-            }
-
-            getCategoryLabel(category) {
-                const labels = {
-                    'pntf': 'PNFT',
-                    'meeting': 'Reunión',
-                    'training': 'Capacitación',
-                    'design': 'Diseño',
-                    'report': 'Informe',
-                    'system': 'Sistema',
-                    'other': 'Otra'
-                };
-                return labels[category] || category;
-            }
-
-            getPriorityLabel(priority) {
-                const labels = {
-                    'low': 'Baja',
-                    'medium': 'Media',
-                    'high': 'Alta',
-                    'urgent': 'Urgente'
-                };
-                return labels[priority] || priority;
-            }
-
-            getPriorityBadge(priority) {
-                const badges = {
-                    'low': '🟢 Baja',
-                    'medium': '🟡 Media',
-                    'high': '🟠 Alta',
-                    'urgent': '🔴 Urgente'
-                };
-                return badges[priority] || priority;
-            }
-
-            getStatusLabel(status) {
-                const labels = {
-                    'pending': 'Pendiente',
-                    'in-progress': 'En Progreso',
-                    'completed': 'Completado'
-                };
-                return labels[status] || status;
-            }
-
-            // ============================================
-            // INTERFAZ Y MODALES
-            // ============================================
-
-            openModal(modalId) {
-                document.getElementById(modalId).classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            closeModal(modalId) {
-                document.getElementById(modalId).classList.remove('active');
-                document.body.style.overflow = 'auto';
-                
-                // Limpiar formulario
-                if (modalId === 'task-modal') {
-                    document.getElementById('task-form').reset();
-                    document.getElementById('task-date').value = new Date().toISOString().split('T')[0];
-                    this.editingTaskId = null;
-                }
-            }
-
-            showExportModal() {
-                this.openModal('export-modal');
-            }
-
-            openTaskModal() {
-                document.getElementById('task-date').value = new Date().toISOString().split('T')[0];
-                this.openModal('task-modal');
-            }
-
-            showNotification(title, message, type = 'info') {
-                const notificationCenter = document.getElementById('notification-center');
-                
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.innerHTML = `
-                    <div>
-                        <strong>${title}</strong>
-                        <p style="margin: 5px 0 0; font-size: 0.9rem; opacity: 0.9;">${message}</p>
+                        <p class="text-slate-600">Basado en tablas de especificaciones DGTH. Cada competencia contiene descriptores e indicadores. Haz clic para ver detalles.</p>
                     </div>
-                    <button class="task-action-btn" onclick="this.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
+
+                    <!-- MÓDULOS DE COMPETENCIAS (estudio) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-brain text-purple-600"></i> Competencias a evaluar</h3>
+                        <div class="space-y-3" id="competencias-lista">
                 `;
-                
-                notificationCenter.appendChild(notification);
-                
-                // Auto-eliminar después de 5 segundos
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.style.opacity = '0';
-                        notification.style.transform = 'translateX(100%)';
-                        setTimeout(() => notification.remove(), 300);
-                    }
-                }, 5000);
-            }
 
-            // ============================================
-            // FILTROS Y BÚSQUEDA
-            // ============================================
-
-            setFilter(filter) {
-                this.currentFilter = filter;
-                
-                // Actualizar botones de filtro
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.classList.remove('active');
+                // Recorremos competencias y creamos acordeón sencillo
+                perfil.competencias.forEach((comp, index) => {
+                    html += `
+                        <div class="border rounded-xl competencia-card transition-all" data-index="${index}">
+                            <div class="bg-slate-50 p-4 rounded-t-xl flex justify-between items-center competencia-titulo">
+                                <div>
+                                    <span class="text-xs font-mono bg-blue-200 text-blue-800 px-2 py-1 rounded-full">${comp.area}</span>
+                                    <span class="font-semibold text-slate-800 ml-2">${comp.titulo}</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-slate-400"></i>
+                            </div>
+                            <div class="p-4 hidden competencia-detalle border-t">
+                                <div class="mb-3">
+                                    <span class="font-medium text-slate-700">Descriptores:</span>
+                                    <ul class="list-disc list-inside text-slate-600 mt-1">
+                                        ${comp.descriptores.map(d => `<li class="ml-2">${d}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-slate-700">Indicadores (ejemplos):</span>
+                                    <ul class="list-disc list-inside text-slate-600 mt-1">
+                                        ${comp.indicadores.map(i => `<li class="ml-2">${i}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 });
-                event.target.classList.add('active');
-                
-                this.renderTasks();
-            }
 
-            searchTasks() {
-                this.renderTasks();
-            }
+                html += `</div></div>`; // cierra competencias
 
-            filterTasks() {
-                const filter = document.getElementById('task-filter').value;
-                this.currentFilter = filter;
-                this.renderTasks();
-            }
+                // ---------- SIMULADOR DE PREGUNTAS ----------
+                html += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6" id="simulador">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-regular fa-pen-to-square text-green-600"></i> Comprobación · Preguntas de repaso</h3>
+                        <p class="text-sm text-slate-500 mb-4">Seleccioná una respuesta. Te explicamos por qué es correcta o incorrecta (basado en casos).</p>
+                        <div id="preguntas-container" class="space-y-6">
+                `;
 
-            // ============================================
-            // CARGA DEL SISTEMA
-            // ============================================
-
-            async loadSystemData() {
-                try {
-                    // Cargar tareas
-                    this.renderTasks();
-                    this.updateStatistics();
-                    
-                    // Configurar fecha de hoy por defecto
-                    document.getElementById('task-date').value = new Date().toISOString().split('T')[0];
-                    
-                    // Mostrar estado del sistema
-                    console.log('Sistema Agenda DRTE cargado exitosamente');
-                    
-                } catch (error) {
-                    console.error('Error al cargar datos del sistema:', error);
-                    this.showNotification('Error', 'Error al cargar datos del sistema', 'error');
-                }
-            }
-
-            // ============================================
-            // FUNCIONES RÁPIDAS
-            // ============================================
-
-            quickMeeting() {
-                document.getElementById('task-title').value = 'Reunión de coordinación';
-                document.getElementById('task-category').value = 'meeting';
-                document.getElementById('task-priority').value = 'medium';
-                this.openModal('task-modal');
-            }
-
-            uploadFile() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.multiple = true;
-                input.accept = '.jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv';
-                
-                input.onchange = (e) => {
-                    const files = Array.from(e.target.files);
-                    if (files.length > 0) {
-                        this.showNotification('Archivos subidos', `${files.length} archivo(s) listo(s) para procesar`, 'success');
-                        // Aquí podrías implementar la subida real a IndexedDB
-                    }
-                };
-                
-                input.click();
-            }
-
-            openBackupManager() {
-                this.showNotification('Gestor de Backups', 'Funcionalidad en desarrollo', 'info');
-            }
-
-            showDayTasks(date) {
-                const tasks = this.getTasks().filter(task => task.date === date);
-                if (tasks.length === 0) return;
-                
-                const taskList = tasks.map(task => `• ${task.title} (${this.getPriorityLabel(task.priority)})`).join('\n');
-                alert(`Tareas para ${date}:\n\n${taskList}`);
-            }
-        }
-
-        // ============================================
-        // INICIALIZACIÓN DEL SISTEMA
-        // ============================================
-
-        let agenda;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                // Crear instancia del sistema
-                agenda = new AgendaDRTE();
-                
-                // Hacer agenda globalmente accesible
-                window.agenda = agenda;
-                
-                // Configurar eventos globales
-                setupGlobalEvents();
-                
-                console.log('✅ Sistema Agenda DRTE inicializado exitosamente');
-                
-            } catch (error) {
-                console.error('❌ Error crítico al inicializar el sistema:', error);
-                alert('Error crítico al cargar la aplicación. Por favor, recarga la página.');
-            }
-        });
-
-        function setupGlobalEvents() {
-            // Cerrar modal al hacer clic fuera
-            document.querySelectorAll('.modal-overlay').forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        this.classList.remove('active');
-                        document.body.style.overflow = 'auto';
-                    }
+                perfil.preguntas.forEach((p, idx) => {
+                    html += `
+                        <div class="pregunta-card p-5" data-pregunta-idx="${idx}">
+                            <p class="font-medium text-slate-800 mb-3">${idx+1}. ${p.pregunta}</p>
+                            <div class="space-y-2 mb-4">
+                                ${p.opciones.map((opt, optIdx) => `
+                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 opcion-wrapper" data-opt-index="${optIdx}">
+                                        <input type="radio" name="preg_${idx}" value="${optIdx}" id="opt_${idx}_${optIdx}" class="w-4 h-4 text-blue-600">
+                                        <label for="opt_${idx}_${optIdx}" class="text-slate-700 cursor-pointer flex-1">${opt}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="feedback hidden text-sm p-3 rounded-lg" id="fb_${idx}"></div>
+                        </div>
+                    `;
                 });
-            });
-            
-            // Configurar tecla ESC para cerrar modales
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-overlay').forEach(modal => {
-                        modal.classList.remove('active');
-                        document.body.style.overflow = 'auto';
+
+                html += `</div></div>`; // cierra simulador
+
+                contenidoDiv.innerHTML = html;
+
+                // ----------------------------------------------------------
+                // AGREGAR EVENTOS a competencias (acordeón)
+                document.querySelectorAll('.competencia-titulo').forEach(titulo => {
+                    titulo.addEventListener('click', function(e) {
+                        const card = this.closest('.competencia-card');
+                        const detalle = card.querySelector('.competencia-detalle');
+                        const icon = this.querySelector('.fa-chevron-down');
+                        detalle.classList.toggle('hidden');
+                        icon.classList.toggle('rotate-180');
                     });
-                }
-            });
-            
-            // Configurar fecha mínima en formulario
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('task-date').min = today;
-        }
+                });
 
-        // Funciones globales para acceso desde HTML
-        function openTaskModal() { agenda.openTaskModal(); }
-        function closeModal(id) { agenda.closeModal(id); }
-        function showExportModal() { agenda.showExportModal(); }
-        function exportToExcel() { agenda.exportToExcel(); }
-        function exportToPDF() { agenda.exportToPDF(); }
-        function exportToCSV() { agenda.exportToCSV(); }
-        function exportBackup() { agenda.exportBackup(); }
-        function previousMonth() { agenda.previousMonth(); }
-        function nextMonth() { agenda.nextMonth(); }
-        function setFilter(filter) { agenda.setFilter(filter); }
-        function searchTasks() { agenda.searchTasks(); }
-        function filterTasks() { agenda.filterTasks(); }
-        function saveTask(event) { agenda.saveTask(event); }
-        function quickMeeting() { agenda.quickMeeting(); }
-        function uploadFile() { agenda.uploadFile(); }
-        function openBackupManager() { agenda.openBackupManager(); }
+                // AGREGAR EVENTOS a preguntas: mostrar feedback al hacer clic en radio
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.addEventListener('change', function(e) {
+                        const preguntaCard = this.closest('.pregunta-card');
+                        const preguntaIdx = preguntaCard.dataset.preguntaIdx;
+                        const opcionElegida = parseInt(this.value);
+                        const preguntaReal = perfil.preguntas[preguntaIdx];
+                        const feedbackDiv = preguntaCard.querySelector('.feedback');
+                        
+                        // remover feedback previo
+                        feedbackDiv.classList.remove('hidden', 'feedback-correcto', 'feedback-incorrecto', 'text-sm');
+                        
+                        if (opcionElegida === preguntaReal.correcta) {
+                            feedbackDiv.className = 'feedback-correcto p-3 rounded-lg text-sm text-green-800 block';
+                            feedbackDiv.innerHTML = `<i class="fa-regular fa-circle-check mr-1"></i> <strong>¡Correcto!</strong> ${preguntaReal.explicacion}`;
+                        } else {
+                            feedbackDiv.className = 'feedback-incorrecto p-3 rounded-lg text-sm text-red-800 block';
+                            const opcionCorrectaTexto = preguntaReal.opciones[preguntaReal.correcta];
+                            feedbackDiv.innerHTML = `<i class="fa-regular fa-circle-xmark mr-1"></i> <strong>Incorrecto.</strong> La respuesta correcta es: ${opcionCorrectaTexto}.<br>${preguntaReal.explicacion}`;
+                        }
+                        
+                        // Deshabilitar los radios de esta pregunta para evitar cambios (opcional, pero mejora UX)
+                        preguntaCard.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+                    });
+                });
+            }
+
+            // --------------------------------------------------------------
+            // Inicializar selector de estrato (píldoras)
+            selectorBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const estrato = this.dataset.estrato;
+                    estratoActual = estrato;
+                    
+                    // actualizar estilo de botones
+                    selectorBtns.forEach(b => {
+                        b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                        b.classList.add('bg-slate-100', 'text-slate-700');
+                    });
+                    this.classList.remove('bg-slate-100', 'text-slate-700');
+                    this.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                    
+                    renderizarEstrato(estrato);
+                });
+            });
+
+            // Cargar estrato por defecto (Técnico Docente)
+            document.querySelector('button[data-estrato="tecnico"]').classList.remove('bg-slate-100','text-slate-700');
+            document.querySelector('button[data-estrato="tecnico"]').classList.add('bg-blue-600','text-white','border-blue-600');
+            renderizarEstrato('tecnico');
+
+        })();
     </script>
+
+    <!-- Ajuste para que los iconos de fontawesome funcionen bien -->
+    <script src="https://kit.fontawesome.com/ yourcode  "></script> <!-- si no usas kit, el link CDN ya funciona -->
 </body>
 </html>
