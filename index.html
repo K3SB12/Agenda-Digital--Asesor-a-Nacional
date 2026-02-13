@@ -187,78 +187,167 @@
             constructor(docs) {
                 this.documentos = docs;
                 this.historial = JSON.parse(localStorage.getItem('historialPreguntas')) || {};
+                this.frasesUsadas = JSON.parse(localStorage.getItem('frasesUsadas')) || {};
             }
-
-            // Extraer fragmentos relevantes de un documento
-            extraerFragmentos(doc, competenciaCodigo) {
-                const texto = doc.contenido;
-                const oraciones = texto.split(/[.!?]+/).filter(o => o.trim().length > 40);
+        
+            // Extraer opciones incorrectas del MISMO documento
+            generarOpcionesIncorrectas(texto, documento, fragmentoCorrecto) {
+                // Dividir el documento en frases
+                const frases = documento.split(/[.!?]+/).filter(f => f.trim().length > 30);
                 
-                // Palabras clave por competencia
-                const keywords = {
-                    '1.1': ['didáctica', 'metodología', 'pedagogía', 'curriculum', 'STEAM', 'PNFT', 'guía', 'docente', 'aprendizaje'],
-                    '1.2': ['ley', 'artículo', 'reglamento', 'normativa', 'política', 'ética', 'código', 'estatuto', 'convención', '10159', '8292', '6227', '1581', '7494', '7600'],
-                    '1.3': ['circular', 'lineamiento', 'organización', 'estructura', 'nivel', 'central', 'regional', 'institucional'],
-                    '2.1': ['plan', 'programa', 'proyecto', 'diseño', 'estrategia', 'PPPJ', 'marco'],
-                    '2.3': ['tecnología', 'TIC', 'digital', 'innovación', 'MITDE', 'gobernanza', 'transformación']
-                };
-                
-                // Filtrar oraciones relevantes para esta competencia
-                const relevantes = oraciones.filter(o => 
-                    keywords[competenciaCodigo]?.some(k => o.includes(k))
+                // Excluir la frase correcta y frases muy similares
+                const frasesIncorrectas = frases.filter(f => 
+                    !fragmentoCorrecto.includes(f.substring(0, 30)) && 
+                    !f.includes('artículo') && // Evitar artículos legales en incorrectas
+                    f.length < 150
                 );
                 
-                return relevantes.length > 0 ? relevantes : oraciones;
+                // Seleccionar 3 frases diferentes al azar
+                const seleccionadas = [];
+                const copiaFrases = [...frasesIncorrectas];
+                
+                for (let i = 0; i < 3; i++) {
+                    if (copiaFrases.length === 0) break;
+                    const idx = Math.floor(Math.random() * copiaFrases.length);
+                    seleccionadas.push(copiaFrases.splice(idx, 1)[0]);
+                }
+                
+                // Si no hay suficientes, usar frases genéricas pero relacionadas
+                while (seleccionadas.length < 3) {
+                    seleccionadas.push(`Interpretación incorrecta de ${texto.substring(0, 30)}...`);
+                }
+                
+                return seleccionadas;
             }
-
+        
             generarPregunta(competenciaCodigo) {
                 if (this.documentos.length === 0) return null;
                 
                 // Seleccionar documento aleatorio
                 const doc = this.documentos[Math.floor(Math.random() * this.documentos.length)];
-                const fragmentos = this.extraerFragmentos(doc, competenciaCodigo);
                 
+                // Extraer fragmentos relevantes
+                const fragmentos = this.extraerFragmentos(doc, competenciaCodigo);
                 if (fragmentos.length === 0) return this.generarPregunta(competenciaCodigo);
                 
-                const fragmento = fragmentos[Math.floor(Math.random() * fragmentos.length)];
+                // Seleccionar fragmento NO usado antes
+                let fragmento;
+                let intentos = 0;
+                do {
+                    fragmento = fragmentos[Math.floor(Math.random() * fragmentos.length)];
+                    intentos++;
+                } while (this.fraseUsada(fragmento) && intentos < 10);
                 
-                // Determinar nivel de la pregunta
-                let nivel = 'conceptual';
-                if (fragmento.includes('artículo') || fragmento.includes('ley')) nivel = 'normativo';
-                else if (fragmento.includes('ejemplo') || fragmento.includes('caso')) nivel = 'aplicado';
+                // Marcar como usada
+                this.marcarFraseUsada(fragmento);
                 
-                // Extraer posible artículo/ley
-                const articuloMatch = fragmento.match(/(art[íi]culo\s+\d+)/i);
-                const leyMatch = fragmento.match(/(ley\s+\d+)/i);
-                const referencia = articuloMatch ? articuloMatch[0] : (leyMatch ? leyMatch[0] : '');
+                // Determinar nivel y XP
+                const nivel = this.determinarNivel(fragmento);
+                const xp = nivel === 'normativo' ? 20 : (nivel === 'aplicado' ? 15 : 10);
                 
-                // Generar opciones
+                // Extraer referencia legal si existe
+                const referencia = this.extraerReferencia(fragmento);
+                
+                // Generar opciones incorrectas del MISMO documento
+                const incorrectas = this.generarOpcionesIncorrectas(
+                    doc.contenido, 
+                    doc.contenido, 
+                    fragmento
+                );
+                
+                // Crear las 4 opciones (1 correcta + 3 incorrectas)
                 const opciones = [
-                    { texto: `Aplicar lo establecido en ${doc.nombre}`, correcta: true,
-                      fundamento: `Según ${doc.nombre}: "${fragmento.substring(0, 150)}..."` },
-                    { texto: 'Actuar según criterio personal', correcta: false,
-                      fundamento: 'Debe basarse en documentos oficiales, no en opiniones' },
-                    { texto: 'Consultar informalmente con colegas', correcta: false,
-                      fundamento: 'Los procedimientos deben ser formales y documentados' },
-                    { texto: 'Esperar directrices superiores sin actuar', correcta: false,
-                      fundamento: 'La omisión puede generar responsabilidad administrativa' }
+                    { 
+                        texto: fragmento.substring(0, 150) + '...', 
+                        correcta: true,
+                        fundamento: `✅ Correcto. Este fragmento de ${doc.nombre} ${referencia ? `(${referencia})` : ''} es la base normativa.`
+                    }
                 ];
+                
+                // Agregar incorrectas
+                incorrectas.forEach((inc, idx) => {
+                    opciones.push({
+                        texto: inc.substring(0, 120) + '...',
+                        correcta: false,
+                        fundamento: `❌ Incorrecto. Esta interpretación no se ajusta a ${doc.nombre}. La correcta se basa en: "${fragmento.substring(0, 100)}..."`
+                    });
+                });
+                
+                // ROTAR posición de la respuesta correcta
+                const opcionCorrecta = opciones.shift(); // Sacar la correcta
+                const posicionCorrecta = Math.floor(Math.random() * 4); // Posición aleatoria 0-3
+                opciones.splice(posicionCorrecta, 0, opcionCorrecta); // Insertar en posición aleatoria
                 
                 return {
                     id: `gen_${Date.now()}_${Math.random()}`,
                     competencia: competenciaCodigo,
-                    texto: `Según el documento "${doc.nombre}", ¿cuál es la actuación correcta?\n\n"${fragmento.substring(0, 200)}..."`,
+                    texto: `Basado en el documento "${doc.nombre}", ¿cuál de las siguientes afirmaciones es CORRECTA según la normativa?`,
                     opciones: opciones,
-                    correcta: 0,
-                    fundamento: opciones[0].fundamento + (referencia ? ` (${referencia})` : ''),
+                    correcta: posicionCorrecta, // Guardar dónde quedó la correcta
+                    fundamento: opcionCorrecta.fundamento,
                     documento: doc.nombre,
                     nivel: nivel,
-                    xp: nivel === 'normativo' ? 20 : (nivel === 'aplicado' ? 15 : 10)
+                    xp: xp,
+                    referencia: referencia
                 };
             }
+        
+            fraseUsada(frase) {
+                if (!this.frasesUsadas[competenciaActual]) return false;
+                const hash = frase.substring(0, 50);
+                return this.frasesUsadas[competenciaActual]?.includes(hash);
+            }
+        
+            marcarFraseUsada(frase) {
+                if (!this.frasesUsadas[competenciaActual]) {
+                    this.frasesUsadas[competenciaActual] = [];
+                }
+                const hash = frase.substring(0, 50);
+                this.frasesUsadas[competenciaActual].push(hash);
+                // Limitar historial
+                if (this.frasesUsadas[competenciaActual].length > 50) {
+                    this.frasesUsadas[competenciaActual].shift();
+                }
+                localStorage.setItem('frasesUsadas', JSON.stringify(this.frasesUsadas));
+            }
+        
+            extraerReferencia(texto) {
+                const artMatch = texto.match(/(art[íi]culo\s+\d+)/i);
+                if (artMatch) return artMatch[0];
+                const leyMatch = texto.match(/(ley\s+\d+)/i);
+                if (leyMatch) return leyMatch[0];
+                const circMatch = texto.match(/(circular\s+[a-z0-9-]+)/i);
+                if (circMatch) return circMatch[0];
+                return '';
+            }
+        
+            extraerFragmentos(doc, competenciaCodigo) {
+                const texto = doc.contenido;
+                const oraciones = texto.split(/[.!?]+/).filter(o => o.trim().length > 50);
+                
+                const keywords = {
+                    '1.1': ['didáctica', 'metodología', 'pedagogía', 'curriculum', 'STEAM', 'PNFT', 'guía', 'docente'],
+                    '1.2': ['ley', 'artículo', 'reglamento', 'normativa', 'política', 'ética', 'código', 'estatuto', 'convención', '10159', '8292', '6227'],
+                    '1.3': ['circular', 'lineamiento', 'organización', 'estructura', 'nivel', 'central', 'regional'],
+                    '2.1': ['plan', 'programa', 'proyecto', 'diseño', 'estrategia', 'PPPJ'],
+                    '2.3': ['tecnología', 'TIC', 'digital', 'innovación', 'MITDE', 'gobernanza']
+                };
+                
+                return oraciones.filter(o => 
+                    keywords[competenciaCodigo]?.some(k => o.includes(k))
+                );
+            }
+        
+            determinarNivel(texto) {
+                if (texto.includes('artículo') || texto.includes('ley') || texto.includes('circular')) {
+                    return 'normativo';
+                }
+                if (texto.includes('ejemplo') || texto.includes('caso') || texto.includes('aplicación')) {
+                    return 'aplicado';
+                }
+                return 'conceptual';
+            }
         }
-
-        let generador = null;
 
         // ============================================
         // FUNCIONES DE CARGA DE DOCUMENTOS
