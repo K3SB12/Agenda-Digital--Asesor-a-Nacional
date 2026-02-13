@@ -3,942 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 NEURONA IDONEIDAD · Tutor Adaptativo MEP</title>
+    <title>Tutor Idoneidad MEP · Con tus documentos</title>
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Chart.js para gráficos de progreso -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estilos avanzados */
-        :root {
-            --primary: #2563eb;
-            --secondary: #7c3aed;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-        
-        .neuron-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            padding: 2px;
-        }
-        
-        .neuron-card-inner {
-            background: white;
-            border-radius: 18px;
-            padding: 20px;
-            height: 100%;
-        }
-        
-        .chat-bubble-user {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-            border-radius: 20px 20px 5px 20px;
-            padding: 12px 18px;
-            max-width: 80%;
-            align-self: flex-end;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-        
-        .chat-bubble-tutor {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px 20px 20px 5px;
-            padding: 12px 18px;
-            max-width: 80%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .competencia-item {
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
-        }
-        
-        .competencia-item:hover {
-            border-left-color: var(--primary);
-            background: #f8fafc;
-            transform: translateX(5px);
-        }
-        
-        .nivel-bajo { background: linear-gradient(135deg, #fee2e2, #fecaca); }
-        .nivel-medio { background: linear-gradient(135deg, #fef3c7, #fde68a); }
-        .nivel-alto { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
-        
-        .pregunta-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s;
-        }
-        
-        .pregunta-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
-        }
-        
-        .badge-articulo {
-            background: #1e293b;
-            color: white;
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .animate-pulse-slow {
-            animation: pulse 3s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        .brain-wave {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .brain-wave::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: wave 3s infinite;
-        }
-        
-        @keyframes wave {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
+        body { background: #f0f9ff; }
+        .app-container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+        .card { background: white; border-radius: 24px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .btn-primary { background: #2563eb; color: white; padding: 12px 24px; border-radius: 12px; font-weight: bold; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .documento-item { padding: 8px; border-bottom: 1px solid #e5e7eb; cursor: pointer; }
+        .documento-item:hover { background: #f3f4f6; }
+        .pregunta-card { border-left: 4px solid #2563eb; padding: 16px; margin: 16px 0; background: #f8fafc; border-radius: 12px; }
+        .correcto { background: #dcfce7; border-left-color: #22c55e; }
+        .incorrecto { background: #fee2e2; border-left-color: #ef4444; }
+        @media (max-width: 768px) { .grid-cols-2 { grid-template-columns: 1fr; } }
     </style>
 </head>
-<body class="font-sans antialiased py-6">
-    
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<body>
+    <div class="app-container">
         
-        <!-- CABECERA NEURONAL -->
-        <div class="neuron-card mb-6">
-            <div class="neuron-card-inner flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center animate-pulse-slow brain-wave">
-                            <i class="fa-solid fa-brain text-white text-3xl"></i>
-                        </div>
-                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            NEURONA · IDONEIDAD
-                        </h1>
-                        <p class="text-slate-600 flex items-center gap-2">
-                            <i class="fa-solid fa-microchip text-blue-500"></i>
-                            Tutor adaptativo con inteligencia contextual · Aprende de tus respuestas
-                        </p>
-                    </div>
-                </div>
-                <div class="flex gap-3">
-                    <span class="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
-                        <i class="fa-regular fa-clock"></i>
-                        <span id="fecha-actual"></span>
-                    </span>
-                </div>
+        <!-- CABECERA -->
+        <div class="card mb-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                    📚 <span class="text-blue-600">Idoneidad</span> MEP
+                </h1>
+                <p class="text-gray-600">Tutor con tus documentos · Transitorio IX</p>
+            </div>
+            <div>
+                <span id="estado-offline" class="hidden bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                    <i class="fa-regular fa-wifi-slash"></i> Modo offline
+                </span>
             </div>
         </div>
 
-        <!-- MÉTRICAS DE APRENDIZAJE (NEURONA EN ACCIÓN) -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="glass-card p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-slate-500">Nivel de conocimiento</p>
-                        <p class="text-2xl font-bold" id="nivel-conocimiento">0%</p>
-                    </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-chart-line text-blue-600 text-xl"></i>
-                    </div>
-                </div>
-                <div class="w-full bg-slate-200 h-2 rounded-full mt-2">
-                    <div class="bg-blue-600 h-2 rounded-full" id="barra-conocimiento" style="width: 0%"></div>
-                </div>
-            </div>
-            
-            <div class="glass-card p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-slate-500">Preguntas respondidas</p>
-                        <p class="text-2xl font-bold" id="total-preguntas">0</p>
-                    </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-check text-green-600 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="glass-card p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-slate-500">Aciertos</p>
-                        <p class="text-2xl font-bold" id="total-aciertos">0</p>
-                    </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-trophy text-purple-600 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="glass-card p-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-slate-500">Leyes dominadas</p>
-                        <p class="text-2xl font-bold" id="leyes-dominadas">0/12</p>
-                    </div>
-                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-book text-yellow-600 text-xl"></i>
-                    </div>
-                </div>
+        <!-- SELECCIÓN DE CARPETA (SOLO EN COMPU) -->
+        <div class="card mb-4">
+            <h2 class="text-lg font-semibold mb-3">📁 Tus documentos</h2>
+            <p class="text-sm text-gray-600 mb-3">Seleccioná la carpeta "knowledge" con tus 30+ documentos</p>
+            <input type="file" id="folderInput" webkitdirectory directory multiple class="mb-3">
+            <div id="documentos-lista" class="max-h-40 overflow-y-auto border rounded-lg p-2 hidden">
+                <p class="font-medium mb-2">Documentos cargados:</p>
+                <ul id="lista-archivos" class="text-sm"></ul>
             </div>
         </div>
 
-        <!-- SELECTOR DE ESTRATO (AHORA CON PERSONALIDAD) -->
-        <div class="glass-card p-6 mb-6">
-            <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-brain text-purple-500 animate-pulse"></i>
-                La neurona necesita saber: ¿qué perfil estás entrenando?
-            </h2>
-            <div class="flex flex-wrap gap-3" id="estrato-selector">
-                <button data-estrato="docente" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-all flex items-center gap-2 border-2 border-transparent">
-                    <i class="fa-solid fa-chalkboard-user text-lg"></i>
-                    Propiamente Docente
-                </button>
-                <button data-estrato="tecnico" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-all flex items-center gap-2 border-2 border-transparent">
-                    <i class="fa-solid fa-users-between-lines text-lg"></i>
-                    Técnico Docente
-                </button>
-                <button data-estrato="administrativo" class="estrato-btn bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-all flex items-center gap-2 border-2 border-transparent">
-                    <i class="fa-solid fa-building text-lg"></i>
-                    Administrativo Docente
-                </button>
+        <!-- SELECTOR DE ESTRATO -->
+        <div class="card mb-4">
+            <h2 class="text-lg font-semibold mb-3">🎯 Tu perfil</h2>
+            <div class="flex flex-wrap gap-2">
+                <button data-estrato="docente" class="estrato-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-blue-100 transition">Propiamente Docente</button>
+                <button data-estrato="tecnico" class="estrato-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-blue-100 transition">Técnico Docente</button>
+                <button data-estrato="administrativo" class="estrato-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-blue-100 transition">Administrativo Docente</button>
             </div>
         </div>
 
-        <!-- CONTENEDOR PRINCIPAL: CHAT + CONTENIDO -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- CONTENIDO PRINCIPAL (2 COLUMNAS) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            <!-- COLUMNA IZQUIERDA: CHAT DE LA NEURONA -->
-            <div class="lg:col-span-1">
-                <div class="glass-card p-4 sticky top-4" style="height: calc(100vh - 200px);">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="relative">
-                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-                                <i class="fa-regular fa-message text-white"></i>
-                            </div>
-                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-slate-800">Conversación con tu neurona</h3>
-                            <p class="text-xs text-slate-500">Ella recuerda todo lo que hablamos</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Área de chat con scroll -->
-                    <div id="chat-container" class="h-[calc(100%-180px)] overflow-y-auto mb-3 flex flex-col space-y-3 pr-2">
-                        <!-- Mensajes dinámicos -->
-                    </div>
-                    
-                    <!-- Input de chat -->
-                    <div class="flex gap-2 mt-2">
-                        <input type="text" id="chat-input" placeholder="Habla con tu neurona..." 
-                               class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        <button id="btn-enviar-chat" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-3 rounded-xl hover:shadow-lg transition text-sm flex items-center gap-2">
-                            <i class="fa-regular fa-paper-plane"></i>
+            <!-- COLUMNA IZQUIERDA: COMPETENCIAS -->
+            <div class="card">
+                <h2 class="text-lg font-semibold mb-4">📋 Competencias a evaluar</h2>
+                <div id="competencias-container" class="space-y-3">
+                    <!-- Se llena con JS -->
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: CHAT Y PREGUNTAS -->
+            <div class="card">
+                <h2 class="text-lg font-semibold mb-4">💬 Tutor + Simulador</h2>
+                
+                <!-- Buscador en documentos -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Consultá tus documentos:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="pregunta-input" placeholder="Ej: ¿Qué dice el artículo 8 de Control Interno?" class="flex-1 border rounded-lg px-3 py-2">
+                        <button id="btn-preguntar" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            <i class="fa-regular fa-magnifying-glass"></i>
                         </button>
                     </div>
-                    
-                    <!-- Sugerencias contextuales -->
-                    <div class="flex flex-wrap gap-1 mt-3">
-                        <span class="text-xs text-gray-500 w-full mb-1">La neurona sugiere:</span>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">📚 Explicame Ley 10159</button>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">🎯 Generá 3 preguntas difíciles</button>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">📊 Mi progreso</button>
-                        <button class="sugerencia-btn text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full">⚠️ Repasar errores</button>
-                    </div>
+                    <div id="resultado-busqueda" class="mt-2 text-sm p-2 bg-gray-50 rounded-lg hidden"></div>
+                </div>
+
+                <!-- Generador de preguntas -->
+                <div class="mb-4">
+                    <button id="btn-generar" class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-medium">
+                        <i class="fa-regular fa-pen-to-square mr-2"></i> Generar pregunta de práctica
+                    </button>
+                </div>
+
+                <!-- Simulador -->
+                <div id="simulador-container" class="space-y-4 max-h-96 overflow-y-auto">
+                    <!-- Las preguntas aparecen acá -->
                 </div>
             </div>
-            
-            <!-- COLUMNA DERECHA: CONTENIDO ADAPTATIVO -->
-            <div class="lg:col-span-2 space-y-6">
-                
-                <!-- MAPA DE CALOR DE COMPETENCIAS -->
-                <div class="glass-card p-6">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-fire-flame text-orange-500"></i>
-                        Mapa de calor de tu conocimiento
-                    </h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="mapa-competencias">
-                        <!-- Se llena dinámicamente -->
-                    </div>
-                </div>
-                
-                <!-- COMPETENCIAS DETALLADAS -->
-                <div class="glass-card p-6">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-blue-500"></i>
-                        Competencias del perfil (con tu nivel actual)
-                    </h3>
-                    <div id="competencias-container" class="space-y-3">
-                        <!-- Se llena dinámicamente -->
-                    </div>
-                </div>
-                
-                <!-- SIMULADOR INTELIGENTE -->
-                <div class="glass-card p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-regular fa-pen-to-square text-green-600"></i>
-                            Simulador adaptativo
-                        </h3>
-                        <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-medium" id="dificultad-actual">
-                            Nivel: medio
-                        </span>
-                    </div>
-                    <div id="simulador-container" class="space-y-6">
-                        <!-- Preguntas dinámicas -->
-                    </div>
-                </div>
-            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="text-center text-sm text-gray-500 mt-4">
+            <p>📱 Podés instalar esta app en tu celular (Compartir → Agregar a pantalla de inicio)</p>
         </div>
     </div>
 
     <script>
-        (function() {
-            // --------------------------------------------------------------
-            // NEURONA CENTRAL - Base de conocimiento y estado de aprendizaje
-            // --------------------------------------------------------------
+        // ============================================
+        // BASE DE CONOCIMIENTO DEL MEP (competencias)
+        // ============================================
+        const perfilesMEP = {
+            docente: {
+                nombre: 'Propiamente Docente',
+                competencias: [
+                    { codigo: '1.1', nombre: 'Conocimiento de estudiantes y contexto', saber: true },
+                    { codigo: '1.2', nombre: 'Dominio disciplinar y didáctico', saber: true },
+                    { codigo: '1.3', nombre: 'Políticas y normativa educativa', saber: true },
+                    { codigo: '2.1', nombre: 'Diseño de experiencias de aprendizaje', saber: false },
+                    { codigo: '2.2', nombre: 'Mediación pedagógica', saber: false },
+                    { codigo: '2.3', nombre: 'Evaluación de aprendizajes', saber: false }
+                ]
+            },
+            tecnico: {
+                nombre: 'Técnico Docente (Asesores)',
+                competencias: [
+                    { codigo: '1.1', nombre: 'Área disciplinar y curricular', saber: true },
+                    { codigo: '1.2', nombre: 'Marco jurídico y políticas públicas', saber: true },
+                    { codigo: '1.3', nombre: 'Estructura organizacional MEP', saber: true },
+                    { codigo: '2.1', nombre: 'Diseño de planes y proyectos', saber: false },
+                    { codigo: '2.3', nombre: 'Liderazgo y asesoría con TIC', saber: false }
+                ]
+            },
+            administrativo: {
+                nombre: 'Administrativo Docente',
+                competencias: [
+                    { codigo: '1.1', nombre: 'Liderazgo pedagógico y gestión', saber: true },
+                    { codigo: '1.4', nombre: 'Tecnologías en educación', saber: true },
+                    { codigo: '2.3', nombre: 'Gestión de recursos materiales/financieros', saber: false },
+                    { codigo: '2.4', nombre: 'Gestión segura de información', saber: false },
+                    { codigo: '2.5', nombre: 'Liderazgo y responsabilidad', saber: false }
+                ]
+            }
+        };
+
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let estratoActual = 'tecnico';
+        let documentos = []; // Aquí guardaremos los textos de los documentos
+        let preguntasGeneradas = [];
+
+        // ============================================
+        // FUNCIONES PARA LEER CARPETA
+        // ============================================
+        document.getElementById('folderInput').addEventListener('change', async function(e) {
+            const archivos = Array.from(e.target.files);
+            documentos = [];
             
-            class NeuronaAprendizaje {
-                constructor() {
-                    // Estado del aprendizaje
-                    this.estado = {
-                        estratoActual: 'tecnico',
-                        respuestasHistorial: [],
-                        nivelConocimiento: 0,
-                        totalPreguntas: 0,
-                        totalAciertos: 0,
-                        competenciasDominadas: {},
-                        leyesEstudiadas: {},
-                        ultimaInteraccion: new Date(),
-                        dificultadActual: 'media',
-                        recomendaciones: []
-                    };
-                    
-                    // Base de conocimiento legal
-                    this.leyesDB = {
-                        'ley 10159': {
-                            nombres: ['ley 10159', 'ley marco empleo público', 'empleo público', 'carrera docente'],
-                            nombre: 'Ley Marco de Empleo Público (Ley 10159)',
-                            articulos: [
-                                { num: 'Art. 5 inciso l', texto: 'Idoneidad como requisito para ingreso' },
-                                { num: 'Art. 15 d y e', texto: 'Selección por mérito e idoneidad' }
-                            ],
-                            extracto: 'Fundamenta la exigencia de aprobar examen para Carrera Docente.',
-                            competencias: ['1.2 Marco jurídico', '1.3 Estructura MEP'],
-                            nivelDominio: 0
-                        },
-                        'control interno': {
-                            nombres: ['control interno', 'ley 8292', '8292'],
-                            nombre: 'Ley de Control Interno (Ley 8292)',
-                            articulos: [
-                                { num: 'Art. 8', texto: 'Deberes del jerarca: implementar sistemas de control' },
-                                { num: 'Art. 12', texto: 'Responsabilidad por control interno' },
-                                { num: 'Art. 16', texto: 'Medidas correctivas inmediatas' }
-                            ],
-                            extracto: 'Responsabilidades en control interno y gestión de riesgos.',
-                            competencias: ['2.3 Gestión recursos', '2.5 Liderazgo'],
-                            nivelDominio: 0
-                        },
-                        'código niñez': {
-                            nombres: ['código niñez', 'código de la niñez', 'niñez', 'codigo ninez'],
-                            nombre: 'Código de la Niñez y Adolescencia',
-                            articulos: [
-                                { num: 'Art. 24', texto: 'Derecho a integridad física y psicológica' },
-                                { num: 'Art. 105', texto: 'Obligación de denunciar situaciones de riesgo' }
-                            ],
-                            extracto: 'Protección de menores y obligación de denuncia.',
-                            competencias: ['1.1 Conocimiento estudiantes', '1.3 Políticas'],
-                            nivelDominio: 0
-                        },
-                        'contratación administrativa': {
-                            nombres: ['contratación administrativa', 'ley 7494', '7494'],
-                            nombre: 'Ley de Contratación Administrativa (Ley 7494)',
-                            articulos: [
-                                { num: 'Art. 6', texto: 'Principios de eficiencia y transparencia' },
-                                { num: 'Art. 40', texto: 'Procedimientos de contratación' }
-                            ],
-                            extracto: 'Regula compras y contrataciones públicas.',
-                            competencias: ['2.3 Gestión recursos', '2.4 Seguridad información'],
-                            nivelDominio: 0
-                        },
-                        'convención colectiva': {
-                            nombres: ['convención colectiva', 'convencion colectiva'],
-                            nombre: 'Convención Colectiva MEP',
-                            articulos: [
-                                { num: 'Capítulo III', texto: 'Derechos y obligaciones laborales' },
-                                { num: 'Capítulo VII', texto: 'Resolución de conflictos' }
-                            ],
-                            extracto: 'Relaciones laborales en el MEP.',
-                            competencias: ['1.2 Normativa laboral', '2.5 Liderazgo'],
-                            nivelDominio: 0
-                        }
-                    };
-                    
-                    // Perfiles por estrato (competencias)
-                    this.perfiles = {
-                        docente: {
-                            nombre: 'Propiamente Docente',
-                            competencias: [
-                                { codigo: '1.1', nombre: 'Conocimiento de estudiantes y contexto', nivel: 0 },
-                                { codigo: '1.2', nombre: 'Dominio disciplinar y didáctico', nivel: 0 },
-                                { codigo: '1.3', nombre: 'Políticas y normativa educativa', nivel: 0 },
-                                { codigo: '2.1', nombre: 'Diseño de experiencias de aprendizaje', nivel: 0 },
-                                { codigo: '2.2', nombre: 'Mediación pedagógica', nivel: 0 },
-                                { codigo: '2.3', nombre: 'Evaluación de aprendizajes', nivel: 0 }
-                            ]
-                        },
-                        tecnico: {
-                            nombre: 'Técnico Docente (Asesores)',
-                            competencias: [
-                                { codigo: '1.1', nombre: 'Área disciplinar y curricular', nivel: 0 },
-                                { codigo: '1.2', nombre: 'Marco jurídico y políticas', nivel: 0 },
-                                { codigo: '1.3', nombre: 'Estructura organizacional MEP', nivel: 0 },
-                                { codigo: '2.1', nombre: 'Diseño de planes y proyectos', nivel: 0 },
-                                { codigo: '2.3', nombre: 'Liderazgo y asesoría con TIC', nivel: 0 }
-                            ]
-                        },
-                        administrativo: {
-                            nombre: 'Administrativo Docente',
-                            competencias: [
-                                { codigo: '1.1', nombre: 'Liderazgo pedagógico y gestión', nivel: 0 },
-                                { codigo: '1.4', nombre: 'Tecnologías en educación', nivel: 0 },
-                                { codigo: '2.3', nombre: 'Gestión de recursos', nivel: 0 },
-                                { codigo: '2.4', nombre: 'Gestión segura de información', nivel: 0 },
-                                { codigo: '2.5', nombre: 'Liderazgo y responsabilidad', nivel: 0 }
-                            ]
-                        }
-                    };
-                    
-                    // Banco de preguntas base
-                    this.preguntasBase = {
-                        docente: [
-                            {
-                                pregunta: 'Una docente observa que un estudiante llega con moretones frecuentes. ¿Cuál es su obligación según el Código de la Niñez?',
-                                opciones: [
-                                    'Hablar con la familia',
-                                    'Denunciar ante PANI (Art. 105)',
-                                    'Reportar solo al director',
-                                    'Esperar a que el estudiante hable'
-                                ],
-                                correcta: 1,
-                                ley: 'código niñez',
-                                articulo: 'Art. 105',
-                                dificultad: 'media',
-                                competencia: '1.3'
-                            }
-                        ],
-                        tecnico: [
-                            {
-                                pregunta: 'Como asesor, ¿qué normativa debe consultar para un conflicto laboral entre docentes?',
-                                opciones: [
-                                    'Ley de Control Interno',
-                                    'Convención Colectiva MEP',
-                                    'Ley de Contratación',
-                                    'Estatuto de Servicio Civil'
-                                ],
-                                correcta: 1,
-                                ley: 'convención colectiva',
-                                articulo: 'Capítulo VII',
-                                dificultad: 'media',
-                                competencia: '1.2'
-                            }
-                        ],
-                        administrativo: [
-                            {
-                                pregunta: 'Para una compra institucional, ¿qué ley regula el procedimiento?',
-                                opciones: [
-                                    'Ley de Control Interno',
-                                    'Ley de Contratación Administrativa',
-                                    'Ley de Empleo Público',
-                                    'Código de Niñez'
-                                ],
-                                correcta: 1,
-                                ley: 'contratación administrativa',
-                                articulo: 'Art. 6',
-                                dificultad: 'media',
-                                competencia: '2.3'
-                            }
-                        ]
-                    };
-                }
-                
-                // Buscar ley por texto
-                buscarLey(texto) {
-                    const consulta = texto.toLowerCase();
-                    for (let [key, ley] of Object.entries(this.leyesDB)) {
-                        for (let nombre of ley.nombres) {
-                            if (consulta.includes(nombre)) return ley;
-                        }
+            for (let archivo of archivos) {
+                if (archivo.type.includes('text') || archivo.name.endsWith('.txt') || archivo.name.endsWith('.pdf')) {
+                    try {
+                        const texto = await archivo.text();
+                        documentos.push({
+                            nombre: archivo.name,
+                            contenido: texto.toLowerCase(),
+                            tamano: archivo.size
+                        });
+                    } catch (error) {
+                        console.log('Error leyendo', archivo.name);
                     }
-                    return null;
-                }
-                
-                // Generar pregunta adaptativa
-                generarPregunta(ley = null, dificultad = null) {
-                    const dificultadObj = dificultad || this.estado.dificultadActual;
-                    const estrato = this.estado.estratoActual;
-                    
-                    // Si se especifica una ley, buscar preguntas de esa ley
-                    if (ley) {
-                        const leyEncontrada = this.buscarLey(ley);
-                        if (leyEncontrada) {
-                            // Crear pregunta personalizada
-                            const actores = ['el director', 'la docente', 'el asesor', 'el administrador'];
-                            const situaciones = [
-                                'una irregularidad financiera',
-                                'un posible caso de maltrato',
-                                'un conflicto laboral',
-                                'una denuncia anónima'
-                            ];
-                            
-                            const actor = actores[Math.floor(Math.random() * actores.length)];
-                            const situacion = situaciones[Math.floor(Math.random() * situaciones.length)];
-                            const articulo = leyEncontrada.articulos[Math.floor(Math.random() * leyEncontrada.articulos.length)];
-                            
-                            return {
-                                pregunta: `Según ${leyEncontrada.nombre}, si ${actor} detecta ${situacion}, ¿cuál debe ser su actuación?`,
-                                opciones: [
-                                    `Aplicar ${articulo.num}: ${articulo.texto.substring(0, 30)}...`,
-                                    'Consultar con superiores antes de actuar',
-                                    'Documentar y esperar',
-                                    'Ignorar por falta de competencia'
-                                ],
-                                correcta: 0,
-                                ley: leyEncontrada.nombre,
-                                articulo: articulo.num,
-                                explicacion: `${articulo.num}: ${articulo.texto}`,
-                                dificultad: dificultadObj
-                            };
-                        }
-                    }
-                    
-                    // Pregunta genérica del estrato
-                    const preguntasEstrato = this.preguntasBase[estrato] || [];
-                    if (preguntasEstrato.length > 0) {
-                        return preguntasEstrato[Math.floor(Math.random() * preguntasEstrato.length)];
-                    }
-                    
-                    return null;
-                }
-                
-                // Procesar respuesta y actualizar aprendizaje
-                procesarRespuesta(pregunta, respuestaIdx, correcta) {
-                    this.estado.totalPreguntas++;
-                    if (correcta) this.estado.totalAciertos++;
-                    
-                    // Actualizar nivel de ley
-                    if (pregunta.ley) {
-                        const leyKey = Object.keys(this.leyesDB).find(k => 
-                            this.leyesDB[k].nombre.includes(pregunta.ley) || 
-                            pregunta.ley.includes(this.leyesDB[k].nombre)
-                        );
-                        
-                        if (leyKey) {
-                            const ley = this.leyesDB[leyKey];
-                            if (!ley.nivelDominio) ley.nivelDominio = 0;
-                            
-                            if (correcta) {
-                                ley.nivelDominio = Math.min(100, ley.nivelDominio + 10);
-                            } else {
-                                ley.nivelDominio = Math.max(0, ley.nivelDominio - 5);
-                            }
-                        }
-                    }
-                    
-                    // Actualizar competencia
-                    if (pregunta.competencia) {
-                        const competencia = this.perfiles[this.estado.estratoActual].competencias
-                            .find(c => c.codigo === pregunta.competencia);
-                        if (competencia) {
-                            if (!competencia.nivel) competencia.nivel = 0;
-                            if (correcta) {
-                                competencia.nivel = Math.min(100, competencia.nivel + 15);
-                            } else {
-                                competencia.nivel = Math.max(0, competencia.nivel - 10);
-                            }
-                        }
-                    }
-                    
-                    // Calcular nivel general
-                    this.estado.nivelConocimiento = Math.round(
-                        (this.estado.totalAciertos / this.estado.totalPreguntas) * 100
-                    ) || 0;
-                    
-                    // Ajustar dificultad
-                    if (this.estado.nivelConocimiento > 70) {
-                        this.estado.dificultadActual = 'alta';
-                    } else if (this.estado.nivelConocimiento > 40) {
-                        this.estado.dificultadActual = 'media';
-                    } else {
-                        this.estado.dificultadActual = 'baja';
-                    }
-                    
-                    return this.estado.nivelConocimiento;
-                }
-                
-                // Obtener recomendación personalizada
-                obtenerRecomendacion() {
-                    const leyesBajas = Object.values(this.leyesDB)
-                        .filter(l => l.nivelDominio < 50)
-                        .map(l => l.nombre);
-                    
-                    if (leyesBajas.length > 0) {
-                        return `🔍 Necesitas reforzar: ${leyesBajas.slice(0, 3).join(', ')}. ¿Querés que genere preguntas sobre alguna?`;
-                    }
-                    
-                    if (this.estado.nivelConocimiento > 80) {
-                        return "🌟 ¡Vas excelente! Probá con preguntas de alta dificultad para desafiarte.";
-                    }
-                    
-                    return "📚 Seguí practicando. Recordá que la constancia es clave.";
                 }
             }
             
-            // --------------------------------------------------------------
-            // INICIALIZAR NEURONA
-            // --------------------------------------------------------------
-            const neurona = new NeuronaAprendizaje();
+            // Mostrar lista de documentos cargados
+            const listaDiv = document.getElementById('lista-archivos');
+            listaDiv.innerHTML = '';
+            documentos.forEach(doc => {
+                listaDiv.innerHTML += `<li class="documento-item" onclick="buscarEnDocumento('${doc.nombre}')">📄 ${doc.nombre}</li>`;
+            });
+            document.getElementById('documentos-lista').classList.remove('hidden');
+        });
+
+        // ============================================
+        // BUSCAR EN DOCUMENTOS
+        // ============================================
+        function buscarEnDocumentos(consulta) {
+            const resultados = [];
+            const terminos = consulta.toLowerCase().split(' ');
             
-            // Elementos DOM
-            const chatContainer = document.getElementById('chat-container');
-            const chatInput = document.getElementById('chat-input');
-            const btnEnviar = document.getElementById('btn-enviar-chat');
-            const selectorBtns = document.querySelectorAll('.estrato-btn');
-            const mapaComp = document.getElementById('mapa-competencias');
-            const competenciasContainer = document.getElementById('competencias-container');
-            const simuladorContainer = document.getElementById('simulador-container');
-            
-            // Variables de UI
-            let preguntasActivas = [];
-            
-            // --------------------------------------------------------------
-            // FUNCIONES DE UI
-            // --------------------------------------------------------------
-            
-            function agregarMensajeChat(contenido, esUsuario = false) {
-                const div = document.createElement('div');
-                div.className = `flex ${esUsuario ? 'justify-end' : 'justify-start'} mb-3`;
-                
-                if (esUsuario) {
-                    div.innerHTML = `
-                        <div class="chat-bubble-user">
-                            <p class="text-sm">${contenido}</p>
-                        </div>
-                    `;
-                } else {
-                    div.innerHTML = `
-                        <div class="chat-bubble-tutor">
-                            <span class="font-bold text-purple-600 block mb-1 text-xs">🧠 NEURONA</span>
-                            <p class="text-sm">${contenido}</p>
-                        </div>
-                    `;
-                }
-                
-                chatContainer.appendChild(div);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-            
-            function actualizarMetricas() {
-                document.getElementById('nivel-conocimiento').textContent = `${neurona.estado.nivelConocimiento}%`;
-                document.getElementById('barra-conocimiento').style.width = `${neurona.estado.nivelConocimiento}%`;
-                document.getElementById('total-preguntas').textContent = neurona.estado.totalPreguntas;
-                document.getElementById('total-aciertos').textContent = neurona.estado.totalAciertos;
-                
-                const leyesDominadas = Object.values(neurona.leyesDB).filter(l => l.nivelDominio > 70).length;
-                document.getElementById('leyes-dominadas').textContent = `${leyesDominadas}/${Object.keys(neurona.leyesDB).length}`;
-                
-                document.getElementById('dificultad-actual').textContent = `Nivel: ${neurona.estado.dificultadActual}`;
-            }
-            
-            function renderizarMapaCompetencias() {
-                const competencias = neurona.perfiles[neurona.estado.estratoActual].competencias;
-                let html = '';
-                
-                competencias.forEach(comp => {
-                    const nivel = comp.nivel || 0;
-                    let colorClass = 'bg-red-200';
-                    if (nivel > 66) colorClass = 'bg-green-200';
-                    else if (nivel > 33) colorClass = 'bg-yellow-200';
-                    
-                    html += `
-                        <div class="p-3 rounded-xl ${colorClass}">
-                            <div class="text-xs font-bold">${comp.codigo}</div>
-                            <div class="text-xs">${comp.nombre.substring(0, 20)}...</div>
-                            <div class="w-full bg-white/50 h-1 mt-1 rounded">
-                                <div class="bg-blue-600 h-1 rounded" style="width: ${nivel}%"></div>
-                            </div>
-                        </div>
-                    `;
+            documentos.forEach(doc => {
+                let relevancia = 0;
+                terminos.forEach(term => {
+                    if (doc.contenido.includes(term)) relevancia++;
                 });
                 
-                mapaComp.innerHTML = html;
-            }
-            
-            function renderizarCompetencias() {
-                const competencias = neurona.perfiles[neurona.estado.estratoActual].competencias;
-                let html = '';
-                
-                competencias.forEach(comp => {
-                    const nivel = comp.nivel || 0;
-                    let nivelClass = 'nivel-bajo';
-                    if (nivel > 66) nivelClass = 'nivel-alto';
-                    else if (nivel > 33) nivelClass = 'nivel-medio';
+                if (relevancia > 0) {
+                    // Extraer contexto alrededor de la coincidencia
+                    const indice = doc.contenido.indexOf(terminos[0]);
+                    const inicio = Math.max(0, indice - 100);
+                    const fin = Math.min(doc.contenido.length, indice + 200);
+                    const contexto = doc.contenido.substring(inicio, fin) + '...';
                     
-                    html += `
-                        <div class="competencia-item p-4 rounded-xl ${nivelClass}">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-sm">${comp.codigo} - ${comp.nombre}</span>
-                                <span class="text-sm font-bold">${nivel}%</span>
-                            </div>
-                            <div class="w-full bg-white/50 h-2 rounded-full">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${nivel}%"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                competenciasContainer.innerHTML = html;
+                    resultados.push({
+                        documento: doc.nombre,
+                        relevancia: relevancia,
+                        contexto: contexto
+                    });
+                }
+            });
+            
+            return resultados.sort((a,b) => b.relevancia - a.relevancia);
+        }
+
+        // ============================================
+        // GENERAR PREGUNTA BASADA EN DOCUMENTOS
+        // ============================================
+        function generarPregunta() {
+            if (documentos.length === 0) {
+                alert('Primero cargá tus documentos');
+                return;
             }
             
-            function agregarPreguntaAlSimulador(pregunta) {
-                if (!pregunta) return;
-                
-                const id = `preg_${Date.now()}_${Math.random()}`;
-                preguntasActivas.push({ id, ...pregunta });
-                
-                const html = `
-                    <div class="pregunta-card" data-pregunta-id="${id}">
-                        <div class="flex justify-between items-start mb-3">
-                            <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">
-                                🧠 Generada por neurona · ${pregunta.dificultad}
-                            </span>
-                            <span class="badge-articulo">
-                                <i class="fa-regular fa-bookmark mr-1"></i>${pregunta.articulo || 'Artículo'}
-                            </span>
-                        </div>
-                        <p class="font-semibold text-slate-800 mb-4">${pregunta.pregunta}</p>
-                        <div class="space-y-3 mb-4">
-                            ${pregunta.opciones.map((opt, idx) => `
-                                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
-                                    <input type="radio" name="${id}" value="${idx}" class="w-4 h-4 text-blue-600 radio-pregunta">
-                                    <label class="text-slate-700 cursor-pointer flex-1 text-sm">${opt}</label>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="feedback hidden text-sm p-3 rounded-lg" data-feedback="${id}"></div>
+            // Tomar un documento aleatorio
+            const doc = documentos[Math.floor(Math.random() * documentos.length)];
+            
+            // Extraer una frase aleatoria (simplificado)
+            const oraciones = doc.contenido.split('.');
+            const oracion = oraciones[Math.floor(Math.random() * oraciones.length)];
+            
+            if (oracion.length < 20) return generarPregunta(); // Intentar de nuevo
+            
+            // Crear pregunta
+            const pregunta = {
+                texto: `Según el documento "${doc.nombre}", ¿qué establece la siguiente afirmación?\n"${oracion.substring(0, 100)}..."`,
+                opciones: [
+                    'A) Lo establece como obligación del funcionario',
+                    'B) Lo establece como facultad discrecional',
+                    'C) No está regulado en la normativa',
+                    'D) Es competencia de otra instancia'
+                ],
+                correcta: 0, // Simplificado
+                fuente: doc.nombre
+            };
+            
+            return pregunta;
+        }
+
+        // ============================================
+        // RENDERIZAR COMPETENCIAS
+        // ============================================
+        function renderizarCompetencias() {
+            const perfil = perfilesMEP[estratoActual];
+            let html = '';
+            
+            perfil.competencias.forEach(comp => {
+                html += `
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <span class="text-xs font-mono ${comp.saber ? 'bg-blue-200' : 'bg-green-200'} px-2 py-1 rounded-full">
+                            ${comp.saber ? 'SABER' : 'SABER HACER'}
+                        </span>
+                        <span class="font-medium block mt-1">${comp.codigo} ${comp.nombre}</span>
                     </div>
                 `;
-                
-                simuladorContainer.innerHTML = html + simuladorContainer.innerHTML;
-                
-                // Agregar eventos a los radios de esta nueva pregunta
-                document.querySelectorAll(`[name="${id}"]`).forEach(radio => {
-                    radio.addEventListener('change', function(e) {
-                        const preguntaCard = this.closest('.pregunta-card');
-                        const preguntaId = preguntaCard.dataset.preguntaId;
-                        const preguntaObj = preguntasActivas.find(p => p.id === preguntaId);
-                        const opcionElegida = parseInt(this.value);
-                        const feedbackDiv = preguntaCard.querySelector('.feedback');
-                        
-                        const esCorrecta = opcionElegida === preguntaObj.correcta;
-                        
-                        // Procesar en la neurona
-                        neurona.procesarRespuesta(preguntaObj, opcionElegida, esCorrecta);
-                        
-                        // Mostrar feedback
-                        feedbackDiv.className = esCorrecta ? 'feedback-correcto text-sm block' : 'feedback-incorrecto text-sm block';
-                        feedbackDiv.innerHTML = esCorrecta 
-                            ? `<i class="fa-regular fa-circle-check mr-1"></i> ¡Correcto! ${preguntaObj.explicacion || ''}`
-                            : `<i class="fa-regular fa-circle-xmark mr-1"></i> Incorrecto. La respuesta correcta era: ${preguntaObj.opciones[preguntaObj.correcta]}`;
-                        
-                        // Deshabilitar radios
-                        preguntaCard.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
-                        
-                        // Actualizar UI
-                        actualizarMetricas();
-                        renderizarMapaCompetencias();
-                        renderizarCompetencias();
-                        
-                        // La neurona comenta
-                        setTimeout(() => {
-                            if (esCorrecta) {
-                                agregarMensajeChat(`✅ ¡Bien! Tu nivel en ${preguntaObj.ley || 'este tema'} subió.`, false);
-                            } else {
-                                agregarMensajeChat(`📚 Revisá ${preguntaObj.articulo || 'el artículo'} de ${preguntaObj.ley || 'la ley'}. ¿Querés que te lo explique?`, false);
-                            }
-                        }, 500);
-                    });
+            });
+            
+            document.getElementById('competencias-container').innerHTML = html;
+        }
+
+        // ============================================
+        // EVENTOS
+        // ============================================
+        
+        // Selector de estrato
+        document.querySelectorAll('.estrato-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                estratoActual = this.dataset.estrato;
+                renderizarCompetencias();
+            });
+        });
+
+        // Botón preguntar
+        document.getElementById('btn-preguntar').addEventListener('click', function() {
+            const pregunta = document.getElementById('pregunta-input').value;
+            if (!pregunta || documentos.length === 0) return;
+            
+            const resultados = buscarEnDocumentos(pregunta);
+            const resultadoDiv = document.getElementById('resultado-busqueda');
+            
+            if (resultados.length > 0) {
+                let html = '<p class="font-bold mb-2">📄 Resultados:</p>';
+                resultados.slice(0, 3).forEach(r => {
+                    html += `
+                        <div class="mb-2 p-2 bg-white rounded">
+                            <span class="font-medium">${r.documento}</span>
+                            <p class="text-xs mt-1">${r.contexto}</p>
+                        </div>
+                    `;
                 });
+                resultadoDiv.innerHTML = html;
+                resultadoDiv.classList.remove('hidden');
+            } else {
+                resultadoDiv.innerHTML = '<p class="text-gray-500">No se encontraron resultados</p>';
+                resultadoDiv.classList.remove('hidden');
             }
+        });
+
+        // Botón generar pregunta
+        document.getElementById('btn-generar').addEventListener('click', function() {
+            const pregunta = generarPregunta();
+            if (!pregunta) return;
             
-            // --------------------------------------------------------------
-            // PROCESAR CONSULTAS DEL CHAT
-            // --------------------------------------------------------------
+            preguntasGeneradas.push(pregunta);
+            const idx = preguntasGeneradas.length - 1;
             
-            function procesarConsulta(mensaje) {
-                const msg = mensaje.toLowerCase();
-                
-                // 1. Solicitud de explicación de ley
-                if (msg.includes('explica') || msg.includes('qué dice')) {
-                    const ley = neurona.buscarLey(msg);
-                    if (ley) {
-                        let respuesta = `**${ley.nombre}**\n\n📌 ${ley.extracto}\n\n📖 **Artículos importantes:**\n`;
-                        ley.articulos.forEach(art => {
-                            respuesta += `• **${art.num}:** ${art.texto}\n`;
-                        });
-                        return respuesta;
-                    }
-                }
-                
-                // 2. Generar preguntas
-                if (msg.includes('genera') || msg.includes('crea') || msg.includes('pregunta')) {
-                    const cantidad = msg.match(/\d+/) ? parseInt(msg.match(/\d+/)[0]) : 1;
+            const simulador = document.getElementById('simulador-container');
+            const preguntaHTML = `
+                <div class="pregunta-card" data-idx="${idx}">
+                    <p class="font-medium mb-3">${pregunta.texto}</p>
+                    <div class="space-y-2">
+                        ${pregunta.opciones.map((opt, optIdx) => `
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="preg_${idx}" value="${optIdx}" class="radio-pregunta">
+                                <span>${opt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="feedback hidden mt-3 text-sm p-2 rounded"></div>
+                    <p class="text-xs text-gray-400 mt-2">Fuente: ${pregunta.fuente}</p>
+                </div>
+            `;
+            
+            simulador.innerHTML = preguntaHTML + simulador.innerHTML;
+            
+            // Eventos para los radios
+            document.querySelectorAll(`[name="preg_${idx}"]`).forEach(radio => {
+                radio.addEventListener('change', function(e) {
+                    const card = this.closest('.pregunta-card');
+                    const feedback = card.querySelector('.feedback');
+                    const correcta = preguntasGeneradas[card.dataset.idx].correcta;
                     
-                    // Verificar si menciona una ley específica
-                    const leyMencionada = neurona.buscarLey(msg);
-                    
-                    let respuestas = [];
-                    for (let i = 0; i < cantidad; i++) {
-                        const pregunta = neurona.generarPregunta(leyMencionada ? leyMencionada.nombre : null);
-                        if (pregunta) {
-                            agregarPreguntaAlSimulador(pregunta);
-                            respuestas.push(pregunta);
-                        }
+                    if (parseInt(this.value) === correcta) {
+                        feedback.className = 'feedback correcto mt-3 text-sm p-2 rounded';
+                        feedback.innerHTML = '✅ ¡Correcto! Basado en tus documentos.';
+                    } else {
+                        feedback.className = 'feedback incorrecto mt-3 text-sm p-2 rounded';
+                        feedback.innerHTML = '❌ Revisá el documento mencionado en la fuente.';
                     }
                     
-                    if (respuestas.length > 0) {
-                        return `✅ Generé ${respuestas.length} pregunta(s) sobre ${leyMencionada ? leyMencionada.nombre : 'temas variados'}. Revisá el simulador.`;
-                    }
-                }
-                
-                // 3. Progreso
-                if (msg.includes('progreso') || msg.includes('cómo voy')) {
-                    return `📊 **Tu progreso:**\n• Nivel: ${neurona.estado.nivelConocimiento}%\n• Preguntas: ${neurona.estado.totalPreguntas}\n• Aciertos: ${neurona.estado.totalAciertos}\n\n${neurona.obtenerRecomendacion()}`;
-                }
-                
-                // 4. Repasar errores
-                if (msg.includes('error') || msg.includes('fallo') || msg.includes('repasar')) {
-                    return "Voy a generar preguntas de las leyes que tienes más débiles. ¡Prepárate!";
-                }
-                
-                // 5. Búsqueda general
-                const ley = neurona.buscarLey(msg);
-                if (ley) {
-                    return `**${ley.nombre}**\n\n${ley.extracto}\n\n¿Querés que genere preguntas sobre esta ley?`;
-                }
-                
-                return "No entendí. Podés pedirme:\n• 'Explicame la Ley 10159'\n• 'Generá 3 preguntas sobre Control Interno'\n• 'Cómo va mi progreso'\n• 'Repasar errores'";
-            }
-            
-            // --------------------------------------------------------------
-            // EVENTOS
-            // --------------------------------------------------------------
-            
-            btnEnviar.addEventListener('click', () => {
-                const mensaje = chatInput.value.trim();
-                if (!mensaje) return;
-                
-                agregarMensajeChat(mensaje, true);
-                chatInput.value = '';
-                
-                setTimeout(() => {
-                    const respuesta = procesarConsulta(mensaje);
-                    agregarMensajeChat(respuesta, false);
-                }, 500);
-            });
-            
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') btnEnviar.click();
-            });
-            
-            document.querySelectorAll('.sugerencia-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    let texto = btn.textContent.replace(/^[^\s]+\s/, '');
-                    chatInput.value = texto;
-                    btnEnviar.click();
+                    feedback.classList.remove('hidden');
                 });
             });
-            
-            selectorBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const estrato = this.dataset.estrato;
-                    neurona.estado.estratoActual = estrato;
-                    
-                    selectorBtns.forEach(b => {
-                        b.classList.remove('bg-blue-600', 'text-white');
-                        b.classList.add('bg-slate-100', 'text-slate-700');
-                    });
-                    this.classList.remove('bg-slate-100', 'text-slate-700');
-                    this.classList.add('bg-blue-600', 'text-white');
-                    
-                    renderizarMapaCompetencias();
-                    renderizarCompetencias();
-                    
-                    agregarMensajeChat(`✅ Cambiaste a **${neurona.perfiles[estrato].nombre}**. Voy a adaptar mis preguntas a tu nuevo perfil.`, false);
-                });
-            });
-            
-            // Inicializar
-            document.getElementById('fecha-actual').textContent = new Date().toLocaleDateString('es-CR', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            
-            document.querySelector('button[data-estrato="tecnico"]').click();
-            
-            agregarMensajeChat("🧠 **¡Hola! Soy tu neurona de aprendizaje.** He analizado tu perfil y estoy lista para adaptarme a ti. Podés pedirme que explique leyes, genere preguntas, o analice tu progreso. ¿Por dónde empezamos?", false);
-            
-            // Generar primera pregunta de bienvenida
-            setTimeout(() => {
-                const pregunta = neurona.generarPregunta();
-                if (pregunta) {
-                    agregarPreguntaAlSimulador(pregunta);
-                }
-            }, 1000);
-        })();
+        });
+
+        // Inicializar
+        renderizarCompetencias();
+
+        // ============================================
+        // SERVICE WORKER (para offline y PWA)
+        // ============================================
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('SW registrado'))
+                .catch(err => console.log('Error SW:', err));
+        }
+
+        // Detectar si está offline
+        window.addEventListener('offline', () => {
+            document.getElementById('estado-offline').classList.remove('hidden');
+        });
+        window.addEventListener('online', () => {
+            document.getElementById('estado-offline').classList.add('hidden');
+        });
     </script>
 </body>
 </html>
