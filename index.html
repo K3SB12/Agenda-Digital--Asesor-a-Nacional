@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 TUTOR IDONEIDAD MEP · Asesores</title>
+    <title>🧠 TUTOR IDONEIDAD MEP · Lector de PDFs</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- PDF.js desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         body { background: #f0f9ff; font-family: system-ui, sans-serif; }
         .card { background: white; border-radius: 24px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
@@ -18,6 +20,7 @@
         .feedback-incorrecto { background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px; border-radius: 12px; }
         .progreso-bar { height: 8px; border-radius: 4px; background: #e2e8f0; overflow: hidden; }
         .progreso-fill { height: 100%; background: #2563eb; width: 0%; transition: width 0.3s; }
+        .pdf-badge { background: #fee2e2; color: #b91c1c; font-size: 0.7rem; padding: 2px 6px; border-radius: 12px; }
     </style>
 </head>
 <body class="p-4 md:p-6">
@@ -28,9 +31,9 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 class="text-3xl md:text-4xl font-bold mb-2">📘 Idoneidad MEP</h1>
-                    <p class="text-blue-100">Tutor inteligente para asesores · Transitorio IX</p>
+                    <p class="text-blue-100">Tutor con lectura de PDFs · Transitorio IX</p>
                     <div class="flex flex-wrap gap-2 mt-3 text-xs bg-white/20 p-3 rounded-xl">
-                        <span class="font-semibold">Fundamento:</span> LMEP N.º 10159 (arts.5l,15d-e) · Ley N.º9871 · Resolución DG-RES-88-2023 · RPCID art.17d · Calificación mínima 70
+                        <span class="font-semibold">Fundamento:</span> LMEP N.º 10159 · Ley N.º9871 · Resolución DG-RES-88-2023 · Calificación mínima 70
                     </div>
                 </div>
                 <a href="https://dgth.mep.go.cr/pruebas-de-idoneidad-transitorio-ix/" target="_blank" class="bg-white text-blue-700 px-4 py-2 rounded-full text-sm font-bold hover:bg-blue-50 transition flex items-center gap-2">
@@ -39,7 +42,7 @@
             </div>
         </div>
 
-        <!-- SELECTOR DE ESTRATO (Perfiles Título II) -->
+        <!-- SELECTOR DE ESTRATO -->
         <div class="card">
             <h2 class="text-xl font-bold mb-4">🎯 Seleccione su estrato (Título II)</h2>
             <div class="flex flex-wrap gap-3" id="selector-estrato">
@@ -49,19 +52,15 @@
             </div>
         </div>
 
-        <!-- CONTENEDOR PRINCIPAL: 2 COLUMNAS -->
+        <!-- CONTENEDOR PRINCIPAL -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <!-- COLUMNA IZQUIERDA: COMPETENCIAS + PROGRESO -->
             <div class="lg:col-span-1 space-y-6">
-                <!-- Competencias del Estrato (con indicadores MEP) -->
                 <div class="card">
                     <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-list"></i> Competencias a evaluar</h2>
-                    <div id="competencias-container" class="space-y-4 text-sm">
-                        <!-- Se inyecta por JS -->
-                    </div>
+                    <div id="competencias-container" class="space-y-4 text-sm"></div>
                 </div>
-                <!-- Progreso Personal -->
                 <div class="card">
                     <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-chart-line"></i> Mi progreso</h2>
                     <div class="space-y-3">
@@ -80,15 +79,16 @@
 
             <!-- COLUMNA DERECHA: DOCUMENTOS + SIMULADOR -->
             <div class="lg:col-span-2 space-y-6">
-                <!-- Carga de Documentos (solo .txt) -->
+                <!-- CARGA DE PDFS -->
                 <div class="card">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-folder-open"></i> 1. Cargue sus documentos (.txt)</h2>
-                    <p class="text-sm text-amber-600 mb-3">⚠️ Use archivos .txt (Bloc de notas) para evitar errores. Incluya leyes, guías, PNFT, etc.</p>
-                    <input type="file" id="carpeta-docs" webkitdirectory directory multiple accept=".txt" class="mb-3">
-                    <div id="lista-docs" class="text-sm max-h-32 overflow-y-auto bg-slate-50 p-3 rounded-lg hidden"></div>
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-folder-open"></i> 1. Cargue sus documentos (PDF o TXT)</h2>
+                    <p class="text-sm text-green-600 mb-3">✅ Ahora acepta PDFs directamente. Seleccione todos sus archivos.</p>
+                    <input type="file" id="carga-docs" multiple accept=".pdf,.txt" class="mb-3">
+                    <div id="lista-docs" class="text-sm max-h-40 overflow-y-auto bg-slate-50 p-3 rounded-lg hidden"></div>
+                    <div id="progreso-carga" class="text-xs text-gray-500 mt-2"></div>
                 </div>
 
-                <!-- Generador por Competencia -->
+                <!-- GENERADOR -->
                 <div class="card">
                     <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-pen-to-square"></i> 2. Practique por competencia</h2>
                     <div class="flex flex-wrap gap-2 mb-4">
@@ -99,9 +99,7 @@
                             <i class="fa-regular fa-flask"></i> Generar pregunta
                         </button>
                     </div>
-                    <div id="simulador-container" class="space-y-4">
-                        <!-- Las preguntas aparecen aquí -->
-                    </div>
+                    <div id="simulador-container" class="space-y-4"></div>
                 </div>
             </div>
         </div>
@@ -109,9 +107,10 @@
 
     <script>
         (function() {
-            // --------------------------------------------------------------
-            // 1. PERFILES MEP (COMPLETOS con indicadores)
-            // --------------------------------------------------------------
+            // Configurar PDF.js
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+            // Perfiles MEP (COMPLETOS)
             const perfilesMEP = {
                 tecnico: {
                     nombre: 'Técnico Docente (Asesores)',
@@ -119,11 +118,11 @@
                         { codigo: '1.1', nombre: 'Área disciplinar, pedagógica y curricular', saber: true,
                           indicadores: ['Domina su disciplina', 'Asesora sobre actualizaciones curriculares', 'Fundamenta con teorías pedagógicas'] },
                         { codigo: '1.2', nombre: 'Marco jurídico, ético y políticas públicas', saber: true,
-                          indicadores: ['Aplica Política Educativa', 'Respeta principios éticos', 'Interpreta normativa vinculante (Leyes 10159, 8292, etc.)'] },
+                          indicadores: ['Aplica Política Educativa', 'Interpreta normativa vinculante (Leyes 10159, 8292, etc.)'] },
                         { codigo: '1.3', nombre: 'Estructura organizacional del MEP', saber: true,
-                          indicadores: ['Coordina entre niveles central, regional e institucional', 'Deriva consultas al nivel correspondiente'] },
+                          indicadores: ['Coordina entre niveles central, regional e institucional'] },
                         { codigo: '2.1', nombre: 'Diseño de planes, programas y proyectos', saber: false,
-                          indicadores: ['Elabora proyectos de mejora', 'Diseña estrategias de intervención pedagógica'] },
+                          indicadores: ['Elabora proyectos de mejora', 'Diseña estrategias de intervención'] },
                         { codigo: '2.3', nombre: 'Liderazgo, asesoría y TIC', saber: false,
                           indicadores: ['Utiliza plataformas digitales', 'Promueve innovación educativa con TIC'] }
                     ]
@@ -131,37 +130,74 @@
                 docente: {
                     nombre: 'Propiamente Docente',
                     competencias: [
-                        { codigo: '1.1', nombre: 'Conocimiento de estudiantes y contexto', saber: true, indicadores: ['Identifica etapas del desarrollo', 'Reconoce factores socioculturales'] },
-                        { codigo: '1.2', nombre: 'Dominio disciplinar y didáctico', saber: true, indicadores: ['Selecciona estrategias didácticas', 'Aplica teorías pedagógicas'] },
-                        { codigo: '1.3', nombre: 'Políticas y normativa educativa', saber: true, indicadores: ['Cita Código de Niñez', 'Aplica lineamientos de evaluación'] },
-                        { codigo: '2.1', nombre: 'Diseño de experiencias de aprendizaje', saber: false, indicadores: ['Adecua objetivos', 'Selecciona recursos'] },
-                        { codigo: '2.2', nombre: 'Mediación pedagógica', saber: false, indicadores: ['Aplica aprendizaje cooperativo', 'Integra TIC'] },
-                        { codigo: '2.3', nombre: 'Evaluación de aprendizajes', saber: false, indicadores: ['Construye rúbricas', 'Analiza resultados'] }
+                        { codigo: '1.1', nombre: 'Conocimiento de estudiantes y contexto', saber: true, indicadores: ['Identifica etapas del desarrollo'] },
+                        { codigo: '1.2', nombre: 'Dominio disciplinar y didáctico', saber: true, indicadores: ['Selecciona estrategias didácticas'] },
+                        { codigo: '1.3', nombre: 'Políticas y normativa educativa', saber: true, indicadores: ['Cita Código de Niñez'] },
+                        { codigo: '2.1', nombre: 'Diseño de experiencias de aprendizaje', saber: false, indicadores: ['Adecua objetivos'] },
+                        { codigo: '2.2', nombre: 'Mediación pedagógica', saber: false, indicadores: ['Aplica aprendizaje cooperativo'] },
+                        { codigo: '2.3', nombre: 'Evaluación de aprendizajes', saber: false, indicadores: ['Construye rúbricas'] }
                     ]
                 },
                 administrativo: {
                     nombre: 'Administrativo Docente',
                     competencias: [
-                        { codigo: '1.1', nombre: 'Liderazgo pedagógico y gestión', saber: true, indicadores: ['Identifica modelos de supervisión', 'Reconoce estilos de dirección'] },
-                        { codigo: '1.4', nombre: 'Tecnologías en educación', saber: true, indicadores: ['Usa sistemas institucionales', 'Conoce políticas de seguridad'] },
+                        { codigo: '1.1', nombre: 'Liderazgo pedagógico y gestión', saber: true, indicadores: ['Identifica modelos de supervisión'] },
+                        { codigo: '1.4', nombre: 'Tecnologías en educación', saber: true, indicadores: ['Usa sistemas institucionales'] },
                         { codigo: '2.3', nombre: 'Gestión de recursos', saber: false, indicadores: ['Elabora presupuestos', 'Aplica Ley de Contratación'] },
-                        { codigo: '2.4', nombre: 'Gestión segura de información', saber: false, indicadores: ['Aplica protocolos de datos', 'Resguarda documentación'] },
-                        { codigo: '2.5', nombre: 'Liderazgo y responsabilidad', saber: false, indicadores: ['Conduce reuniones', 'Resuelve conflictos'] }
+                        { codigo: '2.4', nombre: 'Gestión segura de información', saber: false, indicadores: ['Aplica protocolos de datos'] },
+                        { codigo: '2.5', nombre: 'Liderazgo y responsabilidad', saber: false, indicadores: ['Conduce reuniones'] }
                     ]
                 }
             };
 
-            // --------------------------------------------------------------
-            // 2. ESTADO DE LA APLICACIÓN
-            // --------------------------------------------------------------
+            // Estado
             let estratoActual = 'tecnico';
-            let documentos = [];  // { nombre, contenido, analisis }
+            let documentos = [];
             let progreso = JSON.parse(localStorage.getItem('progresoMEP')) || { total:0, correctas:0, porCompetencia:{} };
-            let preguntasHechas = [];
 
-            // --------------------------------------------------------------
-            // 3. FUNCIONES DE INTERFAZ
-            // --------------------------------------------------------------
+            // Palabras clave por competencia (para clasificar PDFs)
+            const palabrasClave = {
+                '1.1': ['currículum', 'didáctica', 'metodología', 'pedagogía', 'STEAM', 'PNFT', 'guía docente', 'módulo', 'enseñanza', 'aprendizaje'],
+                '1.2': ['ley', 'artículo', 'reglamento', 'normativa', 'política', 'ética', 'código', 'estatuto', 'convención', '10159', '8292', '6227', '1581', '7494'],
+                '1.3': ['circular', 'lineamiento', 'organización', 'estructura', 'nivel central', 'regional', 'institucional', 'directriz'],
+                '2.1': ['plan', 'programa', 'proyecto', 'diseño', 'estrategia', 'PPPJ', 'marco estratégico'],
+                '2.3': ['tecnología', 'TIC', 'digital', 'innovación', 'MITDE', 'gobernanza', 'transformación digital', 'inteligencia artificial']
+            };
+
+            // Función para leer PDF
+            async function leerPDF(archivo) {
+                const arrayBuffer = await archivo.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let textoCompleto = '';
+                
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const strings = content.items.map(item => item.str);
+                    textoCompleto += strings.join(' ') + ' ';
+                }
+                
+                return textoCompleto.toLowerCase().replace(/[^\w\sáéíóúñü]/g, ' ').replace(/\s+/g, ' ');
+            }
+
+            // Clasificar documento por competencias
+            function clasificarDocumento(nombre, contenido) {
+                const textoCompleto = (nombre + ' ' + contenido).toLowerCase();
+                const competenciasRel = [];
+                
+                for (let [codigo, keywords] of Object.entries(palabrasClave)) {
+                    for (let kw of keywords) {
+                        if (textoCompleto.includes(kw)) {
+                            competenciasRel.push(codigo);
+                            break;
+                        }
+                    }
+                }
+                
+                return [...new Set(competenciasRel)]; // Únicas
+            }
+
+            // Renderizar competencias
             function renderizarCompetencias() {
                 const perfil = perfilesMEP[estratoActual];
                 let html = '';
@@ -170,8 +206,8 @@
                     html += `
                         <div class="border-l-4 border-blue-500 pl-3 py-2 bg-slate-50 rounded">
                             <div class="flex justify-between items-center">
-                                <span class="competencia-badge">${comp.codigo} ${comp.saber ? '📘 SABER' : '🛠️ HACER'}</span>
-                                <span class="text-xs font-mono">Nivel: ${nivel}%</span>
+                                <span class="competencia-badge">${comp.codigo} ${comp.saber ? '📘' : '🛠️'}</span>
+                                <span class="text-xs font-mono">${nivel}%</span>
                             </div>
                             <p class="font-medium mt-1">${comp.nombre}</p>
                             <div class="mt-2">${comp.indicadores.map(i => `<span class="indicador-item">✓ ${i}</span>`).join('')}</div>
@@ -179,18 +215,16 @@
                     `;
                 });
                 document.getElementById('competencias-container').innerHTML = html;
-                actualizarSelectorCompetencias();
-            }
-
-            function actualizarSelectorCompetencias() {
+                
+                // Llenar selector
                 const select = document.getElementById('selector-competencia');
-                const perfil = perfilesMEP[estratoActual];
                 select.innerHTML = '<option value="">Cualquier competencia (automático)</option>';
                 perfil.competencias.forEach(comp => {
                     select.innerHTML += `<option value="${comp.codigo}">${comp.codigo} - ${comp.nombre}</option>`;
                 });
             }
 
+            // Actualizar UI de progreso
             function actualizarProgresoUI() {
                 const total = progreso.total || 0;
                 const correctas = progreso.correctas || 0;
@@ -200,73 +234,60 @@
                 document.getElementById('total-correctas').textContent = correctas;
                 document.getElementById('total-preguntas').textContent = total;
 
-                // Recomendación de refuerzo (competencias con nivel < 60)
                 const perfil = perfilesMEP[estratoActual];
                 const aReforzar = perfil.competencias.filter(c => (progreso.porCompetencia[c.codigo]?.nivel || 0) < 60).map(c => c.codigo);
-                if (aReforzar.length > 0) {
-                    document.getElementById('recomendacion-refuerzo').innerHTML = `📚 Reforzar: competencias ${aReforzar.join(', ')}`;
-                } else {
-                    document.getElementById('recomendacion-refuerzo').innerHTML = '✅ Buen nivel en todas las competencias.';
-                }
+                document.getElementById('recomendacion-refuerzo').innerHTML = aReforzar.length > 0 
+                    ? `📚 Reforzar: competencias ${aReforzar.join(', ')}`
+                    : '✅ Buen nivel en todas las competencias.';
             }
 
-            // --------------------------------------------------------------
-            // 4. ANÁLISIS AUTOMÁTICO DE DOCUMENTOS (RELACIÓN CON COMPETENCIAS)
-            // --------------------------------------------------------------
-            const palabrasClavePorCompetencia = {
-                '1.1': ['currículum', 'didáctica', 'metodología', 'pedagogía', 'STEAM', 'PNFT', 'guía docente', 'módulo', 'enseñanza', 'aprendizaje'],
-                '1.2': ['ley', 'artículo', 'reglamento', 'normativa', 'política', 'ética', 'código', 'estatuto', 'convención', '10159', '8292', '6227', '1581', '7494'],
-                '1.3': ['circular', 'lineamiento', 'organización', 'estructura', 'nivel central', 'regional', 'institucional', 'directriz'],
-                '2.1': ['plan', 'programa', 'proyecto', 'diseño', 'estrategia', 'PPPJ', 'marco estratégico'],
-                '2.3': ['tecnología', 'TIC', 'digital', 'innovación', 'MITDE', 'gobernanza', 'transformación digital', 'inteligencia artificial']
-            };
-
-            function analizarDocumento(nombre, contenido) {
-                const textoCompleto = (nombre + ' ' + contenido).toLowerCase();
-                const competenciasRelacionadas = [];
-                for (let [codigo, keywords] of Object.entries(palabrasClavePorCompetencia)) {
-                    let peso = 0;
-                    keywords.forEach(kw => { if (textoCompleto.includes(kw)) peso++; });
-                    if (peso > 0) competenciasRelacionadas.push(codigo);
-                }
-                return competenciasRelacionadas;
-            }
-
-            // --------------------------------------------------------------
-            // 5. CARGA DE DOCUMENTOS
-            // --------------------------------------------------------------
-            document.getElementById('carpeta-docs').addEventListener('change', async function(e) {
-                const archivos = Array.from(e.target.files).filter(f => f.name.endsWith('.txt'));
+            // Carga de documentos (PDF + TXT)
+            document.getElementById('carga-docs').addEventListener('change', async function(e) {
+                const archivos = Array.from(e.target.files);
                 documentos = [];
                 const listaDiv = document.getElementById('lista-docs');
+                const progresoDiv = document.getElementById('progreso-carga');
                 listaDiv.innerHTML = '';
                 
-                for (let archivo of archivos) {
-                    const texto = await archivo.text();
-                    const contenidoLimpio = texto.replace(/[^\w\sáéíóúñü.,;:()\-"'\n\r]/g, ' ').replace(/\s+/g, ' ').toLowerCase();
-                    const analisis = analizarDocumento(archivo.name, contenidoLimpio);
-                    documentos.push({
-                        nombre: archivo.name,
-                        contenido: contenidoLimpio,
-                        competencias: analisis
-                    });
-                    listaDiv.innerHTML += `<div class="py-1 border-b text-xs">📄 ${archivo.name} → <span class="font-mono">[${analisis.join(', ') || 'sin clasificar'}]</span></div>`;
+                for (let i = 0; i < archivos.length; i++) {
+                    const archivo = archivos[i];
+                    progresoDiv.innerHTML = `Procesando ${i+1}/${archivos.length}: ${archivo.name}...`;
+                    
+                    try {
+                        let contenido = '';
+                        if (archivo.name.toLowerCase().endsWith('.pdf')) {
+                            contenido = await leerPDF(archivo);
+                        } else {
+                            contenido = await archivo.text();
+                            contenido = contenido.toLowerCase().replace(/[^\w\sáéíóúñü]/g, ' ').replace(/\s+/g, ' ');
+                        }
+                        
+                        const competencias = clasificarDocumento(archivo.name, contenido);
+                        documentos.push({
+                            nombre: archivo.name,
+                            contenido: contenido,
+                            competencias: competencias
+                        });
+                        
+                        const badge = archivo.name.endsWith('.pdf') ? '<span class="pdf-badge ml-1">PDF</span>' : '';
+                        listaDiv.innerHTML += `<div class="py-1 border-b text-xs">📄 ${archivo.name} ${badge} → [${competencias.join(', ') || 'sin clasificar'}]</div>`;
+                    } catch (error) {
+                        listaDiv.innerHTML += `<div class="py-1 text-red-600">❌ Error con ${archivo.name}</div>`;
+                    }
                 }
+                
                 listaDiv.classList.remove('hidden');
+                progresoDiv.innerHTML = `✅ ${documentos.length} documentos procesados`;
             });
 
-            // --------------------------------------------------------------
-            // 6. GENERADOR DE PREGUNTAS POR COMPETENCIA
-            // --------------------------------------------------------------
+            // Generar pregunta
             function generarPregunta(competenciaElegida = null) {
                 if (documentos.length === 0) { alert('Cargue documentos primero'); return; }
 
-                // 1. Determinar competencia objetivo
                 let competenciaObj = null;
                 if (competenciaElegida) {
                     competenciaObj = perfilesMEP[estratoActual].competencias.find(c => c.codigo === competenciaElegida);
                 } else {
-                    // Elegir automática (con sesgo hacia las de menor nivel)
                     const comps = perfilesMEP[estratoActual].competencias;
                     const niveles = comps.map(c => progreso.porCompetencia[c.codigo]?.nivel || 0);
                     const minNivel = Math.min(...niveles);
@@ -275,43 +296,33 @@
                 }
                 if (!competenciaObj) return;
 
-                // 2. Buscar documentos relacionados con esa competencia
                 let docsRel = documentos.filter(d => d.competencias.includes(competenciaObj.codigo));
-                if (docsRel.length === 0) docsRel = documentos; // fallback
-
+                if (docsRel.length === 0) docsRel = documentos;
                 const doc = docsRel[Math.floor(Math.random() * docsRel.length)];
 
-                // 3. Extraer un fragmento
                 const oraciones = doc.contenido.split('.').filter(o => o.trim().length > 40);
                 if (oraciones.length === 0) return generarPregunta(competenciaElegida);
                 const fragmento = oraciones[Math.floor(Math.random() * oraciones.length)].trim();
 
-                // 4. Crear opciones según la competencia
-                let opciones, explicacion;
-                if (competenciaObj.codigo === '1.2') {
-                    opciones = ['Aplicar la normativa vigente (Leyes 10159, 8292, etc.)', 'Actuar según criterio personal', 'Consultar solo con colegas', 'Esperar directrices sin actuar'];
-                    explicacion = 'El marco jurídico establece obligaciones claras. Fundamente su respuesta en las leyes.';
-                } else if (competenciaObj.codigo === '2.3') {
-                    opciones = ['Usar el Modelo de Gobernanza TIC y la Guía MITDE', 'Implementar tecnología sin plan', 'Evitar herramientas digitales', 'Asesorar sin considerar transformación digital'];
-                    explicacion = 'La asesoría con TIC debe basarse en las políticas de transformación digital.';
-                } else {
-                    opciones = ['Opción A (correcta, basada en el documento)', 'Opción B (incorrecta)', 'Opción C (incorrecta)', 'Opción D (incorrecta)'];
-                    explicacion = 'La respuesta correcta se fundamenta en el documento analizado.';
-                }
+                // Opciones base (se pueden personalizar más)
+                const opciones = [
+                    'A) Aplicar la normativa o procedimiento establecido',
+                    'B) Actuar según criterio personal',
+                    'C) Consultar con colegas sin fundamento legal',
+                    'D) Esperar directrices sin actuar'
+                ];
 
                 return {
                     competencia: competenciaObj.codigo,
                     pregunta: `[Competencia ${competenciaObj.codigo}] Según "${doc.nombre}":\n"${fragmento.substring(0,200)}..."\n¿Cuál es la actuación correcta?`,
                     opciones: opciones,
                     correcta: 0,
-                    explicacion: explicacion,
+                    explicacion: `La respuesta correcta se fundamenta en el documento "${doc.nombre}". Revise el texto completo para más contexto.`,
                     documento: doc.nombre
                 };
             }
 
-            // --------------------------------------------------------------
-            // 7. AGREGAR PREGUNTA AL SIMULADOR
-            // --------------------------------------------------------------
+            // Agregar pregunta al simulador
             function agregarPregunta(p) {
                 const id = Date.now();
                 const container = document.getElementById('simulador-container');
@@ -327,7 +338,6 @@
                 `;
                 container.innerHTML = html + container.innerHTML;
 
-                // Evento de respuesta
                 document.querySelectorAll(`[name="p_${id}"]`).forEach(r => r.addEventListener('change', function(e) {
                     const card = this.closest('.pregunta-card');
                     const feedback = card.querySelector('.feedback');
@@ -343,7 +353,7 @@
                     progreso.porCompetencia[competencia].nivel = Math.round((progreso.porCompetencia[competencia].correctas / progreso.porCompetencia[competencia].total) * 100);
 
                     feedback.className = esCorrecta ? 'feedback-correcto text-sm block' : 'feedback-incorrecto text-sm block';
-                    feedback.innerHTML = esCorrecta ? `✅ Correcto! ${p.explicacion}` : `❌ Incorrecto. Respuesta correcta: ${p.opciones[correcta]}. ${p.explicacion}`;
+                    feedback.innerHTML = esCorrecta ? `✅ Correcto! ${p.explicacion}` : `❌ Incorrecto. ${p.explicacion}`;
                     
                     localStorage.setItem('progresoMEP', JSON.stringify(progreso));
                     renderizarCompetencias();
@@ -352,9 +362,7 @@
                 }));
             }
 
-            // --------------------------------------------------------------
-            // 8. EVENTOS
-            // --------------------------------------------------------------
+            // Eventos
             document.getElementById('selector-estrato').addEventListener('click', (e) => {
                 const btn = e.target.closest('.estrato-btn');
                 if (!btn) return;
@@ -366,8 +374,7 @@
 
             document.getElementById('btn-generar').addEventListener('click', () => {
                 const select = document.getElementById('selector-competencia');
-                const competenciaElegida = select.value || null;
-                const pregunta = generarPregunta(competenciaElegida);
+                const pregunta = generarPregunta(select.value || null);
                 if (pregunta) agregarPregunta(pregunta);
             });
 
