@@ -379,7 +379,7 @@
         }
 
         // ============================================
-        // FUNCIONES DE PROCESAMIENTO DE DOCUMENTOS
+        // FUNCIONES DE PROCESAMIENTO DE DOCUMENTOS (CORREGIDO)
         // ============================================
         async function procesarArchivoSeguro(archivo) {
             try {
@@ -393,15 +393,17 @@
                 }
                 
                 let contenido = '';
+                let paginas = 1;
                 
                 if (ext === 'pdf') {
                     const arrayBuffer = await archivo.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                    const maxPaginas = Math.min(pdf.numPages, 50);
+                    const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    paginas = pdfDoc.numPages;
+                    const maxPaginas = Math.min(pdfDoc.numPages, 50);
                     
                     for (let i = 1; i <= maxPaginas; i++) {
                         try {
-                            const page = await pdf.getPage(i);
+                            const page = await pdfDoc.getPage(i);
                             const content = await page.getTextContent();
                             contenido += content.items.map(item => item.str).join(' ') + ' ';
                         } catch (pageError) {
@@ -422,7 +424,7 @@
                     nombre: archivo.name,
                     contenido: contenido,
                     tamaño: archivo.size,
-                    paginas: ext === 'pdf' ? pdf.numPages : 1
+                    paginas: paginas
                 };
                 
             } catch (error) {
@@ -1116,7 +1118,7 @@
             });
         });
 
-        // Carga de documentos
+        // Carga de documentos (CORREGIDO)
         document.getElementById('carga-docs').addEventListener('change', async function(e) {
             const archivos = Array.from(e.target.files);
             documentos = [];
