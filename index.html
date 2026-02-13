@@ -485,27 +485,28 @@
             `;
             
             pregunta.opciones.forEach((op, idx) => {
+                // Limitar a 150 caracteres para vista previa, con tooltip para texto completo
+                const textoPreview = op.texto.length > 150 ? op.texto.substring(0, 150) + '...' : op.texto;
+                const textoCompleto = op.texto;
+                
                 html += `
-                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer"
+                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer relative group"
                            onclick="seleccionarOpcion(this, ${idx})">
-                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold">${String.fromCharCode(65 + idx)}</span>
-                        <span>${op.texto}</span>
+                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <span class="text-sm block">${textoPreview}</span>
+                            ${textoCompleto.length > 150 ? `
+                                <div class="hidden group-hover:block absolute left-0 right-0 bottom-full mb-2 p-4 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 max-w-lg whitespace-normal break-words">
+                                    <div class="font-bold mb-1 text-yellow-300">📄 Texto completo:</div>
+                                    ${textoCompleto}
+                                </div>
+                            ` : ''}
+                        </div>
                     </label>
                 `;
             });
-            
-            html += `
-                    </div>
-                    <button id="btn-responder" onclick="responderPregunta()" 
-                            class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold" disabled>
-                        Verificar
-                    </button>
-                </div>
-                <div id="feedback-duolingo" class="hidden mt-4"></div>
-            `;
-            
-            document.getElementById('pregunta-container').innerHTML = html;
-        }
 
         function seleccionarOpcion(label, idx) {
             document.querySelectorAll('#pregunta-container label').forEach(l => {
