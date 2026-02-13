@@ -1,644 +1,220 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 IDOMEP v1 · Sistema de Idoneidad</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- PDF.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <style>
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        .animate-pulse-slow {
-            animation: pulse 2s infinite;
-        }
-        .heart-full { color: #ef4444; }
-        .heart-empty { color: #d1d5db; }
-        .ruta-item {
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-        .ruta-item.disponible:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4);
-            border-color: #3b82f6;
-        }
-        .ruta-item.bloqueado {
-            opacity: 0.6;
-            filter: grayscale(0.5);
-            cursor: not-allowed;
-        }
-        .medalla {
-            transition: all 0.3s;
-            filter: grayscale(0.7);
-        }
-        .medalla.obtenida {
-            filter: grayscale(0);
-        }
-        .tab-button.active {
-            background: #2563eb;
-            color: white;
-        }
-        .feedback-card {
-            border-left-width: 4px;
-            transition: all 0.3s;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDOMEP PRO · Transitorio IX</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 font-sans min-h-screen">
 
-    <!-- BARRA SUPERIOR -->
-    <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-blue-100 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">🎓</span>
-                <span class="font-bold text-gray-800">IDOMEP <span class="text-blue-600">v1</span></span>
-            </div>
-            <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
-                <button data-tab="inicio" class="tab-button px-4 py-1.5 rounded-lg text-sm font-medium transition active">
-                    <i class="fa-regular fa-house"></i> Inicio
-                </button>
-                <button data-tab="duolingo" class="tab-button px-4 py-1.5 rounded-lg text-sm font-medium transition">
-                    <i class="fa-regular fa-gamepad"></i> IdoMep v1
-                </button>
-            </div>
-        </div>
-    </div>
+<body class="bg-slate-100 min-h-screen p-6">
 
-    <div class="max-w-7xl mx-auto p-4">
-        
-        <!-- TAB INICIO -->
-        <div id="tab-inicio" class="tab-content block">
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 border-l-8 border-blue-600">
-                <h2 class="text-2xl font-bold mb-2">📚 Sistema de Estudio MEP</h2>
-                <p class="text-gray-600">Cargue sus documentos, seleccione su estrato y practique por competencias.</p>
-                <div class="mt-3 text-sm bg-blue-50 p-3 rounded-lg">
-                    <span class="font-medium">Fundamento:</span> LMEP N.º 10159 · Ley N.º9871 · Resolución DG-RES-88-2023 · Calificación mínima 70
-                </div>
-            </div>
+<!-- HEADER -->
+<div class="bg-indigo-700 text-white p-6 rounded-xl shadow-lg mb-6">
+<h1 class="text-3xl font-bold">🎓 IDOMEP PRO</h1>
+<p class="text-sm mt-2">
+Transitorio IX · Estratos Título II · Calificación mínima 70
+</p>
 
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                <h3 class="font-bold text-lg mb-4">🎯 Seleccione su estrato</h3>
-                <div class="flex flex-wrap gap-3" id="selector-estrato-inicio">
-                    <button data-estrato="docente" class="estrato-btn px-5 py-2.5 rounded-full bg-slate-100 hover:bg-blue-100 transition font-medium">Propiamente Docente</button>
-                    <button data-estrato="tecnico" class="estrato-btn px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition font-medium">Técnico Docente (Asesores)</button>
-                    <button data-estrato="administrativo" class="estrato-btn px-5 py-2.5 rounded-full bg-slate-100 hover:bg-blue-100 transition font-medium">Administrativo Docente</button>
-                </div>
-            </div>
+<div class="mt-3 text-xs bg-white/20 p-3 rounded-lg">
+Fundamento: Art.2 RPCID · Art.5 inc l) LMEP 10159 · Ley 9871 · DG-RES-88-2023
+</div>
 
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                <h3 class="font-bold text-lg mb-4">📁 Documentos de estudio (PDF o TXT)</h3>
-                <p class="text-sm text-amber-600 mb-3">⚠️ Seleccione todos sus archivos. El sistema los leerá automáticamente.</p>
-                <input type="file" id="carga-docs" multiple accept=".pdf,.txt" class="mb-4 w-full p-2 border rounded-lg">
-                <div id="lista-docs" class="text-sm max-h-40 overflow-y-auto bg-slate-50 p-3 rounded-lg hidden"></div>
-            </div>
+<div class="mt-3 flex gap-3 text-sm">
+<a href="https://dgth.mep.go.cr/pruebas-de-idoneidad-transitorio-ix/"
+target="_blank"
+class="bg-white text-indigo-700 px-3 py-1 rounded font-semibold">
+Tablas DGTH
+</a>
 
-            <div class="grid grid-cols-1 gap-6">
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-bold text-lg mb-4">📋 Competencias del estrato</h3>
-                    <div id="competencias-container" class="space-y-3"></div>
-                </div>
-            </div>
-        </div>
+<a href="https://notebooklm.google.com/notebook/1d7bd2c4-bc5c-43bb-b65d-62275a44c58f"
+target="_blank"
+class="bg-yellow-400 text-black px-3 py-1 rounded font-semibold">
+NotebookLM Lecturas
+</a>
+</div>
+</div>
 
-        <!-- TAB DUOLINGO -->
-        <div id="tab-duolingo" class="tab-content hidden">
-            
-            <!-- Panel superior gamificado -->
-            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl shadow-xl p-6 mb-6 text-white">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
-                            <span class="text-4xl">🎮</span>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl md:text-3xl font-black">IDOMEP <span class="text-yellow-300">v1</span></h2>
-                            <p class="text-blue-100">Domina competencias · Gana medallas</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-6">
-                        <div class="text-center">
-                            <div class="text-sm opacity-90">NIVEL</div>
-                            <div class="text-3xl font-bold" id="nivel-duolingo">1</div>
-                            <div class="text-xs bg-white/20 px-2 py-0.5 rounded-full mt-1" id="rango-duolingo">Aspirante</div>
-                        </div>
-                        <div class="w-32 flex flex-col justify-center">
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>XP</span>
-                                <span><span id="xp-duolingo">0</span>/200</span>
-                            </div>
-                            <div class="w-full bg-white/30 h-3 rounded-full overflow-hidden">
-                                <div class="bg-yellow-400 h-3 rounded-full" id="barra-xp-duolingo" style="width:0%"></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1 text-2xl" id="vidas-duolingo">
-                            <span class="heart-full">❤️</span>
-                            <span class="heart-full">❤️</span>
-                            <span class="heart-full">❤️</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- SELECTOR ESTRATO -->
+<div class="bg-white p-4 rounded-xl shadow mb-6">
+<h2 class="font-bold mb-3">Seleccione su Estrato</h2>
+<select id="estratoSelect" class="border p-2 rounded w-full">
+<option value="tecnico">Técnico Docente</option>
+<option value="docente">Propiamente Docente</option>
+<option value="administrativo">Administrativo Docente</option>
+</select>
+</div>
 
-            <!-- Mapa de ruta -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
-                <h3 class="font-bold text-lg mb-4">🗺️ Ruta de dominio</h3>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="ruta-container"></div>
-            </div>
+<!-- PROGRESO -->
+<div class="bg-white p-4 rounded-xl shadow mb-6">
+<h2 class="font-bold mb-3">Mi Progreso</h2>
+<div class="bg-slate-200 rounded-full h-3">
+<div id="barraProgreso" class="bg-green-500 h-3 rounded-full" style="width:0%"></div>
+</div>
+<p class="text-sm mt-2">
+Dominio general: <span id="nivelGeneral">0%</span>
+</p>
+</div>
 
-            <!-- Medallas -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
-                <h3 class="font-bold text-lg mb-4">🏅 Medallas</h3>
-                <div class="grid grid-cols-3 md:grid-cols-6 gap-3" id="medallas-container"></div>
-            </div>
+<!-- MODULOS -->
+<div class="bg-white p-4 rounded-xl shadow mb-6">
+<h2 class="font-bold mb-4">Ruta por Competencias</h2>
+<div id="modulosContainer" class="space-y-2"></div>
+</div>
 
-            <!-- Área de juego -->
-            <div class="bg-white rounded-2xl shadow-xl p-6">
-                <div id="pregunta-header" class="flex justify-between items-center mb-4">
-                    <div>
-                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium" id="competencia-actual-tag">
-                            📘 1.1 Área disciplinar
-                        </span>
-                        <span class="ml-2 text-xs text-gray-500" id="nivel-pregunta-tag">🟢 Conceptual</span>
-                    </div>
-                </div>
-                
-                <div id="pregunta-container" class="min-h-[300px]">
-                    <div class="text-center text-gray-500 py-12">
-                        <i class="fa-regular fa-circle-play text-4xl mb-3"></i>
-                        <p>Seleccione una competencia en la ruta para comenzar</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- AREA PREGUNTA -->
+<div class="bg-white p-6 rounded-xl shadow mb-6">
+<h2 class="font-bold mb-4">Simulador Oficial</h2>
+<div id="preguntaArea"></div>
+</div>
 
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+<!-- BOTON JUEGO -->
+<div class="text-center">
+<button onclick="activarJuego()"
+class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-lg font-bold">
+🎮 Jugar IdoMep
+</button>
+</div>
 
-        // ============================================
-        // BANCO DE PREGUNTAS COMPLETO
-        // ============================================
-        const bancoPreguntas = {
-            '1.1': {
-                conceptual: [
-                    {
-                        id: '1.1_c1',
-                        texto: 'Según las guías docentes del MEP, ¿cuál es el propósito principal de las metodologías activas?',
-                        opciones: [
-                            { texto: 'Promover la participación activa y el aprendizaje significativo', correcta: true, 
-                              fundamento: 'Guías docentes MEP: "Las metodologías activas buscan que el estudiante construya su aprendizaje"',
-                              errorComun: 'Confundir con metodologías tradicionales' },
-                            { texto: 'Mantener el orden en el aula', correcta: false,
-                              fundamento: 'El orden es un medio, no el propósito',
-                              errorComun: 'Enfocarse en lo administrativo' },
-                            { texto: 'Cumplir con el programa exactamente', correcta: false,
-                              fundamento: 'El programa es una guía, no un fin en sí mismo',
-                              errorComun: 'Rigidez curricular' },
-                            { texto: 'Evaluar más fácilmente', correcta: false,
-                              fundamento: 'La evaluación es parte del proceso, no el propósito',
-                              errorComun: 'Visión reduccionista' }
-                        ],
-                        articulos: [{ doc: 'Guía docente FT-Primaria.pdf', art: 'Capítulo 3' }],
-                        nivel: 'conceptual',
-                        xp: 10
-                    }
-                ],
-                aplicado: [
-                    {
-                        id: '1.1_a1',
-                        texto: 'Un docente de secundaria implementa Design Thinking pero los estudiantes no logran empatizar. ¿Qué debe recomendar como asesor?',
-                        opciones: [
-                            { texto: 'Revisar la fase de empatía con actividades de sensibilización', correcta: true,
-                              fundamento: 'Design Thinking: la empatía es la base del proceso',
-                              errorComun: 'Saltarse etapas del método' },
-                            { texto: 'Cambiar directamente a otra metodología', correcta: false,
-                              fundamento: 'El problema no es la metodología sino su aplicación',
-                              errorComun: 'Abandonar ante la primera dificultad' },
-                            { texto: 'Continuar con las siguientes fases', correcta: false,
-                              fundamento: 'No se puede avanzar sin empatía',
-                              errorComun: 'Ignorar problemas de base' },
-                            { texto: 'Reducir la exigencia del proyecto', correcta: false,
-                              fundamento: 'Se debe ajustar el proceso, no bajar estándares',
-                              errorComun: 'Conformismo' }
-                        ],
-                        articulos: [{ doc: 'Design Thinking 1.pdf', art: 'Fase 1: Empatía' }],
-                        nivel: 'aplicado',
-                        xp: 15
-                    }
-                ],
-                normativo: [
-                    {
-                        id: '1.1_n1',
-                        texto: '¿Qué artículo de la Ley 10159 establece la idoneidad como requisito para la carrera docente?',
-                        opciones: [
-                            { texto: 'Artículo 5, inciso l', correcta: true,
-                              fundamento: 'Ley 10159 Art.5: "La idoneidad comprobada es requisito para el ingreso"',
-                              errorComun: 'Confundir con otros artículos' },
-                            { texto: 'Artículo 15, inciso d', correcta: false,
-                              fundamento: 'Ese artículo habla de procedimientos de selección',
-                              errorComun: 'Ubicación incorrecta' },
-                            { texto: 'Artículo 55 del Estatuto', correcta: false,
-                              fundamento: 'El Estatuto es ley 1581, no 10159',
-                              errorComun: 'Confundir leyes' },
-                            { texto: 'Artículo 8 de la Ley 8292', correcta: false,
-                              fundamento: 'Esa es la Ley de Control Interno',
-                              errorComun: 'Mezclar normativas' }
-                        ],
-                        articulos: [{ doc: 'Ley 10159.pdf', art: 'Art.5' }],
-                        nivel: 'normativo',
-                        xp: 20
-                    }
-                ]
-            },
-            '1.2': {
-                conceptual: [
-                    {
-                        id: '1.2_c1',
-                        texto: '¿Qué establece la Ley 8292 sobre el control interno?',
-                        opciones: [
-                            { texto: 'Obligación del jerarca de implementar sistemas de control', correcta: true,
-                              fundamento: 'Ley 8292 Art.8: "El jerarca debe velar por el control interno"',
-                              errorComun: 'Creer que es responsabilidad exclusiva de auditoría' },
-                            { texto: 'Es potestativo del jerarca', correcta: false,
-                              fundamento: 'Es obligatorio, no opcional',
-                              errorComun: 'Discrecionalidad mal entendida' },
-                            { texto: 'Solo aplica para recursos financieros', correcta: false,
-                              fundamento: 'Aplica a todos los procesos institucionales',
-                              errorComun: 'Visión reduccionista' },
-                            { texto: 'Es responsabilidad de la auditoría externa', correcta: false,
-                              fundamento: 'La auditoría supervisa, no ejecuta',
-                              errorComun: 'Delegar responsabilidad' }
-                        ],
-                        articulos: [{ doc: 'ley 8292.docx', art: 'Art.8' }],
-                        nivel: 'conceptual',
-                        xp: 10
-                    }
-                ],
-                aplicado: [
-                    {
-                        id: '1.2_a1',
-                        texto: 'Un director omite procedimientos de control interno en compras. ¿Qué artículo de la Ley 8292 se vulnera principalmente?',
-                        opciones: [
-                            { texto: 'Artículo 8 (Deberes del jerarca)', correcta: true,
-                              fundamento: 'Establece la obligación de velar por el control interno',
-                              errorComun: 'Enfocarse en artículos sancionatorios' },
-                            { texto: 'Artículo 16 (Medidas correctivas)', correcta: false,
-                              fundamento: 'Aplica cuando ya se detectó la falta',
-                              errorComun: 'Confundir deber con sanción' },
-                            { texto: 'Artículo 12 (Sistema de control)', correcta: false,
-                              fundamento: 'Es complementario, pero el deber principal es Art.8',
-                              errorComun: 'No identificar el deber primario' },
-                            { texto: 'Artículo 4 (Principios)', correcta: false,
-                              fundamento: 'Es muy general, no específico',
-                              errorComun: 'Quedarse en principios' }
-                        ],
-                        articulos: [{ doc: 'ley 8292.docx', art: 'Art.8' }],
-                        nivel: 'aplicado',
-                        xp: 15
-                    }
-                ],
-                normativo: [
-                    {
-                        id: '1.2_n1',
-                        texto: '¿Cuál es el artículo exacto de la Ley 10159 que menciona la idoneidad comprobada?',
-                        opciones: [
-                            { texto: 'Artículo 5, inciso l: "Idoneidad comprobada mediante mecanismos técnicos"', correcta: true,
-                              fundamento: 'Texto literal de la ley',
-                              errorComun: 'Citar de memoria sin precisión' },
-                            { texto: 'Artículo 5, inciso m', correcta: false,
-                              fundamento: 'Ese inciso habla de igualdad de acceso',
-                              errorComun: 'Confundir incisos' },
-                            { texto: 'Artículo 15, inciso e', correcta: false,
-                              fundamento: 'Habla de procedimientos de selección',
-                              errorComun: 'Ubicación incorrecta' },
-                            { texto: 'Transitorio IX', correcta: false,
-                              fundamento: 'El transitorio no es un artículo',
-                              errorComun: 'Confundir partes de la ley' }
-                        ],
-                        articulos: [{ doc: 'Ley 10159.pdf', art: 'Art.5' }],
-                        nivel: 'normativo',
-                        xp: 20
-                    }
-                ]
-            }
-        };
+<!-- ================= SCRIPT ================= -->
 
-        // Ruta de competencias
-        const rutaDuolingo = [
-            { codigo: '1.1', nombre: 'Área disciplinar', tipo: '📘', estado: 'disponible' },
-            { codigo: '1.2', nombre: 'Marco jurídico', tipo: '📘', estado: 'bloqueado' },
-            { codigo: '1.3', nombre: 'Estructura MEP', tipo: '📘', estado: 'bloqueado' },
-            { codigo: '2.1', nombre: 'Diseño proyectos', tipo: '🛠️', estado: 'bloqueado' },
-            { codigo: '2.3', nombre: 'Liderazgo TIC', tipo: '🛠️', estado: 'bloqueado' }
-        ];
+<script>
 
-        // Estado gamificado
-        let estadoDuolingo = JSON.parse(localStorage.getItem('estadoDuolingo')) || {
-            '1.1': { xp: 0, vidas: 3, nivelActual: 'conceptual', correctasConsecutivas: 0, porcentaje: 0, preguntasDominadas: [], preguntasRespondidas: [] },
-            '1.2': { xp: 0, vidas: 3, nivelActual: 'conceptual', correctasConsecutivas: 0, porcentaje: 0, preguntasDominadas: [], preguntasRespondidas: [] },
-            '1.3': { xp: 0, vidas: 3, nivelActual: 'conceptual', correctasConsecutivas: 0, porcentaje: 0, preguntasDominadas: [], preguntasRespondidas: [] },
-            '2.1': { xp: 0, vidas: 3, nivelActual: 'conceptual', correctasConsecutivas: 0, porcentaje: 0, preguntasDominadas: [], preguntasRespondidas: [] },
-            '2.3': { xp: 0, vidas: 3, nivelActual: 'conceptual', correctasConsecutivas: 0, porcentaje: 0, preguntasDominadas: [], preguntasRespondidas: [] }
-        };
+// ================= ESTRUCTURA COMPETENCIAS =================
 
-        let progresoGlobal = JSON.parse(localStorage.getItem('progresoGlobal')) || { xpTotal: 0, nivel: 1 };
-        let competenciaActual = '1.1';
-        let preguntaActual = null;
+const perfiles = {
+tecnico: [
+'1.1','1.2','1.3','1.4',
+'2.1','2.2','2.3','2.4'
+],
+docente: [
+'1.1','1.2','1.3',
+'2.1','2.2','2.3'
+],
+administrativo: [
+'1.1','1.2','1.3','1.4','1.5',
+'2.1','2.2','2.3','2.4','2.5'
+]
+};
 
-        // ============================================
-        // FUNCIONES
-        // ============================================
-        
-        function renderizarRuta() {
-            const container = document.getElementById('ruta-container');
-            let html = '';
-            
-            rutaDuolingo.forEach(item => {
-                const estado = estadoDuolingo[item.codigo];
-                const clase = item.estado === 'disponible' ? 'disponible' : 'bloqueado';
-                
-                html += `
-                    <div class="ruta-item ${clase} bg-slate-50 p-4 rounded-xl text-center" data-codigo="${item.codigo}">
-                        <div class="text-3xl mb-2">${item.tipo}</div>
-                        <div class="font-bold text-sm">${item.codigo}</div>
-                        <div class="text-xs text-gray-600 mb-2">${item.nombre}</div>
-                        ${item.estado === 'disponible' ? `
-                            <div class="w-full bg-gray-200 h-1 rounded-full mt-2">
-                                <div class="bg-blue-600 h-1 rounded-full" style="width: ${estado.porcentaje || 0}%"></div>
-                            </div>
-                            <div class="text-xs mt-1">${estado.preguntasDominadas.length}/5</div>
-                        ` : `
-                            <div class="text-xs text-gray-400 mt-2">🔒 Bloqueado</div>
-                        `}
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            document.querySelectorAll('.ruta-item.disponible').forEach(item => {
-                item.addEventListener('click', function() {
-                    competenciaActual = this.dataset.codigo;
-                    cargarPregunta();
-                });
-            });
-        }
+// ================= BANCO DEMO (caso contextualizado) =================
 
-        function actualizarUIDuolingo() {
-            const xp = progresoGlobal.xpTotal || 0;
-            const nivel = Math.floor(xp / 200) + 1;
-            const xpNivel = xp % 200;
-            
-            document.getElementById('nivel-duolingo').textContent = nivel;
-            document.getElementById('xp-duolingo').textContent = xpNivel;
-            document.getElementById('barra-xp-duolingo').style.width = (xpNivel / 200 * 100) + '%';
-            
-            const rangos = ['Aspirante', 'Asesor en formación', 'Asesor profesional', 'Asesor experto'];
-            document.getElementById('rango-duolingo').textContent = rangos[Math.min(nivel-1, rangos.length-1)] || 'Leyenda';
-            
-            const vidas = estadoDuolingo[competenciaActual]?.vidas || 3;
-            let vidasHtml = '';
-            for (let i = 0; i < 3; i++) {
-                vidasHtml += `<span class="${i < vidas ? 'heart-full' : 'heart-empty'} text-2xl">❤️</span>`;
-            }
-            document.getElementById('vidas-duolingo').innerHTML = vidasHtml;
-        }
+const banco = {
+'1.2': [
+{
+texto: 'Un asesor debe aplicar normativa vinculante en un proceso institucional. ¿Qué debe hacer?',
+opciones:[
+{t:'Aplicar LMEP 10159 y RPCID según el caso',c:true},
+{t:'Actuar por costumbre',c:false},
+{t:'Consultar solo al director',c:false},
+{t:'Esperar instrucciones informales',c:false}
+],
+fundamento:'Art.5 LMEP 10159 · Art.2 RPCID'
+}
+]
+};
 
-        function cargarPregunta() {
-            const estado = estadoDuolingo[competenciaActual];
-            const banco = bancoPreguntas[competenciaActual];
-            
-            if (!banco) {
-                document.getElementById('pregunta-container').innerHTML = `
-                    <div class="text-center text-gray-500 py-12">
-                        <p>Banco de preguntas en desarrollo para esta competencia</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let nivelPregunta = estado.nivelActual;
-            const preguntasDisponibles = banco[nivelPregunta]?.filter(p => !estado.preguntasRespondidas.includes(p.id)) || [];
-            
-            if (preguntasDisponibles.length === 0) {
-                estado.preguntasRespondidas = [];
-                cargarPregunta();
-                return;
-            }
-            
-            preguntaActual = preguntasDisponibles[Math.floor(Math.random() * preguntasDisponibles.length)];
-            
-            document.getElementById('competencia-actual-tag').innerHTML = `
-                ${rutaDuolingo.find(r => r.codigo === competenciaActual).tipo} ${competenciaActual} 
-                ${rutaDuolingo.find(r => r.codigo === competenciaActual).nombre}
-            `;
-            
-            const nivelesEtiqueta = { conceptual: '🟢 Conceptual', aplicado: '🟡 Aplicado', normativo: '🔴 Normativo' };
-            document.getElementById('nivel-pregunta-tag').textContent = nivelesEtiqueta[nivelPregunta];
-            
-            let html = `
-                <div class="pregunta-card">
-                    <p class="text-lg font-medium mb-6">${preguntaActual.texto}</p>
-                    <div class="space-y-3 mb-6">
-            `;
-            
-            preguntaActual.opciones.forEach((op, idx) => {
-                html += `
-                    <label class="flex items-start gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition"
-                           onclick="seleccionarOpcion(this, ${idx})">
-                        <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-sm">
-                            ${String.fromCharCode(65 + idx)}
-                        </span>
-                        <span class="flex-1">${op.texto}</span>
-                    </label>
-                `;
-            });
-            
-            html += `
-                    </div>
-                    <button id="btn-responder" onclick="responderPregunta()" 
-                            class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 
-                                   disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        Verificar respuesta
-                    </button>
-                </div>
-                <div id="feedback-duolingo" class="hidden mt-4"></div>
-            `;
-            
-            document.getElementById('pregunta-container').innerHTML = html;
-        }
+// ================= ESTADO =================
 
-        function seleccionarOpcion(label, idx) {
-            document.querySelectorAll('#pregunta-container label').forEach(l => {
-                l.classList.remove('bg-blue-100', 'border-blue-500');
-                l.querySelector('span:first-child').classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
-            });
-            
-            label.classList.add('bg-blue-100', 'border-blue-500');
-            label.querySelector('span:first-child').classList.add('bg-blue-600', 'text-white', 'border-blue-600');
-            
-            document.getElementById('btn-responder').disabled = false;
-            window.opcionSeleccionada = idx;
-        }
+let estado = JSON.parse(localStorage.getItem('idomepEstado')) || {
+estrato:'tecnico',
+competenciaActiva:null,
+progreso:{}
+};
 
-        function responderPregunta() {
-            if (window.opcionSeleccionada === undefined || !preguntaActual) return;
-            
-            const opcionElegida = preguntaActual.opciones[window.opcionSeleccionada];
-            const estado = estadoDuolingo[competenciaActual];
-            const esCorrecta = opcionElegida.correcta;
-            
-            estado.preguntasRespondidas.push(preguntaActual.id);
-            
-            if (esCorrecta) {
-                estado.preguntasDominadas.push(preguntaActual.id);
-                estado.correctasConsecutivas++;
-                estado.xp += preguntaActual.xp;
-                progresoGlobal.xpTotal += preguntaActual.xp;
-            } else {
-                estado.vidas--;
-                estado.correctasConsecutivas = 0;
-            }
-            
-            estado.porcentaje = (estado.preguntasDominadas.length / estado.preguntasRespondidas.length) * 100;
-            
-            localStorage.setItem('estadoDuolingo', JSON.stringify(estadoDuolingo));
-            localStorage.setItem('progresoGlobal', JSON.stringify(progresoGlobal));
-            
-            const feedback = document.getElementById('feedback-duolingo');
-            let html = `
-                <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 ${esCorrecta ? 'border-green-500' : 'border-red-500'} feedback-card">
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl">${esCorrecta ? '✅' : '❌'}</div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg mb-2">${esCorrecta ? '¡Correcto!' : 'Incorrecto'}</h4>
-            `;
-            
-            if (esCorrecta) {
-                html += `
-                    <div class="bg-green-50 p-4 rounded-lg mb-4">
-                        <p class="font-medium text-green-800 mb-2">⚖️ Fundamento:</p>
-                        <p>${opcionElegida.fundamento}</p>
-                        ${preguntaActual.articulos.map(a => `
-                            <p class="text-sm mt-2 font-mono">📄 ${a.doc} - ${a.art}</p>
-                        `).join('')}
-                    </div>
-                `;
-            } else {
-                const correcta = preguntaActual.opciones.find(o => o.correcta);
-                html += `
-                    <div class="bg-red-50 p-4 rounded-lg mb-4">
-                        <p class="font-medium text-red-800 mb-2">❌ Error común:</p>
-                        <p>${opcionElegida.errorComun}</p>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <p class="font-medium text-green-800 mb-2">✅ Respuesta correcta:</p>
-                        <p>${correcta.texto}</p>
-                        <p class="text-sm mt-2">${correcta.fundamento}</p>
-                        ${preguntaActual.articulos.map(a => `
-                            <p class="text-sm mt-2 font-mono">📄 ${a.doc} - ${a.art}</p>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
-            html += `
-                            <button onclick="siguientePregunta()" 
-                                    class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
-                                Continuar →
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            feedback.innerHTML = html;
-            feedback.classList.remove('hidden');
-            
-            document.getElementById('btn-responder').disabled = true;
-            actualizarUIDuolingo();
-            renderizarRuta();
-            
-            if (estado.preguntasDominadas.length >= 5 && estado.porcentaje >= 80 && estado.correctasConsecutivas >= 2) {
-                const index = rutaDuolingo.findIndex(r => r.codigo === competenciaActual);
-                if (index < rutaDuolingo.length - 1) {
-                    rutaDuolingo[index + 1].estado = 'disponible';
-                }
-            }
-        }
+document.getElementById('estratoSelect').value = estado.estrato;
 
-        function siguientePregunta() {
-            document.getElementById('feedback-duolingo').classList.add('hidden');
-            cargarPregunta();
-        }
+// ================= RENDER MODULOS =================
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
-        
-        // Tabs
-        document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                const tab = this.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-                document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            });
-        });
+function renderModulos(){
+const cont = document.getElementById('modulosContainer');
+cont.innerHTML='';
 
-        // Competencias de inicio
-        const perfilesMEP = {
-            tecnico: {
-                competencias: [
-                    { codigo: '1.1', nombre: 'Área disciplinar, pedagógica y curricular', saber: true,
-                      indicadores: ['Domina su disciplina', 'Asesora sobre actualizaciones curriculares', 'Fundamenta con teorías pedagógicas'] },
-                    { codigo: '1.2', nombre: 'Marco jurídico, ético y políticas públicas', saber: true,
-                      indicadores: ['Aplica Política Educativa', 'Interpreta normativa vinculante'] },
-                    { codigo: '1.3', nombre: 'Estructura organizacional del MEP', saber: true,
-                      indicadores: ['Coordina entre niveles', 'Deriva consultas'] },
-                    { codigo: '2.1', nombre: 'Diseño de planes, programas y proyectos', saber: false,
-                      indicadores: ['Elabora proyectos', 'Diseña estrategias'] },
-                    { codigo: '2.3', nombre: 'Liderazgo, asesoría y TIC', saber: false,
-                      indicadores: ['Usa plataformas digitales', 'Promueve innovación'] }
-                ]
-            }
-        };
+const lista = perfiles[estado.estrato];
 
-        function renderizarCompetenciasInicio() {
-            const perfil = perfilesMEP.tecnico;
-            let html = '';
-            
-            perfil.competencias.forEach(comp => {
-                html += `
-                    <div class="p-3 bg-slate-50 rounded-lg border-l-4 border-blue-500">
-                        <span class="text-xs font-mono ${comp.saber ? 'bg-blue-200' : 'bg-green-200'} px-2 py-1 rounded-full">
-                            ${comp.saber ? 'SABER' : 'HACER'}
-                        </span>
-                        <span class="font-medium block mt-1">${comp.codigo} ${comp.nombre}</span>
-                        <div class="mt-2 flex flex-wrap gap-1">
-                            ${comp.indicadores.map(i => `<span class="text-xs bg-white px-2 py-1 rounded-full">✓ ${i}</span>`).join('')}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('competencias-container').innerHTML = html;
-        }
+lista.forEach((comp,i)=>{
+const bloqueado = i>0 && !estado.progreso[lista[i-1]];
+cont.innerHTML+=`
+<div class="p-3 rounded ${bloqueado?'bg-gray-200':'bg-green-100'} cursor-pointer"
+onclick="${bloqueado?'':'activarCompetencia(\''+comp+'\')'}">
+Competencia ${comp} ${bloqueado?'🔒':'✅'}
+</div>
+`;
+});
+}
 
-        renderizarCompetenciasInicio();
-        renderizarRuta();
-        actualizarUIDuolingo();
-    </script>
+renderModulos();
+
+// ================= ACTIVAR COMPETENCIA =================
+
+function activarCompetencia(c){
+estado.competenciaActiva=c;
+cargarPregunta();
+}
+
+// ================= CARGAR PREGUNTA =================
+
+function cargarPregunta(){
+
+const comp=estado.competenciaActiva;
+const area=document.getElementById('preguntaArea');
+
+if(!banco[comp]){
+area.innerHTML='<p>No hay preguntas cargadas aún para esta competencia.</p>';
+return;
+}
+
+const pregunta=banco[comp][0];
+
+let html=`<p class="font-bold mb-3">${pregunta.texto}</p>`;
+
+pregunta.opciones.forEach((op,i)=>{
+html+=`
+<div class="mb-2 cursor-pointer p-2 border rounded"
+onclick="responder(${i})">
+${op.t}
+</div>`;
+});
+
+area.innerHTML=html;
+window.preguntaActual=pregunta;
+}
+
+// ================= RESPONDER =================
+
+function responder(i){
+const correcta=window.preguntaActual.opciones[i].c;
+
+if(correcta){
+alert("✅ Correcto\n"+window.preguntaActual.fundamento);
+estado.progreso[estado.competenciaActiva]=true;
+actualizarProgreso();
+renderModulos();
+}else{
+alert("❌ Incorrecto\nRevisar fundamento legal.");
+}
+localStorage.setItem('idomepEstado',JSON.stringify(estado));
+}
+
+// ================= PROGRESO =================
+
+function actualizarProgreso(){
+const total=perfiles[estado.estrato].length;
+const completadas=Object.keys(estado.progreso).length;
+const porcentaje=Math.round((completadas/total)*100);
+document.getElementById('barraProgreso').style.width=porcentaje+'%';
+document.getElementById('nivelGeneral').innerText=porcentaje+'%';
+}
+
+actualizarProgreso();
+
+// ================= MODO JUEGO =================
+
+function activarJuego(){
+alert("Modo juego activado 🎮\nResponda correctamente para avanzar en la ruta.");
+}
+
+</script>
+
 </body>
 </html>
